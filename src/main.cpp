@@ -3,7 +3,7 @@
 bool quit = false;
 screens screen = TITLE_SCREEN;
 bool isrunning = true;
- 
+//bool Fullscreen=false; 
 int main(int argc, char const *argv[]) {
       if (!init()) {
             printf("initialization failed\n");

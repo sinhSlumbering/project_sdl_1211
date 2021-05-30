@@ -141,6 +141,22 @@ bool checkCol(SDL_Rect* a, SDL_Rect* b)
 
 }
 
+bool fullscreen=false;
+void toggleFullscreen()
+{
+      if( fullscreen )
+		{
+			SDL_SetWindowFullscreen( win, SDL_FALSE );
+			fullscreen = false;
+		}
+		else
+		{
+			SDL_SetWindowFullscreen( win, SDL_TRUE );
+			fullscreen = true;
+			//mMinimized = false;
+		}
+}
+
 void Error(const std::string msg) {
       printf("%s Error: %s\n", msg, SDL_GetError());
 }
@@ -316,7 +332,7 @@ void close() {
       SDL_DestroyTexture(exitB);
       exitB = NULL;
       SDL_DestroyTexture(playertex);
-      playertex=NULL:
+      playertex=NULL;
       SDL_DestroyTexture(bosstex);
       bosstex=NULL;
       SDL_DestroyRenderer(ren);
@@ -367,6 +383,7 @@ void titlescreen() {
                   screen = MAIN_MENU;
             else if (e.type == SDL_MOUSEBUTTONDOWN)
                   screen = MAIN_MENU;
+            
       }
 }
  
@@ -400,6 +417,9 @@ void main_menue() {
                   quit = true;
             else if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
+                        case SDLK_m:
+                              toggleFullscreen();
+                              break;
                         case SDLK_DOWN:
                               cursorupdate(step);
                               break;

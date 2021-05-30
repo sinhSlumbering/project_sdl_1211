@@ -107,5 +107,8 @@ struct Boss
       void render();
 };
 
+//preliminary window stuff
+//extern bool fullscreen=false;
+void toggleFullscreen();
 
 #endif
