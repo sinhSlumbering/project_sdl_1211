@@ -7,9 +7,9 @@ Player::Player()
       xPos = 0;
       yPos = SCREEN_HEIGHT/2-(width/2);
       angle = 0.0;
-      hbxX = xPos + hbspX;
-      hbxY = yPos + hbspY;
-      htbx = {SCREEN_WIDTH/60, SCREEN_HEIGHT/50, width/15, height/12}
+      htbx.x = xPos + hbspX;
+      htbx.y = yPos + hbspY;
+      htbx = {SCREEN_WIDTH/60, SCREEN_HEIGHT/50, width/15, height/12};
 };
 
 void Player::render()
@@ -37,26 +37,48 @@ void Player::handleEvent(SDL_Event* e)
       {
             switch(e->key.keysym.sym)
             {
-                  case SDLK_UP: y=-1; break; 
-                  case SDLK_DOWN: y=1; break;
-                  case SDLK_RIGHT: x=1; break;
-                  case SDLK_LEFT: x=-1; break;
+                  case SDLK_UP: y=-1, angle = 330.0; break; 
+                  case SDLK_DOWN: y=1, angle = 30.0; break;
+                  case SDLK_RIGHT: x=1, angle=0.0; break;
+                  case SDLK_LEFT: x=-1, angle=0.0; break;
             }
             
       }
      if(e->type==SDL_KEYUP)
       {
-            switch (e->key.keysym.sym)
+            angle=0.0;
+            /*switch (e->key.keysym.sym)
             {
                   case SDLK_UP: y=0; break;
                   case SDLK_DOWN: y=0; break;
                   case SDLK_RIGHT: x=0; break;
                   case SDLK_LEFT: x=0; break;
-            }
+            }*/
       }
       move(x, y);
 
 }
+
+Boss::Boss()
+{
+      xPos = SCREEN_WIDTH-width;
+      yPos = SCREEN_HEIGHT/3;
+      htbx={xPos, yPos, width, height};
+}
+void Boss::move()
+{
+      if((yPos<0)||(yPos + height>SCREEN_HEIGHT))
+            scrolldir*=-1;
+      yPos+=scrolldir*yVel;
+}
+void Boss::render()
+{
+      SDL_Rect renderQuad = {xPos, yPos, width, height};
+      SDL_RenderCopyEx(ren, bosstex, NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
+}
+
+Boss plane;
+
 
 int cursorHalfway = (SCREEN_WIDTH - (SCREEN_WIDTH / 20) - SCREEN_WIDTH / 6 - SCREEN_WIDTH / 40);
 SDL_Rect cursorDim = {cursorHalfway, SCREEN_HEIGHT / 20, SCREEN_WIDTH / 40, SCREEN_HEIGHT / 20};
@@ -80,7 +102,44 @@ SDL_Texture* resumeB;
 SDL_Texture* exitB;
 SDL_Texture* cursor;
 SDL_Texture* playertex;
+SDL_Texture* bosstex;
 
+
+bool checkCol(SDL_Rect* a, SDL_Rect* b)
+{
+      int leftA, leftB;
+      int rightA, rightB;
+      int topA, topB;
+      int downA, downB;
+
+      leftA = a->x;
+      rightA = a->x + a->w;
+      topA = a->y;
+      downA = a->y + a->h;
+
+      leftB = b->x;
+      rightB = b->x + b->w;
+      topB = b->y;
+      downB = b->y + b->h;
+      if( downA <= topB )
+      {
+          return false;
+      }     
+      if( topA >= downB )
+      {
+          return false;
+      }     
+      if( rightA <= leftB )
+      {
+          return false;
+      }     
+      if( leftA >= rightB )
+      {
+          return false;
+      }
+      else return true;
+
+}
 
 void Error(const std::string msg) {
       printf("%s Error: %s\n", msg, SDL_GetError());
@@ -207,6 +266,11 @@ bool loadMedia() {
             printf("failed to load player\n");
             success = false;
       }
+      bosstex = loadTex("assets/boss.png");
+      if(bosstex==NULL)
+      {
+            success = false;
+      }
       return success;
 }
  
@@ -252,7 +316,9 @@ void close() {
       SDL_DestroyTexture(exitB);
       exitB = NULL;
       SDL_DestroyTexture(playertex);
- 
+      playertex=NULL:
+      SDL_DestroyTexture(bosstex);
+      bosstex=NULL;
       SDL_DestroyRenderer(ren);
       ren = NULL;
       SDL_DestroyWindow(win);
@@ -388,6 +454,7 @@ void main_menue() {
  
 void gamestart() {
       Player player;
+      int lives = 3;
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Rect bgdim = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
@@ -406,7 +473,11 @@ void gamestart() {
                         
                   }
             }
+            if(lives<1) screen=MAIN_MENU, isrunning=false;
             player.render();
+            plane.render();
+            plane.move();
+            if(checkCol(&player.htbx, &plane.htbx)==true) printf("ouch\n"), lives--;
             SDL_RenderPresent(ren);
             SDL_Delay(1000 / 120);
       }

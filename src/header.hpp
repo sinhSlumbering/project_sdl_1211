@@ -38,6 +38,7 @@ bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey);
 bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim);
 void cursorupdate(int step);
 void cursorJump(int step);
+bool checkCol(SDL_Rect* a, SDL_Rect* b);
 void titlescreen();
 void main_menue();
 void high_score();
@@ -46,6 +47,7 @@ void pauseM();
 void about();
 void gamestart();
 void close();
+
  
 SDL_Texture* loadTex(std::string path);
  
@@ -65,6 +67,7 @@ extern SDL_Texture* resumeB;
 extern SDL_Texture* exitB;
 extern SDL_Texture* cursor;
 extern SDL_Texture* playertex;
+extern SDL_Texture* bosstex;
 
 struct Player
 {
@@ -72,6 +75,7 @@ struct Player
       static const int height = SCREEN_HEIGHT/8;
       static const int xStep = SCREEN_WIDTH/35;
       static const int yStep = SCREEN_HEIGHT/15;
+      static const int hbspX=SCREEN_WIDTH/60, hbspY=SCREEN_HEIGHT/50;
 
       SDL_Rect htbx;
       
@@ -84,5 +88,24 @@ struct Player
       void move(int x, int y);
       void render();
 };
+
+struct Boss
+{
+      static const int width = SCREEN_WIDTH/8;
+      static const int height = SCREEN_HEIGHT/3;
+      int xVel;
+      static const int yVel = SCREEN_HEIGHT/100;
+      int scrolldir=1;
+
+      SDL_Rect htbx;
+      
+      int xPos = SCREEN_WIDTH-width;
+      int yPos = SCREEN_HEIGHT/3;
+      Boss();
+
+      void move();
+      void render();
+};
+
 
 #endif
