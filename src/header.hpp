@@ -51,7 +51,7 @@ void close();
  
 SDL_Texture* loadTex(std::string path);
  
-extern SDL_Window* win;
+//extern SDL_Window* win;
 extern SDL_Renderer* ren;
 extern SDL_Texture* titleBG;
 extern SDL_Texture* mainMenuBG;
@@ -107,8 +107,32 @@ struct Boss
       void render();
 };
 
-//preliminary window stuff
-//extern bool fullscreen=false;
-void toggleFullscreen();
+struct gWindow
+{
+      gWindow();
+      
+      bool init();
+
+      SDL_Renderer* createRenderer();
+
+      void handleEvent(SDL_Event &e);
+
+      void free();
+      void toggleFullscreen();
+
+      int width;
+      int height;
+
+      bool mouseFocus;
+      bool keyboardFocus;
+      bool fullScreen;
+      bool minimized;
+      
+      SDL_Window* window;
+};
+
+
+
+
 
 #endif

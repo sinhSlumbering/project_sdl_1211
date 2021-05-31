@@ -78,6 +78,7 @@ void Boss::render()
 }
 
 Boss plane;
+gWindow win;
 
 
 int cursorHalfway = (SCREEN_WIDTH - (SCREEN_WIDTH / 20) - SCREEN_WIDTH / 6 - SCREEN_WIDTH / 40);
@@ -86,7 +87,7 @@ SDL_Rect pcursorDim = {SCREEN_WIDTH / 2 - SCREEN_WIDTH / 12 - SCREEN_WIDTH / 40,
 int menumax = 4 * SCREEN_HEIGHT / 10, pmenumax = SCREEN_HEIGHT / 3 + 2 * SCREEN_HEIGHT / 10;
 int prevMousex = 0, prevMousey = 0;
 
-SDL_Window* win;
+//SDL_Window* win;
 SDL_Renderer* ren;
 SDL_Texture* titleBG;
 SDL_Texture* mainMenuBG;
@@ -141,21 +142,133 @@ bool checkCol(SDL_Rect* a, SDL_Rect* b)
 
 }
 
-bool fullscreen=false;
-void toggleFullscreen()
+gWindow::gWindow()
 {
-      if( fullscreen )
+      window=NULL;
+      mouseFocus=false;
+      keyboardFocus=false;
+      fullScreen=false;
+      minimized=false;
+      width=0;
+      height=0;
+}
+void gWindow::toggleFullscreen()
+{
+      if( fullScreen )
 		{
-			SDL_SetWindowFullscreen( win, SDL_FALSE );
-			fullscreen = false;
+			SDL_SetWindowFullscreen( window, SDL_FALSE );
+			fullScreen = false;
 		}
 		else
 		{
-			SDL_SetWindowFullscreen( win, SDL_TRUE );
-			fullscreen = true;
-			//mMinimized = false;
+			SDL_SetWindowFullscreen( window, SDL_TRUE );
+			fullScreen = true;
+			minimized = false;
 		}
 }
+bool gWindow::init()
+{
+      window=SDL_CreateWindow("UtensilCranium", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+      if(window!=NULL)
+      {
+            mouseFocus=true;
+            keyboardFocus=true;
+            width=SCREEN_WIDTH;
+            height=SCREEN_HEIGHT;
+      }
+      return window!=NULL;
+}
+SDL_Renderer* gWindow::createRenderer()
+{
+	return SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
+}
+void gWindow::handleEvent( SDL_Event& e )
+{
+	//Window event occured
+	if( e.type == SDL_WINDOWEVENT )
+	{
+		//Caption update flag
+		//bool updateCaption = false;
+
+		switch( e.window.event )
+		{
+			//Get new dimensions and repaint on window size change
+			case SDL_WINDOWEVENT_SIZE_CHANGED:
+			width = e.window.data1;
+			height = e.window.data2;
+			SDL_RenderPresent( ren );
+			break;
+
+			//Repaint on exposure
+			case SDL_WINDOWEVENT_EXPOSED:
+			SDL_RenderPresent( ren );
+			break;
+
+			//Mouse entered window
+			case SDL_WINDOWEVENT_ENTER:
+		      mouseFocus = true;
+			//updateCaption = true;
+			break;
+			
+			//Mouse left window
+			case SDL_WINDOWEVENT_LEAVE:
+			mouseFocus = false;
+			//updateCaption = true;
+			break;
+
+			//Window has keyboard focus
+			case SDL_WINDOWEVENT_FOCUS_GAINED:
+			keyboardFocus = true;
+			//updateCaption = true;
+			break;
+
+			//Window lost keyboard focus
+			case SDL_WINDOWEVENT_FOCUS_LOST:
+			keyboardFocus = false;
+			//updateCaption = true;
+			break;
+
+			//Window minimized
+			case SDL_WINDOWEVENT_MINIMIZED:
+                  minimized = true;
+                  break;
+
+			//Window maxized
+			case SDL_WINDOWEVENT_MAXIMIZED:
+			minimized = false;
+                  break;
+			
+			//Window restored
+			case SDL_WINDOWEVENT_RESTORED:
+			minimized = false;
+                  break;
+		}
+
+		//Update window caption with new data
+		// if( updateCaption )
+		// {
+		// 	std::stringstream caption;
+		// 	caption << "SDL Tutorial - MouseFocus:" << ( ( mMouseFocus ) ? "On" : "Off" ) << " KeyboardFocus:" << ( ( mKeyboardFocus ) ? "On" : "Off" );
+		// 	SDL_SetWindowTitle( mWindow, caption.str().c_str() );
+		// }
+	}
+	
+}
+void gWindow::free()
+{
+      if(win.window!=NULL)
+      {
+            SDL_DestroyWindow(window);
+      }
+      mouseFocus=false;
+      keyboardFocus=false;
+      fullScreen=false;
+      minimized=false;
+      width=0;
+      height=0;
+}
+
+
 
 void Error(const std::string msg) {
       printf("%s Error: %s\n", msg, SDL_GetError());
@@ -179,13 +292,19 @@ bool init() {
             if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
                   printf("linear texture filtering disabled\n");
             }
- 
-            win = SDL_CreateWindow("gaem0.1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-            if (win == NULL) {
+
+            if(!win.init())
+            {
                   Error("window creation");
-                  success = false;
-            } else {
-                  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+                  success=false;
+            }
+            // win = SDL_CreateWindow("gaem0.1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+            // if (win == NULL) {
+            //       Error("window creation");
+            //       success = false;
+            //} 
+            else {
+                  ren = win.createRenderer();
  
                   int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
                   if (!(IMG_Init(imgFlags) & imgFlags)) {
@@ -337,8 +456,7 @@ void close() {
       bosstex=NULL;
       SDL_DestroyRenderer(ren);
       ren = NULL;
-      SDL_DestroyWindow(win);
-      win = NULL;
+      win.free();
  
       IMG_Quit();
       SDL_Quit();
@@ -418,7 +536,7 @@ void main_menue() {
             else if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
                         case SDLK_m:
-                              toggleFullscreen();
+                              win.toggleFullscreen();
                               break;
                         case SDLK_DOWN:
                               cursorupdate(step);
