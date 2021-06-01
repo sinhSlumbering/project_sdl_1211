@@ -5,6 +5,8 @@
 //#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
+#define SCREEN_WIDTH 800;
+#define SCREEN_HEIGHT 600;
  
 enum screens {
       TITLE_SCREEN,
@@ -19,8 +21,8 @@ enum screens {
       EXIT
 };
  
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
+extern int  screen_width;
+extern int  screen_height;
  
 extern bool quit;
 extern screens screen;
@@ -71,36 +73,36 @@ extern SDL_Texture* bosstex;
 
 struct Player
 {
-      static const int width = SCREEN_WIDTH/10;
-      static const int height = SCREEN_HEIGHT/8;
-      static const int xStep = SCREEN_WIDTH/35;
-      static const int yStep = SCREEN_HEIGHT/15;
-      static const int hbspX=SCREEN_WIDTH/60, hbspY=SCREEN_HEIGHT/50;
+      int width = screen_width/10;
+      int height = screen_height/8;
+      int xStep = screen_width/50;
+      int yStep = screen_height/25;
+      int hbspX=screen_width/60, hbspY=screen_height/50;
 
       SDL_Rect htbx;
       
       int xPos = 0;
-      int yPos = SCREEN_HEIGHT/2-(width/2);
+      int yPos = screen_height/2-(width/2);
       double angle = 0.0;
       Player();
 
-      void handleEvent(SDL_Event* e);
+      void handleEvent();
       void move(int x, int y);
       void render();
 };
 
 struct Boss
 {
-      static const int width = SCREEN_WIDTH/8;
-      static const int height = SCREEN_HEIGHT/3;
+      int width = screen_width/8;
+      int height = screen_height/3;
       int xVel;
-      static const int yVel = SCREEN_HEIGHT/100;
+      int yVel = screen_height/100;
       int scrolldir=1;
 
       SDL_Rect htbx;
       
-      int xPos = SCREEN_WIDTH-width;
-      int yPos = SCREEN_HEIGHT/3;
+      int xPos = screen_width-width;
+      int yPos = screen_height/3;
       Boss();
 
       void move();
