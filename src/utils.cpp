@@ -523,10 +523,10 @@ void titlescreen() {
 MainMenue::MainMenue()
 {
       yVal = menumin = screen_height / 20; 
-      xVal = screen_width - (screen_width / 20) - buttonW/2;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
+      xVal=screen_width-buttonW-buttonW/3;
       menumax = 6 * screen_height / 10;
       bgdim = {0, 0, screen_width, screen_height};
       cursorDim.w = screen_width / 40;
@@ -550,11 +550,10 @@ MainMenue::MainMenue()
 void MainMenue::updateUI()
 {
       yVal = menumin = screen_height / 20; 
-      xVal = screen_width - (screen_width / 20) - buttonW/2;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
-      menumax = 6 * screen_height / 10;
+      xVal=screen_width-buttonW-buttonW/3;
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;
       cursorDim.x = xVal-cursorDim.w;
@@ -589,7 +588,7 @@ void MainMenue::handleEvent()
       while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT)
                   quit = true, runs=false;
-            if(win.handleEvent(e)) updateUI(), printf("thismf\n");
+            if(win.handleEvent(e)) updateUI();
             if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:
@@ -661,6 +660,7 @@ void MainMenue::handleEvent()
 }
 void MainMenue::run()
 {
+      //printf("%d %d", screen_width, screen_height);
       handleEvent();
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
@@ -796,10 +796,10 @@ void gamestart() {
 Pause::Pause()
 {
       yVal = menumin = screen_height / 3; 
-      xVal = (screen_width / 2) - buttonW / 2;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
+      xVal = (screen_width / 2) - buttonW / 2;
       menumax = screen_height / 3 + 2 * screen_height / 10;
 
       bgdim = {0, 0, screen_width, screen_height};
@@ -815,10 +815,10 @@ Pause::Pause()
 void Pause::updateUI()
 {
       yVal = menumin = screen_height / 3; 
-      xVal = (screen_width / 2) - buttonW / 2;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
+      xVal = (screen_width / 2) - buttonW / 2;
       menumax = screen_height / 3 + 2 * screen_height / 10;
 
       bgdim = {0, 0, screen_width, screen_height};

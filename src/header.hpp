@@ -5,8 +5,8 @@
 //#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
-#define SCREEN_WIDTH 800;
-#define SCREEN_HEIGHT 600;
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
  
 enum screens {
       TITLE_SCREEN,
