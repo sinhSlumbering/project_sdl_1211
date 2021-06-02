@@ -26,19 +26,19 @@ int main(int argc, char const *argv[]) {
                                     break;
  
                               case HIGH_SCORES:
-                                    high_score();
+                                    highScore.run();
                                     break;
  
                               case HELP:
-                                    help();
+                                    help.run();
                                     break;
  
                               case ABOUT:
-                                    about();
+                                    about.run();
                                     break;
  
                               case PAUSE:
-                                    pauseM();
+                                    pause.run();
                                     break;
                         }
                   }

@@ -43,10 +43,10 @@ void cursorJump(int step);
 bool checkCol(SDL_Rect* a, SDL_Rect* b);
 void titlescreen();
 void main_menue();
-void high_score();
-void help();
+//void high_score();
+//void help();
 void pauseM();
-void about();
+//void about();
 void gamestart();
 void close();
 
@@ -117,7 +117,7 @@ struct gWindow
 
       SDL_Renderer* createRenderer();
 
-      void handleEvent(SDL_Event &e);
+      bool handleEvent(SDL_Event &e);
 
       void free();
       void toggleFullscreen();
@@ -133,8 +133,61 @@ struct gWindow
       SDL_Window* window;
 };
 
+struct About
+{
+      About();
+      SDL_Rect backDim;
+      void run();
+      void handleEvents();
+      void updateUI();
+};
+extern About about;
 
+struct Help
+{
+      Help();
+      SDL_Rect backDim;
+      void run();
+      void handleEvents();
+      void updateUI();
+};
+extern Help help;
 
+struct HighScore
+{
+      HighScore();
+      SDL_Rect backDim;
+      void run();
+      void handleEvents();
+      void updateUI();
+};
+extern HighScore highScore;
 
+struct Pause
+{
+      Pause();
+      int yVal;
+      int xVal;
+      int step;
+      int buttonW;
+      int buttonH;
+      int menumin;
+      int menumax;
+
+      bool runs;
+
+      SDL_Rect cursorDim;
+      SDL_Rect bgdim;
+      SDL_Rect resumeDim;
+      SDL_Rect mainMenueDim;
+      SDL_Rect exitDim;
+      
+      void run();
+      void updateUI();
+      void handleEvent();
+      void cursorUpdate(int i);
+      void cursorJump(SDL_Rect* r);
+};    
+extern Pause pause;
 
 #endif
