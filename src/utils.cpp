@@ -168,7 +168,6 @@ gWindow::gWindow()
 }
 void gWindow::toggleFullscreen()
 {
-      printf("%d, %d\n", screen_width, screen_height);
       if( fullScreen )
 		{
 			SDL_SetWindowFullscreen( window, SDL_FALSE );
@@ -200,22 +199,18 @@ SDL_Renderer* gWindow::createRenderer()
 }
 bool gWindow::handleEvent( SDL_Event& e )
 {
-	//Window event occured
+      bool update=false;
+      //Window event occured
 	if( e.type == SDL_WINDOWEVENT )
 	{
-		//Caption update flag
-		bool updateCaption = false;
 
 		switch( e.window.event )
 		{
 			//Get new dimensions and repaint on window size change
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
-			width = e.window.data1;
-			height = e.window.data2;
-                  screen_height=e.window.data2;
-                  screen_width=e.window.data1;
+			updatescreen();
 			SDL_RenderPresent( ren );
-                  updateCaption=true;
+                  update=true;
 			break;
 
 			//Repaint on exposure
@@ -226,25 +221,25 @@ bool gWindow::handleEvent( SDL_Event& e )
 			//Mouse entered window
 			case SDL_WINDOWEVENT_ENTER:
 		      mouseFocus = true;
-			updateCaption = true;
+			//updateCaption = true;
 			break;
 			
 			//Mouse left window
 			case SDL_WINDOWEVENT_LEAVE:
 			mouseFocus = false;
-			updateCaption = true;
+			//updateCaption = true;
 			break;
 
 			//Window has keyboard focus
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
 			keyboardFocus = true;
-			updateCaption = true;
+			//updateCaption = true;
 			break;
 
 			//Window lost keyboard focus
 			case SDL_WINDOWEVENT_FOCUS_LOST:
 			keyboardFocus = false;
-			updateCaption = true;
+			//updateCaption = true;
 			break;
 
 			//Window minimized
@@ -271,8 +266,8 @@ bool gWindow::handleEvent( SDL_Event& e )
 			// SDL_SetWindowTitle( window, caption.str().c_str() );
                   //printf("%d, %d\n", screen_height, screen_width);
 		//}
-            return updateCaption;
 	}
+      return update;
 	
 }
 void gWindow::free()
@@ -528,14 +523,16 @@ void titlescreen() {
 MainMenue::MainMenue()
 {
       yVal = menumin = screen_height / 20; 
-      xVal = screen_width - (screen_width / 20) - buttonW;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
+      xVal=screen_width-buttonW-buttonW/3;
       menumax = 6 * screen_height / 10;
-
       bgdim = {0, 0, screen_width, screen_height};
-      cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
+      cursorDim.w = screen_width / 40;
+      cursorDim.h = screen_height / 20;
+      cursorDim.x = xVal-cursorDim.w;
+      cursorDim.y = yVal;
       newGameDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
       highScoreDim = {xVal, yVal, buttonW, buttonH};
@@ -553,14 +550,14 @@ MainMenue::MainMenue()
 void MainMenue::updateUI()
 {
       yVal = menumin = screen_height / 20; 
-      xVal = screen_width - (screen_width / 20) - buttonW;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
-      menumax = 6 * screen_height / 10;
+      xVal=screen_width-buttonW-buttonW/3;
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;
       cursorDim.x = xVal-cursorDim.w;
+      cursorDim.y = yVal;
       //cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
       bgdim = {0, 0, screen_width, screen_height};
       newGameDim = {xVal, yVal, buttonW, buttonH};
@@ -663,6 +660,7 @@ void MainMenue::handleEvent()
 }
 void MainMenue::run()
 {
+      //printf("%d %d", screen_width, screen_height);
       handleEvent();
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
@@ -798,10 +796,10 @@ void gamestart() {
 Pause::Pause()
 {
       yVal = menumin = screen_height / 3; 
-      xVal = (screen_width / 2) - buttonW / 2;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
+      xVal = (screen_width / 2) - buttonW / 2;
       menumax = screen_height / 3 + 2 * screen_height / 10;
 
       bgdim = {0, 0, screen_width, screen_height};
@@ -817,10 +815,10 @@ Pause::Pause()
 void Pause::updateUI()
 {
       yVal = menumin = screen_height / 3; 
-      xVal = (screen_width / 2) - buttonW / 2;
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
+      xVal = (screen_width / 2) - buttonW / 2;
       menumax = screen_height / 3 + 2 * screen_height / 10;
 
       bgdim = {0, 0, screen_width, screen_height};
