@@ -133,6 +133,40 @@ struct gWindow
       SDL_Window* window;
 };
 
+struct MainMenue
+{
+      MainMenue();
+      int yVal;
+      int xVal;
+      int step;
+      int buttonW;
+      int buttonH;
+      int menumin;
+      int menumax;
+      int prevMousex, prevMousey;
+
+      bool runs;
+
+      SDL_Rect bgdim;
+      SDL_Rect newGameDim;
+      SDL_Rect highScoreDim;
+      SDL_Rect aboutDim;
+      SDL_Rect optionsDim;
+      SDL_Rect helpDim;
+      SDL_Rect exitDim;
+      SDL_Rect cursorDim;
+      //SDL_Rect continueDim;
+
+      void run();
+      void updateUI();
+      void handleEvent();
+      void cursorUpdate(int i);
+      void cursorJump(SDL_Rect* r);
+
+};
+
+extern MainMenue mainMenu;
+
 struct About
 {
       About();
@@ -173,6 +207,7 @@ struct Pause
       int buttonH;
       int menumin;
       int menumax;
+      int prevMousex, prevMousey;
 
       bool runs;
 

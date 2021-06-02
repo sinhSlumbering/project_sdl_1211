@@ -18,7 +18,7 @@ int main(int argc, char const *argv[]) {
                                     break;
  
                               case MAIN_MENU:
-                                    main_menue();
+                                    mainMenu.run();
                                     break;
  
                               case IN_GAME:

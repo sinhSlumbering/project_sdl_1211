@@ -16,6 +16,7 @@ About about;
 Help help;
 HighScore highScore;
 Pause pause;
+MainMenue mainMenu;
 
 
 Player::Player()
@@ -263,13 +264,13 @@ bool gWindow::handleEvent( SDL_Event& e )
 		}
 
 		//Update window caption with new data
-		if( updateCaption )
-		{
+		//if( updateCaption )
+		//{
                   // std::stringstream caption;
 			// caption << "SDL Tutorial - MouseFocus:" << ( ( mouseFocus ) ? "On" : "Off" ) << " KeyboardFocus:" << ( ( keyboardFocus ) ? "On" : "Off" );
 			// SDL_SetWindowTitle( window, caption.str().c_str() );
                   //printf("%d, %d\n", screen_height, screen_width);
-		}
+		//}
             return updateCaption;
 	}
 	
@@ -523,93 +524,244 @@ void titlescreen() {
                   screen = MAIN_MENU;
             
       }
+} 
+MainMenue::MainMenue()
+{
+      yVal = menumin = screen_height / 20; 
+      xVal = screen_width - (screen_width / 20) - buttonW;
+      step = screen_height / 10;
+      buttonH = screen_height / 20;
+      buttonW = screen_width / 6;
+      menumax = 6 * screen_height / 10;
+
+      bgdim = {0, 0, screen_width, screen_height};
+      cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
+      newGameDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      highScoreDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      optionsDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      helpDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      aboutDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      exitDim = {xVal, yVal, buttonW, buttonH};
+
+      prevMousex = prevMousey = 0;
 }
- 
-void main_menue() {
-      /****position variables should be global, don't need to do maths this much?****/
-      int yval = screen_height / 20, step = screen_height / 10, buttonH = screen_height / 20, buttonW = screen_width / 6, xval = screen_width - (screen_width / 20) - buttonW;
- 
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, mainMenuBG, NULL, NULL);
-      SDL_Rect newGameDim = {xval, yval, buttonW, buttonH};
-      SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
-      yval += step;
-      SDL_Rect helpDim = {xval, yval, buttonW, buttonH};
-      SDL_RenderCopy(ren, helpB, NULL, &helpDim);
-      //yval=screen_height/2;
-      //xval=screen_width-(screen_width/20)-buttonW;
-      SDL_Rect highScoreDim = {xval, yval, buttonW, buttonH};
-      SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
-      yval += step;
-      SDL_Rect aboutDim = {xval, yval, buttonW, buttonH};
-      SDL_RenderCopy(ren, aboutB, NULL, &aboutDim);
-      yval += step;
-      SDL_Rect exitDim = {xval, yval, buttonW, buttonH};
-      SDL_RenderCopy(ren, exitB, NULL, &exitDim);
-      SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
- 
-      SDL_RenderPresent(ren);
+void MainMenue::updateUI()
+{
+      yVal = menumin = screen_height / 20; 
+      xVal = screen_width - (screen_width / 20) - buttonW;
+      step = screen_height / 10;
+      buttonH = screen_height / 20;
+      buttonW = screen_width / 6;
+      menumax = 6 * screen_height / 10;
+      cursorDim.w = screen_width / 40;
+      cursorDim.h = screen_height / 20;
+      cursorDim.x = xVal-cursorDim.w;
+      //cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
+      bgdim = {0, 0, screen_width, screen_height};
+      newGameDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      highScoreDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      optionsDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      helpDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      aboutDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      exitDim = {xVal, yVal, buttonW, buttonH};
+}
+void MainMenue::cursorUpdate(int step)
+{
+      if (cursorDim.y + step < menumin) cursorDim.y = menumin;
+             else if (cursorDim.y + step > menumax);
+             else cursorDim.y += step;     
+}
+void MainMenue::cursorJump(SDL_Rect* r)
+{
+      cursorDim.y=r->y;
+}
+void MainMenue::handleEvent()
+{
       SDL_Event e;
       while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT)
-                  quit = true;
-            win.handleEvent(e);
+                  quit = true, runs=false;
+            if(win.handleEvent(e)) updateUI();
             if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
+                        case SDLK_ESCAPE:
+                              screen = IN_GAME, isrunning = true;
+                              break;
                         case SDLK_m:
                               win.toggleFullscreen();
+                              updatescreen();
+                              updateUI();
+                              break;
+                        case SDLK_UP:
+                              cursorUpdate(-step);
                               break;
                         case SDLK_DOWN:
-                              cursorupdate(step);
+                              cursorUpdate(step); 
                               break;
- 
-                        case SDLK_UP:
-                              cursorupdate(-step);
-                              break;
- 
                         case SDLK_RETURN: {
+                              runs = false;
                               if (cursorpoints(&newGameDim, &cursorDim))
                                     screen = IN_GAME, isrunning = true;
-                              else if (cursorpoints(&highScoreDim, &cursorDim))
-                                    screen = HIGH_SCORES;
-                              else if (cursorpoints(&aboutDim, &cursorDim))
-                                    screen = ABOUT;
+                              else if(cursorpoints(&highScoreDim, &cursorDim))
+                                    screen=HIGH_SCORES;
+                              else if (cursorpoints(&optionsDim, &cursorDim))
+                                    printf("implement options ffs. ;-;\n");
+                              else if (cursorpoints(&helpDim, &cursorDim))
+                                    printf("implement help ffs. ;-;\n");
+                              else if (cursorpoints(&optionsDim, &cursorDim))
+                                    screen=ABOUT;      
                               else if (cursorpoints(&exitDim, &cursorDim))
                                     quit = true;
-                        } break;
+                        }
                   }
             }
+            
       }
  
-      /***what about a mouse handler?***/
       int mousex, mousey;
-      int mButton = SDL_GetMouseState(&mousex, &mousey);
-      //very jank mouse nav handler
+      int mbutton = SDL_GetMouseState(&mousex, &mousey);
       if (prevMousex != 0 && prevMousey != mousey) {
-            if (mousey < highScoreDim.y)
-                  cursorjump(&newGameDim);
+            if (mousey < newGameDim.y)
+                  cursorJump(&newGameDim);
             else if (mousey >= highScoreDim.y && mousey < highScoreDim.y + highScoreDim.h + 1)
-                  cursorjump(&highScoreDim);
-            else if (mousey >= aboutDim.y && mousey < aboutDim.h + aboutDim.y + 1)
-                  cursorjump(&aboutDim);
+                  cursorJump(&highScoreDim);
+            else if (mousey >= optionsDim.y && mousey < optionsDim.y + optionsDim.h + 1)
+                  cursorJump(&optionsDim);
+            else if (mousey >= helpDim.y && mousey < helpDim.y + helpDim.h + 1)
+                  cursorJump(&helpDim);
+            else if (mousey >= aboutDim.y && mousey < aboutDim.y + aboutDim.h + 1)
+                  cursorJump(&aboutDim);
             else if (mousey >= exitDim.y)
-                  cursorjump(&exitDim);
+                  cursorJump(&exitDim);
       }
-      prevMousex = mousex, prevMousey = mousey;
- 
-      if (mButton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+      if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+
             if (mouseIsInside(&newGameDim, mousex, mousey))
-                  screen = IN_GAME, isrunning = true;
+                  isrunning = true, screen = IN_GAME, runs=false;
             else if (mouseIsInside(&highScoreDim, mousex, mousey))
-                  screen = HIGH_SCORES;
+                  screen = HIGH_SCORES, runs=false;
+            else if (mouseIsInside(&optionsDim, mousex, mousey))
+                  ;
             else if (mouseIsInside(&helpDim, mousex, mousey))
-                  screen = HELP;
+                  ;
             else if (mouseIsInside(&aboutDim, mousex, mousey))
-                  screen = ABOUT;
+                  screen=ABOUT;      
             else if (mouseIsInside(&exitDim, mousex, mousey))
-                  quit = true;
+                  quit = true, runs=false;
       }
+      prevMousex=mousex, prevMousey=mousey;
 }
+void MainMenue::run()
+{
+      handleEvent();
+      SDL_RenderClear(ren);
+      SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
+      SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
+      SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
+      SDL_RenderCopy(ren, exitB, NULL, &optionsDim);
+      SDL_RenderCopy(ren, helpB, NULL, &helpDim);
+      SDL_RenderCopy(ren, aboutB, NULL, &aboutDim);
+      SDL_RenderCopy(ren, exitB, NULL, &exitDim);
+      SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
+      SDL_RenderPresent(ren);
+}
+
+// void main_menue() {
+//       /****position variables should be global, don't need to do maths this much?****/
+//       int yval = screen_height / 20, step = screen_height / 10, buttonH = screen_height / 20, buttonW = screen_width / 6, xval = screen_width - (screen_width / 20) - buttonW;
+ 
+//       SDL_RenderClear(ren);
+//       SDL_RenderCopy(ren, mainMenuBG, NULL, NULL);
+//       SDL_Rect newGameDim = {xval, yval, buttonW, buttonH};
+//       SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
+//       yval += step;
+//       SDL_Rect helpDim = {xval, yval, buttonW, buttonH};
+//       SDL_RenderCopy(ren, helpB, NULL, &helpDim);
+//       yval+=step;
+//       //yval=screen_height/2;
+//       //xval=screen_width-(screen_width/20)-buttonW;
+//       SDL_Rect highScoreDim = {xval, yval, buttonW, buttonH};
+//       SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
+//       yval += step;
+//       SDL_Rect aboutDim = {xval, yval, buttonW, buttonH};
+//       SDL_RenderCopy(ren, aboutB, NULL, &aboutDim);
+//       yval += step;
+//       SDL_Rect exitDim = {xval, yval, buttonW, buttonH};
+//       SDL_RenderCopy(ren, exitB, NULL, &exitDim);
+//       SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
+ 
+//       SDL_RenderPresent(ren);
+//       SDL_Event e;
+//       while (SDL_PollEvent(&e) != 0) {
+//             if (e.type == SDL_QUIT)
+//                   quit = true;
+//             win.handleEvent(e);
+//             if (e.type == SDL_KEYDOWN) {
+//                   switch (e.key.keysym.sym) {
+//                         case SDLK_m:
+//                               win.toggleFullscreen();
+//                               break;
+//                         case SDLK_DOWN:
+//                               cursorupdate(step);
+//                               break;
+ 
+//                         case SDLK_UP:
+//                               cursorupdate(-step);
+//                               break;
+ 
+//                         case SDLK_RETURN: {
+//                               if (cursorpoints(&newGameDim, &cursorDim))
+//                                     screen = IN_GAME, isrunning = true;
+//                               else if (cursorpoints(&highScoreDim, &cursorDim))
+//                                     screen = HIGH_SCORES;
+//                               else if (cursorpoints(&aboutDim, &cursorDim))
+//                                     screen = ABOUT;
+//                               else if (cursorpoints(&exitDim, &cursorDim))
+//                                     quit = true;
+//                         } break;
+//                   }
+//             }
+//       }
+ 
+//       /***what about a mouse handler?***/
+//       int mousex, mousey;
+//       int mButton = SDL_GetMouseState(&mousex, &mousey);
+//       //very jank mouse nav handler
+//       if (prevMousex != 0 && prevMousey != mousey) {
+//             if (mousey < highScoreDim.y)
+//                   cursorjump(&newGameDim);
+//             else if (mousey >= highScoreDim.y && mousey < highScoreDim.y + highScoreDim.h + 1)
+//                   cursorjump(&highScoreDim);
+//             else if (mousey >= aboutDim.y && mousey < aboutDim.h + aboutDim.y + 1)
+//                   cursorjump(&aboutDim);
+//             else if (mousey >= exitDim.y)
+//                   cursorjump(&exitDim);
+//       }
+//       prevMousex = mousex, prevMousey = mousey;
+ 
+//       if (mButton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+//             if (mouseIsInside(&newGameDim, mousex, mousey))
+//                   screen = IN_GAME, isrunning = true;
+//             else if (mouseIsInside(&highScoreDim, mousex, mousey))
+//                   screen = HIGH_SCORES;
+//             else if (mouseIsInside(&helpDim, mousex, mousey))
+//                   screen = HELP;
+//             else if (mouseIsInside(&aboutDim, mousex, mousey))
+//                   screen = ABOUT;
+//             else if (mouseIsInside(&exitDim, mousex, mousey))
+//                   quit = true;
+//       }
+// }
  
 void gamestart() {
       Player player;
@@ -660,6 +812,7 @@ Pause::Pause()
       yVal+=step;
       exitDim = {xVal, yVal, buttonW, buttonH};
 
+      prevMousex = prevMousey = 0;
 }
 void Pause::updateUI()
 {
@@ -674,6 +827,7 @@ void Pause::updateUI()
       //cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;
+      cursorDim.x = xVal-cursorDim.w;
       resumeDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
       mainMenueDim = {xVal, yVal, buttonW, buttonH};
@@ -682,9 +836,9 @@ void Pause::updateUI()
 }
 void Pause::cursorUpdate(int step)
 {
-      if (cursorDim.y + step < menumin) cursorDim.y = menumin;
-            else if (cursorDim.y + step > menumax);
-            else cursorDim.y += step;
+       if (cursorDim.y + step < menumin) cursorDim.y = menumin;
+             else if (cursorDim.y + step > menumax);
+             else cursorDim.y += step;     
 }
 void Pause::cursorJump(SDL_Rect* r)
 {
@@ -695,8 +849,9 @@ void Pause::handleEvent()
       SDL_Event e;
       while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT)
-                  quit = true;
-            else if (e.type == SDL_KEYDOWN) {
+                  quit = true, runs=false;
+            if(win.handleEvent(e)) updateUI();
+            if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:
                               screen = IN_GAME, isrunning = true;
@@ -710,7 +865,7 @@ void Pause::handleEvent()
                               cursorUpdate(-step);
                               break;
                         case SDLK_DOWN:
-                              cursorUpdate(step);
+                              cursorUpdate(step); 
                               break;
                         case SDLK_RETURN: {
                               runs = false;
@@ -723,7 +878,7 @@ void Pause::handleEvent()
                         }
                   }
             }
-            if(win.handleEvent(e)) updateUI();
+            
       }
  
       int mousex, mousey;
@@ -745,6 +900,7 @@ void Pause::handleEvent()
             else if (mouseIsInside(&exitDim, mousex, mousey))
                   quit = true, runs=false;
       }
+      prevMousex=mousex, prevMousey=mousey;
 }
 
 void Pause::run()
@@ -760,6 +916,7 @@ void Pause::run()
             SDL_RenderCopy(ren, exitB, NULL, &exitDim);
             SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
             SDL_RenderPresent(ren);
+            SDL_Delay(1000/60);
       }
 }
 
