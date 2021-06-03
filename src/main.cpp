@@ -1,9 +1,7 @@
-#include "header.hpp"
- 
+#include "header.hpp" 
 bool quit = false;
 screens screen = TITLE_SCREEN;
 bool isrunning = true;
-//bool Fullscreen=false; 
 int main(int argc, char const *argv[]) {
       if (!init()) {
             printf("initialization failed\n");
@@ -27,6 +25,10 @@ int main(int argc, char const *argv[]) {
  
                               case HIGH_SCORES:
                                     highScore.run();
+                                    break;
+                              
+                              case OPTIONS:
+                                    options.run();
                                     break;
  
                               case HELP:

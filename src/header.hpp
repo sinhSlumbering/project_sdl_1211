@@ -2,7 +2,6 @@
 #define HEADER_H
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-//#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
 #define SCREEN_WIDTH 800
@@ -27,33 +26,21 @@ extern int  screen_height;
 extern bool quit;
 extern screens screen;
 extern bool isrunning;
-extern int cursorHalfway;
-extern SDL_Rect cursorDim;
-extern SDL_Rect pcursorDim;
-extern int menumax, pmenumax;
- 
-extern int prevMousex, prevMousey;
+extern bool mouseMode;
  
 bool init();
 bool loadMedia();
 bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey);
 bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim);
-void cursorupdate(int step);
-void cursorJump(int step);
 bool checkCol(SDL_Rect* a, SDL_Rect* b);
 void titlescreen();
-void main_menue();
-//void high_score();
-//void help();
-void pauseM();
-//void about();
 void gamestart();
 void close();
+void updatescreen();
 
  
 SDL_Texture* loadTex(std::string path);
  
-//extern SDL_Window* win;
 extern SDL_Renderer* ren;
 extern SDL_Texture* titleBG;
 extern SDL_Texture* mainMenuBG;
@@ -70,44 +57,8 @@ extern SDL_Texture* exitB;
 extern SDL_Texture* cursor;
 extern SDL_Texture* playertex;
 extern SDL_Texture* bosstex;
+extern SDL_Texture* optionsToggle[2];
 
-struct Player
-{
-      int width = screen_width/10;
-      int height = screen_height/8;
-      int xStep = screen_width/50;
-      int yStep = screen_height/25;
-      int hbspX=screen_width/60, hbspY=screen_height/50;
-
-      SDL_Rect htbx;
-      
-      int xPos = 0;
-      int yPos = screen_height/2-(width/2);
-      double angle = 0.0;
-      Player();
-
-      void handleEvent();
-      void move(int x, int y);
-      void render();
-};
-
-struct Boss
-{
-      int width = screen_width/8;
-      int height = screen_height/3;
-      int xVel;
-      int yVel = screen_height/100;
-      int scrolldir=1;
-
-      SDL_Rect htbx;
-      
-      int xPos = screen_width-width;
-      int yPos = screen_height/3;
-      Boss();
-
-      void move();
-      void render();
-};
 
 struct gWindow
 {
@@ -133,6 +84,8 @@ struct gWindow
       SDL_Window* window;
 };
 
+extern gWindow win;
+
 struct MainMenue
 {
       MainMenue();
@@ -145,7 +98,6 @@ struct MainMenue
       int menumax;
       int prevMousex, prevMousey;
 
-      bool runs;
 
       SDL_Rect bgdim;
       SDL_Rect newGameDim;
@@ -197,6 +149,33 @@ struct HighScore
 };
 extern HighScore highScore;
 
+struct Options
+{
+      Options();
+      int yVal;
+      int xVal;
+      int step;
+      int buttonW;
+      int buttonH;
+      int menumin;
+      int menumax;
+      int prevMousex, prevMousey;
+
+
+      SDL_Rect cursorDim;
+      SDL_Rect bgdim;
+      SDL_Rect fullScreenDim;
+      SDL_Rect mouseModeDim;
+      SDL_Rect backDim;
+      
+      void run();
+      void updateUI();
+      void handleEvent();
+      void cursorUpdate(int step);
+      void cursorJump(SDL_Rect* r);
+};    
+extern Options options;
+
 struct Pause
 {
       Pause();
@@ -209,7 +188,6 @@ struct Pause
       int menumax;
       int prevMousex, prevMousey;
 
-      bool runs;
 
       SDL_Rect cursorDim;
       SDL_Rect bgdim;
@@ -224,5 +202,46 @@ struct Pause
       void cursorJump(SDL_Rect* r);
 };    
 extern Pause pause;
+
+struct Player
+{
+      int width = screen_width/10;
+      int height = screen_height/8;
+      int xStep = screen_width/50;
+      int yStep = screen_height/25;
+      int hbspX=screen_width/60, hbspY=screen_height/50;
+
+      SDL_Rect htbx;
+      
+      int xPos = 0;
+      int yPos = screen_height/2-(width/2);
+      double angle = 0.0;
+      Player();
+
+      void handleEvent();
+      void move(int x, int y);
+      void render();
+};
+extern Player player;
+
+struct Boss
+{
+      int width = screen_width/8;
+      int height = screen_height/3;
+      int xVel;
+      int yVel = screen_height/100;
+      int scrolldir=1;
+
+      SDL_Rect htbx;
+      
+      int xPos = screen_width-width;
+      int yPos = screen_height/3;
+      Boss();
+
+      void move();
+      void render();
+};
+
+extern Boss plane;
 
 #endif

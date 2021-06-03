@@ -12,88 +12,17 @@ int screen_width=SCREEN_WIDTH;
 int screen_height=SCREEN_HEIGHT;
 
 Boss plane;
+Player player;
 About about;
 Help help;
 HighScore highScore;
 Pause pause;
 MainMenue mainMenu;
+Options options;
+
+bool mouseMode=false;
 
 
-Player::Player()
-{
-      width = screen_width/10;
-      height = screen_height/8;
-      xStep = screen_width/100;
-      yStep = screen_height/80;
-      hbspX=screen_width/15, hbspY=screen_height/12;
-
-      xPos = 0;
-      yPos = screen_height/2-(width/2);
-      angle = 0.0;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
-      htbx = {screen_width/60, screen_height/50, width/15, height/12};
-};
-
-void Player::render()
-{
-      SDL_Rect renderQuad = {xPos, yPos, width, height};
-      
-      SDL_RenderCopyEx(ren, playertex, NULL, &renderQuad, angle, NULL, SDL_FLIP_NONE);
-
-}
-void Player::move(int x, int y){
-      xPos+=x*xStep;
-      yPos+=y*yStep;
-      if(xPos<0) xPos=0;
-      else if(xPos+width>screen_width) xPos = screen_width-width;
-      if(yPos<0) yPos=0;
-      else if(yPos+height>screen_height) yPos=screen_height-height;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
-}
-void Player::handleEvent()
-{
-      const Uint8* keyState = SDL_GetKeyboardState(NULL);
-      if(keyState[SDL_SCANCODE_UP]) yPos-=yStep;
-      else if(keyState[SDL_SCANCODE_DOWN]) yPos+=yStep;
-      if(keyState[SDL_SCANCODE_RIGHT]) xPos+=xStep;
-      else if(keyState[SDL_SCANCODE_LEFT]) xPos-=xStep;
-
-      if(xPos<0) xPos=0;
-      else if(xPos+width>screen_width) xPos = screen_width-width;
-      if(yPos<0) yPos=0;
-      else if(yPos+height>screen_height) yPos=screen_height-height;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
-       
-}
-
-Boss::Boss()
-{
-      width = screen_width/8;
-      height = screen_height/3;
-      yVel = screen_height/100;
-      scrolldir=1;
-      
-      xPos = screen_width-width;
-      yPos = screen_height/3;
-      htbx={xPos, yPos, width, height};
-}
-void Boss::move()
-{
-      if((yPos<0)||(yPos + height>screen_height))
-            scrolldir*=-1;
-      yPos+=scrolldir*yVel;
-}
-void Boss::render()
-{
-      SDL_Rect renderQuad = {xPos, yPos, width, height};
-      SDL_RenderCopyEx(ren, bosstex, NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
-}
-
-
-//SDL_Window* win;
 SDL_Renderer* ren;
 SDL_Texture* titleBG;
 SDL_Texture* mainMenuBG;
@@ -110,43 +39,8 @@ SDL_Texture* exitB;
 SDL_Texture* cursor;
 SDL_Texture* playertex;
 SDL_Texture* bosstex;
+SDL_Texture* optionsToggle[2];
 
-
-bool checkCol(SDL_Rect* a, SDL_Rect* b)
-{
-      int leftA, leftB;
-      int rightA, rightB;
-      int topA, topB;
-      int downA, downB;
-
-      leftA = a->x;
-      rightA = a->x + a->w;
-      topA = a->y;
-      downA = a->y + a->h;
-
-      leftB = b->x;
-      rightB = b->x + b->w;
-      topB = b->y;
-      downB = b->y + b->h;
-      if( downA <= topB )
-      {
-          return false;
-      }     
-      if( topA >= downB )
-      {
-          return false;
-      }     
-      if( rightA <= leftB )
-      {
-          return false;
-      }     
-      if( leftA >= rightB )
-      {
-          return false;
-      }
-      else return true;
-
-}
 
 gWindow::gWindow()
 {
@@ -250,14 +144,6 @@ bool gWindow::handleEvent( SDL_Event& e )
                   break;
 		}
 
-		//Update window caption with new data
-		//if( updateCaption )
-		//{
-                  // std::stringstream caption;
-			// caption << "SDL Tutorial - MouseFocus:" << ( ( mouseFocus ) ? "On" : "Off" ) << " KeyboardFocus:" << ( ( keyboardFocus ) ? "On" : "Off" );
-			// SDL_SetWindowTitle( window, caption.str().c_str() );
-                  //printf("%d, %d\n", screen_height, screen_width);
-		//}
 	}
       return update;
 	
@@ -305,12 +191,7 @@ bool init() {
             {
                   Error("window creation");
                   success=false;
-            }
-            // win = SDL_CreateWindow("gaem0.1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height, SDL_WINDOW_SHOWN);
-            // if (win == NULL) {
-            //       Error("window creation");
-            //       success = false;
-            //} 
+            } 
             else {
                   ren = win.createRenderer();
  
@@ -325,7 +206,6 @@ bool init() {
 }
 
 
-//rework dis?
 bool loadMedia() {
       bool success = true;
  
@@ -414,6 +294,11 @@ bool loadMedia() {
       {
             success = false;
       }
+      //rework dis later
+      //DANGEROUS_STUFF_PLEASE CHANGE_FOR_THE_LOVE_OF_ALL_THATS_HOLY
+      optionsToggle[0]=exitB;
+      optionsToggle[1]=bosstex;
+
       return success;
 }
  
@@ -462,6 +347,11 @@ void close() {
       playertex=NULL;
       SDL_DestroyTexture(bosstex);
       bosstex=NULL;
+      SDL_DestroyTexture(optionsToggle[0]);
+      optionsToggle[0]=NULL;
+      SDL_DestroyTexture(optionsToggle[0]);
+      optionsToggle[0]=NULL;
+      
       SDL_DestroyRenderer(ren);
       ren = NULL;
       win.free();
@@ -478,479 +368,6 @@ bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim) {
       return (cursorDim->y >= rect->y) && ((cursorDim->h + cursorDim->y) <= (rect->y + rect->h));
 }
   
-void titlescreen() {
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, titleBG, NULL, NULL);
-      SDL_RenderPresent(ren);
-      SDL_Event e;
-      while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT)
-                  quit = true;
-            else if (e.type == SDL_KEYDOWN)
-                  screen = MAIN_MENU;
-            else if (e.type == SDL_MOUSEBUTTONDOWN)
-                  screen = MAIN_MENU;
-            
-      }
-} 
-MainMenue::MainMenue()
-{
-      yVal = menumin = screen_height / 20; 
-      step = screen_height / 10;
-      buttonH = screen_height / 20;
-      buttonW = screen_width / 6;
-      xVal=screen_width-buttonW-buttonW/3;
-      menumax = 6 * screen_height / 10;
-      bgdim = {0, 0, screen_width, screen_height};
-      cursorDim.w = screen_width / 40;
-      cursorDim.h = screen_height / 20;
-      cursorDim.x = xVal-cursorDim.w;
-      cursorDim.y = yVal;
-      newGameDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      highScoreDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      optionsDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      helpDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      aboutDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      exitDim = {xVal, yVal, buttonW, buttonH};
-
-      prevMousex = prevMousey = 0;
-}
-void MainMenue::updateUI()
-{
-      yVal = menumin = screen_height / 20; 
-      step = screen_height / 10;
-      buttonH = screen_height / 20;
-      buttonW = screen_width / 6;
-      xVal=screen_width-buttonW-buttonW/3;
-      cursorDim.w = screen_width / 40;
-      cursorDim.h = screen_height / 20;
-      cursorDim.x = xVal-cursorDim.w;
-      cursorDim.y = yVal;
-      //cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
-      bgdim = {0, 0, screen_width, screen_height};
-      newGameDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      highScoreDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      optionsDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      helpDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      aboutDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      exitDim = {xVal, yVal, buttonW, buttonH};
-}
-void MainMenue::cursorUpdate(int step)
-{
-      if (cursorDim.y + step < menumin) cursorDim.y = menumin;
-             else if (cursorDim.y + step > menumax);
-             else cursorDim.y += step;     
-}
-void MainMenue::cursorJump(SDL_Rect* r)
-{
-      cursorDim.y=r->y;
-}
-void MainMenue::handleEvent()
-{
-      SDL_Event e;
-      while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT)
-                  quit = true, runs=false;
-            if(win.handleEvent(e)) updateUI();
-            if (e.type == SDL_KEYDOWN) {
-                  switch (e.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                              screen = IN_GAME, isrunning = true;
-                              break;
-                        case SDLK_m:
-                              win.toggleFullscreen();
-                              updatescreen();
-                              updateUI();
-                              break;
-                        case SDLK_UP:
-                              cursorUpdate(-step);
-                              break;
-                        case SDLK_DOWN:
-                              cursorUpdate(step); 
-                              break;
-                        case SDLK_RETURN: {
-                              runs = false;
-                              if (cursorpoints(&newGameDim, &cursorDim))
-                                    screen = IN_GAME, isrunning = true;
-                              else if(cursorpoints(&highScoreDim, &cursorDim))
-                                    screen=HIGH_SCORES;
-                              else if (cursorpoints(&optionsDim, &cursorDim))
-                                    printf("implement options ffs. ;-;\n");
-                              else if (cursorpoints(&helpDim, &cursorDim))
-                                    printf("implement help ffs. ;-;\n");
-                              else if (cursorpoints(&optionsDim, &cursorDim))
-                                    screen=ABOUT;      
-                              else if (cursorpoints(&exitDim, &cursorDim))
-                                    quit = true;
-                        }
-                  }
-            }
-            
-      }
- 
-      int mousex, mousey;
-      int mbutton = SDL_GetMouseState(&mousex, &mousey);
-      if (prevMousex != 0 && prevMousey != mousey) {
-            if (mousey < newGameDim.y)
-                  cursorJump(&newGameDim);
-            else if (mousey >= highScoreDim.y && mousey < highScoreDim.y + highScoreDim.h + 1)
-                  cursorJump(&highScoreDim);
-            else if (mousey >= optionsDim.y && mousey < optionsDim.y + optionsDim.h + 1)
-                  cursorJump(&optionsDim);
-            else if (mousey >= helpDim.y && mousey < helpDim.y + helpDim.h + 1)
-                  cursorJump(&helpDim);
-            else if (mousey >= aboutDim.y && mousey < aboutDim.y + aboutDim.h + 1)
-                  cursorJump(&aboutDim);
-            else if (mousey >= exitDim.y)
-                  cursorJump(&exitDim);
-      }
-      if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-
-            if (mouseIsInside(&newGameDim, mousex, mousey))
-                  isrunning = true, screen = IN_GAME, runs=false;
-            else if (mouseIsInside(&highScoreDim, mousex, mousey))
-                  screen = HIGH_SCORES, runs=false;
-            else if (mouseIsInside(&optionsDim, mousex, mousey))
-                  ;
-            else if (mouseIsInside(&helpDim, mousex, mousey))
-                  ;
-            else if (mouseIsInside(&aboutDim, mousex, mousey))
-                  screen=ABOUT;      
-            else if (mouseIsInside(&exitDim, mousex, mousey))
-                  quit = true, runs=false;
-      }
-      prevMousex=mousex, prevMousey=mousey;
-}
-void MainMenue::run()
-{
-      //printf("%d %d", screen_width, screen_height);
-      handleEvent();
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
-      SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
-      SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
-      SDL_RenderCopy(ren, exitB, NULL, &optionsDim);
-      SDL_RenderCopy(ren, helpB, NULL, &helpDim);
-      SDL_RenderCopy(ren, aboutB, NULL, &aboutDim);
-      SDL_RenderCopy(ren, exitB, NULL, &exitDim);
-      SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
-      SDL_RenderPresent(ren);
-}
-
- 
-void gamestart() {
-      Player player;
-      int lives = 3;
-      while (isrunning) {
-            SDL_RenderClear(ren);
-            SDL_Rect bgdim = {0, 0, screen_width, screen_height};
-            SDL_RenderCopy(ren, inGameBG, NULL, &bgdim);
-            SDL_Event e;
-            while (SDL_PollEvent(&e) != 0) {
-                  if (e.type == SDL_QUIT)
-                        quit = true, isrunning = false;
-                  //player.handleEvent(&e);
-                  if (e.type == SDL_KEYDOWN) {
-                        switch (e.key.keysym.sym) {
-                              case SDLK_ESCAPE:
-                                    screen = PAUSE, isrunning = false;
-                                    break;
-                        }
-                        
-                  }
-            }
-            player.handleEvent();
-            if(lives<1) screen=MAIN_MENU, isrunning=false;
-            player.render();
-            plane.render();
-            plane.move();
-            if(checkCol(&player.htbx, &plane.htbx)==true) printf("ouch\n"), lives--;
-            SDL_RenderPresent(ren);
-            SDL_Delay(1000 / 120);
-      }
-}
-
-Pause::Pause()
-{
-      yVal = menumin = screen_height / 3; 
-      step = screen_height / 10;
-      buttonH = screen_height / 20;
-      buttonW = screen_width / 6;
-      xVal = (screen_width / 2) - buttonW / 2;
-      menumax = screen_height / 3 + 2 * screen_height / 10;
-
-      bgdim = {0, 0, screen_width, screen_height};
-      cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
-      resumeDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      mainMenueDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      exitDim = {xVal, yVal, buttonW, buttonH};
-
-      prevMousex = prevMousey = 0;
-}
-void Pause::updateUI()
-{
-      yVal = menumin = screen_height / 3; 
-      step = screen_height / 10;
-      buttonH = screen_height / 20;
-      buttonW = screen_width / 6;
-      xVal = (screen_width / 2) - buttonW / 2;
-      menumax = screen_height / 3 + 2 * screen_height / 10;
-
-      bgdim = {0, 0, screen_width, screen_height};
-      //cursorDim = {screen_width / 2 - screen_width / 12 - screen_width / 40, screen_height / 3, screen_width / 40, screen_height / 20};
-      cursorDim.w = screen_width / 40;
-      cursorDim.h = screen_height / 20;
-      cursorDim.x = xVal-cursorDim.w;
-      resumeDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      mainMenueDim = {xVal, yVal, buttonW, buttonH};
-      yVal+=step;
-      exitDim = {xVal, yVal, buttonW, buttonH};
-}
-void Pause::cursorUpdate(int step)
-{
-       if (cursorDim.y + step < menumin) cursorDim.y = menumin;
-             else if (cursorDim.y + step > menumax);
-             else cursorDim.y += step;     
-}
-void Pause::cursorJump(SDL_Rect* r)
-{
-      cursorDim.y=r->y;
-}
-void Pause::handleEvent()
-{
-      SDL_Event e;
-      while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT)
-                  quit = true, runs=false;
-            if(win.handleEvent(e)) updateUI();
-            if (e.type == SDL_KEYDOWN) {
-                  switch (e.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                              screen = IN_GAME, isrunning = true;
-                              break;
-                        case SDLK_m:
-                              win.toggleFullscreen();
-                              updatescreen();
-                              updateUI();
-                              break;
-                        case SDLK_UP:
-                              cursorUpdate(-step);
-                              break;
-                        case SDLK_DOWN:
-                              cursorUpdate(step); 
-                              break;
-                        case SDLK_RETURN: {
-                              runs = false;
-                              if (cursorpoints(&resumeDim, &cursorDim))
-                                    screen = IN_GAME, isrunning = true;
-                              else if (cursorpoints(&mainMenueDim, &cursorDim))
-                                    screen = MAIN_MENU;
-                              else if (cursorpoints(&exitDim, &cursorDim))
-                                    quit = true;
-                        }
-                  }
-            }
-            
-      }
- 
-      int mousex, mousey;
-      int mbutton = SDL_GetMouseState(&mousex, &mousey);
-      if (prevMousex != 0 && prevMousey != mousey) {
-            if (mousey < mainMenueDim.y)
-                  cursorJump(&resumeDim);
-            else if (mousey >= mainMenueDim.y && mousey < mainMenueDim.y + mainMenueDim.h + 1)
-                  cursorJump(&mainMenueDim);
-            else if (mousey >= exitDim.y)
-                  cursorJump(&exitDim);
-      }
-      if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-
-            if (mouseIsInside(&resumeDim, mousex, mousey))
-                  isrunning = true, screen = IN_GAME, runs=false;
-            else if (mouseIsInside(&mainMenueDim, mousex, mousey))
-                  screen = MAIN_MENU, runs=false;
-            else if (mouseIsInside(&exitDim, mousex, mousey))
-                  quit = true, runs=false;
-      }
-      prevMousex=mousex, prevMousey=mousey;
-}
-
-void Pause::run()
-{
-      runs=true;
-      while(runs)
-      {
-            handleEvent();
-            SDL_RenderClear(ren);
-            SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
-            SDL_RenderCopy(ren, resumeB, NULL, &resumeDim);
-            SDL_RenderCopy(ren, resumeB, NULL, &mainMenueDim);
-            SDL_RenderCopy(ren, exitB, NULL, &exitDim);
-            SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
-            SDL_RenderPresent(ren);
-            SDL_Delay(1000/60);
-      }
-}
 
  
 
-HighScore::HighScore()
-{
-      backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-}
-void HighScore::updateUI()
-{
-      backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-
-}
-void HighScore::handleEvents()
-{
-      SDL_Event e;
-      while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT)
-                  quit = true;
-            else if (e.type == SDL_KEYDOWN) {
-                  switch (e.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                              screen = MAIN_MENU;
-                              break;
-                        case SDLK_m:
-                              win.toggleFullscreen();
-                              updatescreen();
-                              updateUI();
-                              break;
-                  }
-            }
-            if(win.handleEvent(e)) updateUI();
-            
-      }
-
-      int mousex, mousey;
-      int mbutton = SDL_GetMouseState(&mousex, &mousey);
-      if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-            if (mouseIsInside(&backDim, mousex, mousey))
-                  screen = MAIN_MENU;
-      }
-}
-void HighScore::run() {
-      
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, pauseBG, NULL, NULL);
-      //SDL_Rect backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-      SDL_RenderCopy(ren, backB, NULL, &backDim);
-      SDL_RenderPresent(ren);
-      handleEvents();
-}
-
-
-
-About::About()
-{
-      backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-}
-void About::updateUI()
-{
-      backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-
-}
-void About::handleEvents()
-{
-      SDL_Event e;
-      while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT)
-                  quit = true;
-            else if (e.type == SDL_KEYDOWN) {
-                  switch (e.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                              screen = MAIN_MENU;
-                              break;
-                        case SDLK_m:
-                              win.toggleFullscreen();
-                              updatescreen();
-                              updateUI();
-                              break;
-                  }
-            }
-            if(win.handleEvent(e)) updateUI();
-            
-      }
-
-      int mousex, mousey;
-      int mbutton = SDL_GetMouseState(&mousex, &mousey);
-      if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-            if (mouseIsInside(&backDim, mousex, mousey))
-                  screen = MAIN_MENU;
-      }
-}
-void About::run() {
-      
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, aboutBG, NULL, NULL);
-      //SDL_Rect backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-      SDL_RenderCopy(ren, backB, NULL, &backDim);
-      SDL_RenderPresent(ren);
-      handleEvents();
-}
-
-
-
-Help::Help()
-{
-      backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-}
-void Help::updateUI()
-{
-      backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-
-}
-void Help::handleEvents()
-{
-      SDL_Event e;
-      while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT)
-                  quit = true;
-            else if (e.type == SDL_KEYDOWN) {
-                  switch (e.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                              screen = MAIN_MENU;
-                              break;
-                        case SDLK_m:
-                              win.toggleFullscreen();
-                              updatescreen();
-                              updateUI();
-                              break;
-                  }
-            }
-            if(win.handleEvent(e)) updateUI();
-            
-      }
-
-      int mousex, mousey;
-      int mbutton = SDL_GetMouseState(&mousex, &mousey);
-      if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-            if (mouseIsInside(&backDim, mousex, mousey))
-                  screen = MAIN_MENU;
-      }
-}
-void Help::run() {
-      
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, pauseBG, NULL, NULL);
-      //SDL_Rect backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-      SDL_RenderCopy(ren, backB, NULL, &backDim);
-      SDL_RenderPresent(ren);
-      handleEvents();
-}
