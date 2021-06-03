@@ -1,5 +1,5 @@
 # supreme-cringe
 
-  ##issues
+  ## issues
     -mouse nav breaks in fullscreen
     
