@@ -35,18 +35,33 @@ void Player::move(int x, int y){
 }
 void Player::handleEvent()
 {
-      const Uint8* keyState = SDL_GetKeyboardState(NULL);
-      if(keyState[SDL_SCANCODE_UP]) yPos-=yStep;
-      else if(keyState[SDL_SCANCODE_DOWN]) yPos+=yStep;
-      if(keyState[SDL_SCANCODE_RIGHT]) xPos+=xStep;
-      else if(keyState[SDL_SCANCODE_LEFT]) xPos-=xStep;
+      if(!mouseMode)
+      {
+            const Uint8* keyState = SDL_GetKeyboardState(NULL);
+            if(keyState[SDL_SCANCODE_UP]) yPos-=yStep;
+            else if(keyState[SDL_SCANCODE_DOWN]) yPos+=yStep;
+            if(keyState[SDL_SCANCODE_RIGHT]) xPos+=xStep;
+            else if(keyState[SDL_SCANCODE_LEFT]) xPos-=xStep;
 
-      if(xPos<0) xPos=0;
-      else if(xPos+width>screen_width) xPos = screen_width-width;
-      if(yPos<0) yPos=0;
-      else if(yPos+height>screen_height) yPos=screen_height-height;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
+            if(xPos<0) xPos=0;
+            else if(xPos+width>screen_width) xPos = screen_width-width;
+            if(yPos<0) yPos=0;
+            else if(yPos+height>screen_height) yPos=screen_height-height;
+            htbx.x = xPos + hbspX;
+            htbx.y = yPos + hbspY;
+      }
+      else
+      {
+            int mousex, mousey;
+            int mMouse = SDL_GetMouseState(&mousex, &mousey);
+            xPos=mousex, yPos=mousey;
+            if(xPos+width>screen_width) xPos = screen_width-width;
+            else if(xPos<0) xPos=0; 
+            if(yPos+height>screen_height) yPos=screen_height-height;
+            else if(yPos<0) yPos=0;
+            htbx.x = xPos + hbspX;
+            htbx.y = yPos + hbspY;
+      }
        
 }
 
