@@ -1,5 +1,5 @@
 #objects
-OBJS = src/main.cpp src/utils.cpp
+OBJS = src/*.cpp
 #compiler
 CC = g++
 #flags
