@@ -283,7 +283,7 @@ bool loadMedia() {
             printf("failed to load cursor\n");
             success = false;
       }
-      playertex = loadTex("assets/player.png");
+      playertex = loadTex("assets/player1.png");
       if (playertex == NULL)
       {
             printf("failed to load player\n");

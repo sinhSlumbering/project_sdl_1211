@@ -244,4 +244,36 @@ struct Boss
 
 extern Boss plane;
 
+typedef struct Wall
+{
+      int width;
+      int height;
+      int xVel;
+      int yVel;
+      
+      SDL_Rect htbx;
+
+      int xPos;
+      int yPos;
+      Wall();
+
+      void move();
+      void render();
+};
+
+extern Wall wall;
+
+struct Walls 
+{
+      int padding;
+      int wall_number;
+      Wall wallz[3];
+      Walls();
+      void move();
+      void render();
+      void colls();
+};
+
+extern Walls walls;
+
 #endif

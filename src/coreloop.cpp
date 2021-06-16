@@ -1,4 +1,8 @@
 #include "header.hpp"
+#include<time.h>
+
+Wall wall;
+Walls walls;
 
 Player::Player()
 {
@@ -37,9 +41,10 @@ void Player::handleEvent()
 {
       if(!mouseMode)
       {
+            angle=0.0;
             const Uint8* keyState = SDL_GetKeyboardState(NULL);
-            if(keyState[SDL_SCANCODE_UP]) yPos-=yStep;
-            else if(keyState[SDL_SCANCODE_DOWN]) yPos+=yStep;
+            if(keyState[SDL_SCANCODE_UP]) yPos-=yStep, angle=330.0;
+            else if(keyState[SDL_SCANCODE_DOWN]) yPos+=yStep, angle=30.0;
             if(keyState[SDL_SCANCODE_RIGHT]) xPos+=xStep;
             else if(keyState[SDL_SCANCODE_LEFT]) xPos-=xStep;
 
@@ -121,37 +126,87 @@ bool checkCol(SDL_Rect* a, SDL_Rect* b)
           return false;
       }
       else return true;
-
 }
 
-
-void gamestart() {
+Wall::Wall()
+{
+      width=screen_width/15;
+      height=screen_height;
+      xVel=10;
+      yPos=screen_height/2;
+      htbx={xPos, yPos, width, height};
+}
+void Wall::move()
+{
+      xPos-=xVel;
+      if(xPos+width<=0)
+      {
+       xPos=screen_width+width;
+       double val[10]={1.5, 1, 0.75, 1, 2, 1.2, 1, 1.6, 1.3, 0.8};
+       srand(time(0)+wall.yPos);
+       yPos=(screen_height/2)*val[rand()%10];
+      }
+      htbx.x=xPos;
+      htbx.y=yPos;
+}
+void Wall::render()
+{     
+      SDL_Rect renderQuad = {xPos, yPos, width, height};
+      SDL_RenderCopyEx(ren, resumeB, NULL, &htbx, 0.0, NULL, SDL_FLIP_NONE);
+}
+Walls::Walls()
+{
+      padding = screen_width/3;
+      wall_number=3;
+      wallz[0].xPos=screen_width;
+      for(int i=0; i<wall_number; i++)
+            wallz[i].xPos=wallz[i-1].xPos+padding;
+}
+void Walls::move()
+{
+      for(int i=0; i<wall_number; i++)
+            wallz[i].move();
+}
+void Walls::render()
+{
+      for(int i=0; i<wall_number; i++)
+            wallz[i].render();
+}
+void Walls::colls()
+{
+      for(int i=0; i<wall_number; i++)
+            if(checkCol(&player.htbx, &wallz[i].htbx)) printf("lives should be global\n");
+}
+void gamestart() 
+{
       int lives = 3;
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Rect bgdim = {0, 0, screen_width, screen_height};
-            SDL_RenderCopy(ren, inGameBG, NULL, &bgdim);
+            //SDL_RenderCopy(ren, inGameBG, NULL, &bgdim);
             SDL_Event e;
             while (SDL_PollEvent(&e) != 0) {
                   if (e.type == SDL_QUIT)
                         quit = true, isrunning = false;
-                  //player.handleEvent(&e);
                   if (e.type == SDL_KEYDOWN) {
                         switch (e.key.keysym.sym) {
                               case SDLK_ESCAPE:
                                     screen = PAUSE, isrunning = false;
                                     break;
                         }
-                        
                   }
             }
             player.handleEvent();
             if(lives<1) screen=MAIN_MENU, isrunning=false;
             player.render();
-            plane.render();
             plane.move();
+            plane.render();
+            walls.move();
+            walls.render();
+            walls.colls();
             if(checkCol(&player.htbx, &plane.htbx)==true) printf("ouch\n"), lives--;
+            //if(checkCol(&player.htbx, &wall.htbx)==true) printf("that hurt\n"), lives--;
             SDL_RenderPresent(ren);
-            SDL_Delay(1000 / 120);
+            SDL_Delay(1000 / 60);
       }
 }
