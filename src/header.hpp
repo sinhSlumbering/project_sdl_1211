@@ -59,6 +59,19 @@ extern SDL_Texture* playertex;
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
 
+struct upTimer 
+{
+      upTimer();
+
+      bool running;
+      Uint32 startTicks; 
+      
+      void start();
+      Uint32 getTicks();
+      void stop();
+};
+
+extern upTimer iFrame, cFrame;
 
 struct gWindow
 {
@@ -244,24 +257,24 @@ struct Boss
 
 extern Boss plane;
 
-typedef struct Wall
+struct Wall
 {
       int width;
       int height;
       int xVel;
       int yVel;
+      //double val[10];
       
       SDL_Rect htbx;
 
       int xPos;
       int yPos;
+      int yGround;
       Wall();
 
       void move();
       void render();
 };
-
-extern Wall wall;
 
 struct Walls 
 {
@@ -269,6 +282,8 @@ struct Walls
       int wall_number;
       Wall wallz[3];
       Walls();
+
+      Walls(int pad);
       void move();
       void render();
       void colls();

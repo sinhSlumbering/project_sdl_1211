@@ -1,8 +1,9 @@
 #include "header.hpp"
 #include<time.h>
 
-Wall wall;
 Walls walls;
+Boss plane;
+Player player;
 
 Player::Player()
 {
@@ -47,6 +48,9 @@ void Player::handleEvent()
             else if(keyState[SDL_SCANCODE_DOWN]) yPos+=yStep, angle=30.0;
             if(keyState[SDL_SCANCODE_RIGHT]) xPos+=xStep;
             else if(keyState[SDL_SCANCODE_LEFT]) xPos-=xStep;
+            if (keyState[SDL_SCANCODE_SPACE]) if(!cFrame.running)xPos+=player.width, cFrame.start();
+            // if (keyState[SDL_SCANCODE_LSHIFT]) printf("%d\n", iFrame.getTicks());
+            // if (keyState[SDL_SCANCODE_LCTRL]) iFrame.stop();
 
             if(xPos<0) xPos=0;
             else if(xPos+width>screen_width) xPos = screen_width-width;
@@ -74,7 +78,7 @@ Boss::Boss()
 {
       width = screen_width/8;
       height = screen_height/3;
-      yVel = screen_height/100;
+      yVel = screen_height/200;
       scrolldir=1;
       
       xPos = screen_width-width;
@@ -95,37 +99,44 @@ void Boss::render()
 
 bool checkCol(SDL_Rect* a, SDL_Rect* b)
 {
-      int leftA, leftB;
-      int rightA, rightB;
-      int topA, topB;
-      int downA, downB;
+      bool ret=false;
+      if(!iFrame.running)
+      {
+            int leftA, leftB;
+            int rightA, rightB;
+            int topA, topB;
+            int downA, downB;
 
-      leftA = a->x;
-      rightA = a->x + a->w;
-      topA = a->y;
-      downA = a->y + a->h;
+            leftA = a->x;
+            rightA = a->x + a->w;
+            topA = a->y;
+            downA = a->y + a->h;
 
-      leftB = b->x;
-      rightB = b->x + b->w;
-      topB = b->y;
-      downB = b->y + b->h;
-      if( downA <= topB )
-      {
-          return false;
-      }     
-      if( topA >= downB )
-      {
-          return false;
-      }     
-      if( rightA <= leftB )
-      {
-          return false;
-      }     
-      if( leftA >= rightB )
-      {
-          return false;
+            leftB = b->x;
+            rightB = b->x + b->w;
+            topB = b->y;
+            downB = b->y + b->h;
+            if( downA <= topB )
+            {
+            ret=false;
+            }     
+            else if( topA >= downB )
+            {
+            ret=false;
+            }     
+            else if( rightA <= leftB )
+            {
+            ret=false;
+            }     
+            else if( leftA >= rightB )
+            {
+            ret=false;
+            }
+            else ret=true;
+            
       }
-      else return true;
+      if(ret) iFrame.start();
+      return ret;
 }
 
 Wall::Wall()
@@ -134,7 +145,7 @@ Wall::Wall()
       height=screen_height;
       xVel=10;
       yPos=screen_height/2;
-      htbx={xPos, yPos, width, height};
+      htbx={xPos, yPos, width, height};  
 }
 void Wall::move()
 {
@@ -142,16 +153,16 @@ void Wall::move()
       if(xPos+width<=0)
       {
        xPos=screen_width+width;
-       double val[10]={1.5, 1, 0.75, 1, 2, 1.2, 1, 1.6, 1.3, 0.8};
-       srand(time(0)+wall.yPos);
+       double val[10]={1.3, 1.5, 0.75, 0.6, 2, 1.6, 0.85, 0.9, 1.2, 0.8};
+       srand(time(0)+yPos);
        yPos=(screen_height/2)*val[rand()%10];
       }
       htbx.x=xPos;
       htbx.y=yPos;
+      htbx.h=screen_height-htbx.y;
 }
 void Wall::render()
 {     
-      SDL_Rect renderQuad = {xPos, yPos, width, height};
       SDL_RenderCopyEx(ren, resumeB, NULL, &htbx, 0.0, NULL, SDL_FLIP_NONE);
 }
 Walls::Walls()
@@ -162,6 +173,14 @@ Walls::Walls()
       for(int i=0; i<wall_number; i++)
             wallz[i].xPos=wallz[i-1].xPos+padding;
 }
+// Walls::Walls(int pad)
+// {
+//       padding = pad;
+//       wall_number=3;
+//       wallz[0].xPos=screen_width;
+//       for(int i=0; i<wall_number; i++)
+//             wallz[i].xPos=wallz[i-1].xPos+padding;
+// }
 void Walls::move()
 {
       for(int i=0; i<wall_number; i++)
@@ -175,7 +194,7 @@ void Walls::render()
 void Walls::colls()
 {
       for(int i=0; i<wall_number; i++)
-            if(checkCol(&player.htbx, &wallz[i].htbx)) printf("lives should be global\n");
+            if(checkCol(&player.htbx, &wallz[i].htbx)); printf("lives should be global\n");
 }
 void gamestart() 
 {
@@ -203,9 +222,13 @@ void gamestart()
             plane.render();
             walls.move();
             walls.render();
-            walls.colls();
+            //walls.colls();
             if(checkCol(&player.htbx, &plane.htbx)==true) printf("ouch\n"), lives--;
-            //if(checkCol(&player.htbx, &wall.htbx)==true) printf("that hurt\n"), lives--;
+            if(iFrame.running)
+            {
+                  if(iFrame.getTicks()>1500) iFrame.stop();
+            }
+            if(cFrame.running) if(cFrame.getTicks()>300) cFrame.stop();
             SDL_RenderPresent(ren);
             SDL_Delay(1000 / 60);
       }

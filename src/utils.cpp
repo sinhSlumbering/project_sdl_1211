@@ -11,14 +11,13 @@ void updatescreen()
 int screen_width=SCREEN_WIDTH;
 int screen_height=SCREEN_HEIGHT;
 
-Boss plane;
-Player player;
 About about;
 Help help;
 HighScore highScore;
 Pause pause;
 MainMenue mainMenu;
 Options options;
+upTimer iFrame, cFrame;
 
 bool mouseMode=false;
 
@@ -162,7 +161,24 @@ void gWindow::free()
       height=0;
 }
 
-
+upTimer::upTimer()
+{
+      running=false;
+}
+void upTimer::start()
+{
+      running = true;
+      startTicks=SDL_GetTicks();
+}
+Uint32 upTimer::getTicks()
+{
+      return SDL_GetTicks() - startTicks;
+}
+void upTimer::stop()
+{
+      running=false;
+      startTicks=0;
+}
 
 void Error(const std::string msg) {
       printf("%s Error: %s\n", msg, SDL_GetError());
