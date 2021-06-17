@@ -162,7 +162,7 @@ void MainMenue::run()
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
       SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
       SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
-      SDL_RenderCopy(ren, exitB, NULL, &optionsDim);
+      SDL_RenderCopy(ren, OptionsB, NULL, &optionsDim);
       SDL_RenderCopy(ren, helpB, NULL, &helpDim);
       SDL_RenderCopy(ren, aboutB, NULL, &aboutDim);
       SDL_RenderCopy(ren, exitB, NULL, &exitDim);
@@ -283,9 +283,9 @@ void Pause::run()
             handleEvent();
             SDL_RenderClear(ren);
             SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
+            SDL_RenderCopy(ren, pausenewB, NULL, &mainMenueDim);
             SDL_RenderCopy(ren, resumeB, NULL, &resumeDim);
-            SDL_RenderCopy(ren, resumeB, NULL, &mainMenueDim);
-            SDL_RenderCopy(ren, exitB, NULL, &exitDim);
+            SDL_RenderCopy(ren, pauseexitB, NULL, &exitDim);
             SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
             SDL_RenderPresent(ren);
             SDL_Delay(1000/60);

@@ -31,6 +31,9 @@ SDL_Texture* inGameBG;
 SDL_Texture* backB;
 SDL_Texture* highScoreB;
 SDL_Texture* highScoreBG;
+SDL_Texture* OptionsB;
+SDL_Texture* pausenewB;
+SDL_Texture* pauseexitB;
 SDL_Texture* aboutB;
 SDL_Texture* newGameB;
 SDL_Texture* helpB;
@@ -308,8 +311,22 @@ bool loadMedia() {
             printf("failed to load resume button\n");
             success = false;
       }
- 
-      exitB = loadTex("assets/exit.png");
+      pausenewB = loadTex("assets/newgame.png");
+      if (pausenewB == NULL) {
+            printf("failed to load resume button\n");
+            success = false;
+      }
+      pauseexitB = loadTex("assets/exitpause.png");
+      if (pauseexitB == NULL) {
+            printf("failed to load resume button\n");
+            success = false;
+      }
+      OptionsB = loadTex("assets/mainMenu/Options.png");
+      if (OptionsB == NULL) {
+            printf("failed to load resume button\n");
+            success = false;
+      }
+      exitB = loadTex("assets/mainMenu/exit.png");
       if (exitB == NULL) {
             printf("failed to load exit button\n");
             success = false;
