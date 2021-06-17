@@ -36,7 +36,7 @@ SDL_Texture* helpB;
 SDL_Texture* resumeB;
 SDL_Texture* exitB;
 SDL_Texture* cursor;
-SDL_Texture* playertex;
+SDL_Texture* playertex[2];
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
 
@@ -299,8 +299,14 @@ bool loadMedia() {
             printf("failed to load cursor\n");
             success = false;
       }
-      playertex = loadTex("assets/player1.png");
-      if (playertex == NULL)
+      playertex[0] = loadTex("assets/player1.png");
+      if (playertex[0] == NULL)
+      {
+            printf("failed to load player\n");
+            success = false;
+      }
+      playertex[1] = loadTex("assets/player2.png");
+      if (playertex[1] == NULL)
       {
             printf("failed to load player\n");
             success = false;
@@ -359,8 +365,10 @@ void close() {
       resumeB = NULL;
       SDL_DestroyTexture(exitB);
       exitB = NULL;
-      SDL_DestroyTexture(playertex);
-      playertex=NULL;
+      SDL_DestroyTexture(playertex[0]);
+      playertex[0]=NULL;
+      SDL_DestroyTexture(playertex[0]);
+      playertex[0]=NULL;
       SDL_DestroyTexture(bosstex);
       bosstex=NULL;
       SDL_DestroyTexture(optionsToggle[0]);

@@ -4,6 +4,7 @@
 Walls walls;
 Boss plane;
 Player player;
+int hits=0;
 
 Player::Player()
 {
@@ -12,6 +13,7 @@ Player::Player()
       xStep = screen_width/100;
       yStep = screen_height/80;
       hbspX=screen_width/15, hbspY=screen_height/12;
+      tex=0;
 
       xPos = 0;
       yPos = screen_height/2-(width/2);
@@ -25,7 +27,7 @@ void Player::render()
 {
       SDL_Rect renderQuad = {xPos, yPos, width, height};
       
-      SDL_RenderCopyEx(ren, playertex, NULL, &renderQuad, angle, NULL, SDL_FLIP_NONE);
+      SDL_RenderCopyEx(ren, playertex[tex], NULL, &renderQuad, angle, NULL, SDL_FLIP_NONE);
 
 }
 void Player::move(int x, int y){
@@ -89,7 +91,7 @@ void Boss::move()
 {
       if((yPos<0)||(yPos + height>screen_height))
             scrolldir*=-1;
-      yPos+=scrolldir*yVel;
+      htbx.y=yPos+=scrolldir*yVel;
 }
 void Boss::render()
 {
@@ -194,7 +196,7 @@ void Walls::render()
 void Walls::colls()
 {
       for(int i=0; i<wall_number; i++)
-            if(checkCol(&player.htbx, &wallz[i].htbx)); printf("lives should be global\n");
+            if(checkCol(&player.htbx, &wallz[i].htbx)) printf("lives should be global %d\n", hits++);
 }
 void gamestart() 
 {
@@ -222,11 +224,12 @@ void gamestart()
             plane.render();
             walls.move();
             walls.render();
-            //walls.colls();
+            walls.colls();
             if(checkCol(&player.htbx, &plane.htbx)==true) printf("ouch\n"), lives--;
             if(iFrame.running)
             {
-                  if(iFrame.getTicks()>1500) iFrame.stop();
+                  if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0;
+                  else player.tex=(!player.tex);
             }
             if(cFrame.running) if(cFrame.getTicks()>300) cFrame.stop();
             SDL_RenderPresent(ren);

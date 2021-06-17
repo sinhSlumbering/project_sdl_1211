@@ -55,7 +55,7 @@ extern SDL_Texture* helpB;
 extern SDL_Texture* resumeB;
 extern SDL_Texture* exitB;
 extern SDL_Texture* cursor;
-extern SDL_Texture* playertex;
+extern SDL_Texture* playertex[2];
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
 
@@ -223,6 +223,7 @@ struct Player
       int xStep = screen_width/50;
       int yStep = screen_height/25;
       int hbspX=screen_width/60, hbspY=screen_height/50;
+      bool tex;
 
       SDL_Rect htbx;
       
@@ -290,5 +291,6 @@ struct Walls
 };
 
 extern Walls walls;
+
 
 #endif
