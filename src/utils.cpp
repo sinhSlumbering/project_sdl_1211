@@ -39,6 +39,7 @@ SDL_Texture* cursor;
 SDL_Texture* playertex[2];
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
+SDL_Texture* towertex;
 
 
 gWindow::gWindow()
@@ -216,6 +217,7 @@ bool init() {
                         imgError("Initialization");
                         success = false;
                   }
+                  TTF_Init();
             }
       }
       return success;
@@ -249,7 +251,7 @@ bool loadMedia() {
             success = false;
       }
  
-      inGameBG = loadTex("assets/ingame.png");
+      inGameBG = loadTex("assets/background3.png");
       if (inGameBG == NULL) {
             printf("failed to load game screen\n");
             success = false;
@@ -316,6 +318,11 @@ bool loadMedia() {
       {
             success = false;
       }
+      towertex = loadTex("assets/tower.png");
+      if(towertex==NULL)
+      {
+            success = false;
+      }
       //rework dis later
       //DANGEROUS_STUFF_PLEASE CHANGE_FOR_THE_LOVE_OF_ALL_THATS_HOLY
       optionsToggle[0]=exitB;
@@ -375,11 +382,16 @@ void close() {
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
+      SDL_DestroyTexture(scoretex);
+      scoretex=NULL;
+      SDL_DestroyTexture(towertex);
+      towertex=NULL;
       
       SDL_DestroyRenderer(ren);
       ren = NULL;
       win.free();
  
+      TTF_Quit();
       IMG_Quit();
       SDL_Quit();
 }

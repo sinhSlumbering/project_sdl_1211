@@ -2,6 +2,7 @@
 #define HEADER_H
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
 #define SCREEN_WIDTH 800
@@ -22,11 +23,13 @@ enum screens {
  
 extern int  screen_width;
 extern int  screen_height;
+extern int  lives;
  
 extern bool quit;
 extern screens screen;
 extern bool isrunning;
 extern bool mouseMode;
+extern bool invincible;
  
 bool init();
 bool loadMedia();
@@ -58,6 +61,10 @@ extern SDL_Texture* cursor;
 extern SDL_Texture* playertex[2];
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
+extern SDL_Texture* scoretex;
+extern SDL_Texture* towertex;
+
+extern TTF_Font* font;
 
 struct upTimer 
 {
@@ -292,5 +299,28 @@ struct Walls
 
 extern Walls walls;
 
+// struct Bullet 
+// {
+//       int xVel;
+//       int yVel;
+//       SDL_Rect dim;
+
+//       Bullet(int xV, int yV, int w, int h);
+//       void move();
+//       void init();
+//       void col();
+// };
+
+// struct Battack
+// {
+//       Bullet fireball(int xV, int yV, int w, int h);
+//       upTimer interval;
+//       bool fire;
+
+//       Battack();
+//       void execute();
+// };
+
+// extern Battack attack;
 
 #endif
