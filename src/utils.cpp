@@ -40,6 +40,7 @@ SDL_Texture* playertex[2];
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
 SDL_Texture* towertex;
+SDL_Texture* dashtex;
 
 
 gWindow::gWindow()
@@ -179,6 +180,23 @@ void upTimer::stop()
 {
       running=false;
       startTicks=0;
+}
+
+void textCreate(SDL_Renderer *renderer, int x, int y, std::string point,
+        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
+    int text_width;
+    int text_height;
+    SDL_Surface *surface;
+    SDL_Color white = {255, 255, 255, 0};
+    surface = TTF_RenderText_Solid(font, point.c_str(), white);
+    *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    text_width = surface->w;
+    text_height = surface->h;
+    SDL_FreeSurface(surface);
+    rect->x = x;
+    rect->y = y;
+    rect->w = text_width;
+    rect->h = text_height;
 }
 
 void Error(const std::string msg) {
@@ -323,6 +341,11 @@ bool loadMedia() {
       {
             success = false;
       }
+      dashtex = loadTex("assets/dash.png");
+      if(dashtex==NULL)
+      {
+            success = false;
+      }
       //rework dis later
       //DANGEROUS_STUFF_PLEASE CHANGE_FOR_THE_LOVE_OF_ALL_THATS_HOLY
       optionsToggle[0]=exitB;
@@ -384,8 +407,12 @@ void close() {
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(scoretex);
       scoretex=NULL;
+      SDL_DestroyTexture(lifetex);
+      lifetex=NULL;
       SDL_DestroyTexture(towertex);
       towertex=NULL;
+      SDL_DestroyTexture(dashtex);
+      dashtex=NULL;
       
       SDL_DestroyRenderer(ren);
       ren = NULL;

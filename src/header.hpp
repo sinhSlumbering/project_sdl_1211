@@ -40,7 +40,7 @@ void titlescreen();
 void gamestart();
 void close();
 void updatescreen();
-
+void textCreate(SDL_Renderer* renderer, int x, int y, std::string point, TTF_Font* font, SDL_Texture** texture, SDL_Rect *rect);
  
 SDL_Texture* loadTex(std::string path);
  
@@ -62,7 +62,9 @@ extern SDL_Texture* playertex[2];
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
 extern SDL_Texture* scoretex;
+extern SDL_Texture* lifetex;
 extern SDL_Texture* towertex;
+extern SDL_Texture* dashtex;
 
 extern TTF_Font* font;
 

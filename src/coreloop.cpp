@@ -4,11 +4,13 @@
 Walls walls;
 Boss plane;
 Player player;
+SDL_Rect dashdim;
 //Battack attack;
 int lives = 3;
 int hits=0;
 bool invincible = false;
 SDL_Texture* scoretex;
+SDL_Texture* lifetex;
 TTF_Font* font;
 
 char* font_path = "assets/Sans/Sans.ttf";
@@ -70,8 +72,12 @@ void Player::handleEvent()
                   xPos -= xStep;
             if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]) 
                   if(!cFrame.running)
-                        xPos+=player.width*3/2, cFrame.start(), invincible=true;
-
+                       {
+                              dashdim = {player.xPos, player.yPos, player.width, player.height}; 
+                              xPos+=player.width*3/2;
+                              cFrame.start();
+                              invincible=true;
+                       }
 
             if (xPos < 0)
                   xPos = 0;
@@ -127,22 +133,22 @@ void Boss::render()
       SDL_RenderCopyEx(ren, bosstex, NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
 }
 
-void Scoring(SDL_Renderer *renderer, int x, int y, std::string point,
-        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
-    int text_width;
-    int text_height;
-    SDL_Surface *surface;
-    SDL_Color white = {255, 255, 255, 0};
-    surface = TTF_RenderText_Solid(font, point.c_str(), white);
-    *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    text_width = surface->w;
-    text_height = surface->h;
-    SDL_FreeSurface(surface);
-    rect->x = x;
-    rect->y = y;
-    rect->w = text_width;
-    rect->h = text_height;
-}
+// void Scoring(SDL_Renderer *renderer, int x, int y, std::string point,
+//         TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
+//     int text_width;
+//     int text_height;
+//     SDL_Surface *surface;
+//     SDL_Color white = {255, 255, 255, 0};
+//     surface = TTF_RenderText_Solid(font, point.c_str(), white);
+//     *texture = SDL_CreateTextureFromSurface(renderer, surface);
+//     text_width = surface->w;
+//     text_height = surface->h;
+//     SDL_FreeSurface(surface);
+//     rect->x = x;
+//     rect->y = y;
+//     rect->w = text_width;
+//     rect->h = text_height;
+// }
 
 bool checkCol(SDL_Rect* a, SDL_Rect* b)
 {
@@ -307,11 +313,18 @@ void gamestart()
                   if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, invincible=false;
                   else player.tex=(!player.tex);
             }
-            if(cFrame.running) if(cFrame.getTicks()>300) cFrame.stop(), invincible=false;
+            if(cFrame.running) {
+                  if(cFrame.getTicks()>300) cFrame.stop();
+                  invincible=false;
+                  SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
+            }
             if(lives<1) screen=MAIN_MENU, isrunning=false;
             std::string show_score = "Score: "+std::to_string(score);
-            Scoring(ren, 0, 0, show_score, font, &scoretex, &area);
+            textCreate(ren, 0, 0, show_score, font, &scoretex, &area);
             SDL_RenderCopy(ren, scoretex, NULL, &area);
+            std::string show_lives = "Lives: "+std::to_string(lives);
+            textCreate(ren, 0, area.h, show_lives, font, &lifetex, &area);
+            SDL_RenderCopy(ren, lifetex, NULL, &area);
 
             SDL_RenderPresent(ren);
             SDL_Delay(1000 / 60);
