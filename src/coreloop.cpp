@@ -60,18 +60,27 @@ void Player::handleEvent()
       {
             angle=0.0;
             const Uint8 *keyState = SDL_GetKeyboardState(NULL);
-            if (keyState[SDL_SCANCODE_UP]||keyState[SDL_SCANCODE_W])
+            if (keyState[SDL_SCANCODE_UP]||keyState[SDL_SCANCODE_W]){
                   yPos -= yStep, angle=330.0;
-            else if (keyState[SDL_SCANCODE_DOWN]||keyState[SDL_SCANCODE_S])
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            else if (keyState[SDL_SCANCODE_DOWN]||keyState[SDL_SCANCODE_S]){
                   yPos += yStep, angle=30.0;
-            if (keyState[SDL_SCANCODE_RIGHT]||keyState[SDL_SCANCODE_D])
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            if (keyState[SDL_SCANCODE_RIGHT]||keyState[SDL_SCANCODE_D]){
                   xPos += xStep;
-            else if (keyState[SDL_SCANCODE_LEFT]||keyState[SDL_SCANCODE_A])
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            else if (keyState[SDL_SCANCODE_LEFT]||keyState[SDL_SCANCODE_A]){
                   xPos -= xStep;
-            if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]) 
-                  if(!cFrame.running)
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]){ 
+                  if(!cFrame.running){
                         xPos+=player.width*3/2, cFrame.start(), invincible=true;
-
+                  }
+            }
 
             if (xPos < 0)
                   xPos = 0;
@@ -127,22 +136,22 @@ void Boss::render()
       SDL_RenderCopyEx(ren, bosstex, NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
 }
 
-void Scoring(SDL_Renderer *renderer, int x, int y, std::string point,
-        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
-    int text_width;
-    int text_height;
-    SDL_Surface *surface;
-    SDL_Color white = {255, 255, 255, 0};
-    surface = TTF_RenderText_Solid(font, point.c_str(), white);
-    *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    text_width = surface->w;
-    text_height = surface->h;
-    SDL_FreeSurface(surface);
-    rect->x = x;
-    rect->y = y;
-    rect->w = text_width;
-    rect->h = text_height;
-}
+// void Scoring(SDL_Renderer *renderer, int x, int y, std::string point,
+//         TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
+//     int text_width;
+//     int text_height;
+//     SDL_Surface *surface;
+//     SDL_Color white = {255, 255, 255, 0};
+//     surface = TTF_RenderText_Solid(font, point.c_str(), white);
+//     *texture = SDL_CreateTextureFromSurface(renderer, surface);
+//     text_width = surface->w;
+//     text_height = surface->h;
+//     SDL_FreeSurface(surface);
+//     rect->x = x;
+//     rect->y = y;
+//     rect->w = text_width;
+//     rect->h = text_height;
+// }
 
 bool checkCol(SDL_Rect* a, SDL_Rect* b)
 {
@@ -275,7 +284,7 @@ void gamestart()
       ingamedim.w = screen_width;
       ingamedim.x = 0;
       ingamedim.y = 0;
-
+      score = 0;
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
@@ -301,7 +310,11 @@ void gamestart()
             walls.move();
             walls.render();
             walls.colls();
-            if(checkCol(&player.htbx, &plane.htbx)==true) printf("ouch\n"), lives--;
+            if(checkCol(&player.htbx, &plane.htbx)==true){ 
+                  printf("ouch\n");
+                  lives--;
+                  Mix_PlayChannel(-1,ghit,0);
+            }
             if(iFrame.running)
             {
                   if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, invincible=false;
@@ -316,4 +329,5 @@ void gamestart()
             SDL_RenderPresent(ren);
             SDL_Delay(1000 / 60);
       }
+      Cal_highscore(score);
 }

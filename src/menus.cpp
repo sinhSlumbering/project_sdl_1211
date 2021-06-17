@@ -155,6 +155,9 @@ void MainMenue::handleEvent()
 void MainMenue::run()
 {
       handleEvent();
+      if(Mix_PlayingMusic()==0){
+            Mix_PlayMusic(gBackgroundMusic,-1);
+      }
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
       SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
@@ -457,8 +460,21 @@ void HighScore::handleEvents()
 void HighScore::run() {
       
       SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, pauseBG, NULL, NULL);
+      SDL_RenderCopy(ren, highScoreBG, NULL, NULL);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
+      TTF_Init();
+      FILE *fptr = fopen("assets/highscore.txt", "r");
+      font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
+      int num, x, y;
+      x = 385;
+      y = 50;
+
+      while ((num = getw(fptr)) != EOF)
+      {
+            highscore_printing(num,x,y);
+            y += 50;
+      }
+      fclose(fptr);
       SDL_RenderPresent(ren);
       handleEvents();
 }
