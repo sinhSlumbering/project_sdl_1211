@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <iostream>
+#include <SDL2/SDL_ttf.h>
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
  
@@ -22,12 +23,12 @@ enum screens {
  
 extern int  screen_width;
 extern int  screen_height;
- 
+extern int score;
 extern bool quit;
 extern screens screen;
 extern bool isrunning;
 extern bool mouseMode;
- 
+
 bool init();
 bool loadMedia();
 bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey);
@@ -40,7 +41,7 @@ void updatescreen();
 
  
 SDL_Texture* loadTex(std::string path);
- 
+extern SDL_Texture* scoretex;
 extern SDL_Renderer* ren;
 extern SDL_Texture* titleBG;
 extern SDL_Texture* mainMenuBG;
@@ -58,7 +59,7 @@ extern SDL_Texture* cursor;
 extern SDL_Texture* playertex;
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
-
+extern TTF_Font* font;
 
 struct gWindow
 {
@@ -243,37 +244,5 @@ struct Boss
 };
 
 extern Boss plane;
-
-typedef struct Wall
-{
-      int width;
-      int height;
-      int xVel;
-      int yVel;
-      
-      SDL_Rect htbx;
-
-      int xPos;
-      int yPos;
-      Wall();
-
-      void move();
-      void render();
-};
-
-extern Wall wall;
-
-struct Walls 
-{
-      int padding;
-      int wall_number;
-      Wall wallz[3];
-      Walls();
-      void move();
-      void render();
-      void colls();
-};
-
-extern Walls walls;
 
 #endif

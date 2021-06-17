@@ -22,7 +22,7 @@ Options options;
 
 bool mouseMode=false;
 
-
+SDL_Texture* scoretex;
 SDL_Renderer* ren;
 SDL_Texture* titleBG;
 SDL_Texture* mainMenuBG;
@@ -40,7 +40,7 @@ SDL_Texture* cursor;
 SDL_Texture* playertex;
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
-
+TTF_Font *font;
 
 gWindow::gWindow()
 {
@@ -233,7 +233,7 @@ bool loadMedia() {
             success = false;
       }
  
-      inGameBG = loadTex("assets/ingame.png");
+      inGameBG = loadTex("assets/background3.png");
       if (inGameBG == NULL) {
             printf("failed to load game screen\n");
             success = false;
@@ -283,7 +283,7 @@ bool loadMedia() {
             printf("failed to load cursor\n");
             success = false;
       }
-      playertex = loadTex("assets/player1.png");
+      playertex = loadTex("assets/player.png");
       if (playertex == NULL)
       {
             printf("failed to load player\n");
@@ -351,11 +351,12 @@ void close() {
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
-      
+      SDL_DestroyTexture(scoretex);
       SDL_DestroyRenderer(ren);
+      TTF_CloseFont(font);
       ren = NULL;
       win.free();
- 
+      TTF_Quit();
       IMG_Quit();
       SDL_Quit();
 }
