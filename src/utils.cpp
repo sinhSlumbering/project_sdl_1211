@@ -11,14 +11,13 @@ void updatescreen()
 int screen_width=SCREEN_WIDTH;
 int screen_height=SCREEN_HEIGHT;
 
-Boss plane;
-Player player;
 About about;
 Help help;
 HighScore highScore;
 Pause pause;
 MainMenue mainMenu;
 Options options;
+upTimer iFrame, cFrame;
 
 bool mouseMode=false;
 
@@ -37,9 +36,10 @@ SDL_Texture* helpB;
 SDL_Texture* resumeB;
 SDL_Texture* exitB;
 SDL_Texture* cursor;
-SDL_Texture* playertex;
+SDL_Texture* playertex[2];
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
+SDL_Texture* towertex;
 
 
 gWindow::gWindow()
@@ -162,7 +162,24 @@ void gWindow::free()
       height=0;
 }
 
-
+upTimer::upTimer()
+{
+      running=false;
+}
+void upTimer::start()
+{
+      running = true;
+      startTicks=SDL_GetTicks();
+}
+Uint32 upTimer::getTicks()
+{
+      return SDL_GetTicks() - startTicks;
+}
+void upTimer::stop()
+{
+      running=false;
+      startTicks=0;
+}
 
 void Error(const std::string msg) {
       printf("%s Error: %s\n", msg, SDL_GetError());
@@ -200,6 +217,7 @@ bool init() {
                         imgError("Initialization");
                         success = false;
                   }
+                  TTF_Init();
             }
       }
       return success;
@@ -233,7 +251,7 @@ bool loadMedia() {
             success = false;
       }
  
-      inGameBG = loadTex("assets/ingame.png");
+      inGameBG = loadTex("assets/background3.png");
       if (inGameBG == NULL) {
             printf("failed to load game screen\n");
             success = false;
@@ -283,14 +301,25 @@ bool loadMedia() {
             printf("failed to load cursor\n");
             success = false;
       }
-      playertex = loadTex("assets/player1.png");
-      if (playertex == NULL)
+      playertex[0] = loadTex("assets/player1.png");
+      if (playertex[0] == NULL)
+      {
+            printf("failed to load player\n");
+            success = false;
+      }
+      playertex[1] = loadTex("assets/player2.png");
+      if (playertex[1] == NULL)
       {
             printf("failed to load player\n");
             success = false;
       }
       bosstex = loadTex("assets/boss.png");
       if(bosstex==NULL)
+      {
+            success = false;
+      }
+      towertex = loadTex("assets/tower.png");
+      if(towertex==NULL)
       {
             success = false;
       }
@@ -343,19 +372,26 @@ void close() {
       resumeB = NULL;
       SDL_DestroyTexture(exitB);
       exitB = NULL;
-      SDL_DestroyTexture(playertex);
-      playertex=NULL;
+      SDL_DestroyTexture(playertex[0]);
+      playertex[0]=NULL;
+      SDL_DestroyTexture(playertex[0]);
+      playertex[0]=NULL;
       SDL_DestroyTexture(bosstex);
       bosstex=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
+      SDL_DestroyTexture(scoretex);
+      scoretex=NULL;
+      SDL_DestroyTexture(towertex);
+      towertex=NULL;
       
       SDL_DestroyRenderer(ren);
       ren = NULL;
       win.free();
  
+      TTF_Quit();
       IMG_Quit();
       SDL_Quit();
 }

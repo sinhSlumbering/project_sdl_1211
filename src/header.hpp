@@ -2,6 +2,7 @@
 #define HEADER_H
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
 #define SCREEN_WIDTH 800
@@ -22,11 +23,13 @@ enum screens {
  
 extern int  screen_width;
 extern int  screen_height;
+extern int  lives;
  
 extern bool quit;
 extern screens screen;
 extern bool isrunning;
 extern bool mouseMode;
+extern bool invincible;
  
 bool init();
 bool loadMedia();
@@ -55,10 +58,27 @@ extern SDL_Texture* helpB;
 extern SDL_Texture* resumeB;
 extern SDL_Texture* exitB;
 extern SDL_Texture* cursor;
-extern SDL_Texture* playertex;
+extern SDL_Texture* playertex[2];
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
+extern SDL_Texture* scoretex;
+extern SDL_Texture* towertex;
 
+extern TTF_Font* font;
+
+struct upTimer 
+{
+      upTimer();
+
+      bool running;
+      Uint32 startTicks; 
+      
+      void start();
+      Uint32 getTicks();
+      void stop();
+};
+
+extern upTimer iFrame, cFrame;
 
 struct gWindow
 {
@@ -210,6 +230,7 @@ struct Player
       int xStep = screen_width/50;
       int yStep = screen_height/25;
       int hbspX=screen_width/60, hbspY=screen_height/50;
+      bool tex;
 
       SDL_Rect htbx;
       
@@ -244,24 +265,24 @@ struct Boss
 
 extern Boss plane;
 
-typedef struct Wall
+struct Wall
 {
       int width;
       int height;
       int xVel;
       int yVel;
+      //double val[10];
       
       SDL_Rect htbx;
 
       int xPos;
       int yPos;
+      int yGround;
       Wall();
 
       void move();
       void render();
 };
-
-extern Wall wall;
 
 struct Walls 
 {
@@ -269,11 +290,37 @@ struct Walls
       int wall_number;
       Wall wallz[3];
       Walls();
+
+      Walls(int pad);
       void move();
       void render();
       void colls();
 };
 
 extern Walls walls;
+
+// struct Bullet 
+// {
+//       int xVel;
+//       int yVel;
+//       SDL_Rect dim;
+
+//       Bullet(int xV, int yV, int w, int h);
+//       void move();
+//       void init();
+//       void col();
+// };
+
+// struct Battack
+// {
+//       Bullet fireball(int xV, int yV, int w, int h);
+//       upTimer interval;
+//       bool fire;
+
+//       Battack();
+//       void execute();
+// };
+
+// extern Battack attack;
 
 #endif
