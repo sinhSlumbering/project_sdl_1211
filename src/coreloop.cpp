@@ -341,6 +341,7 @@ void gamestart()
       ingamedim.x = 0;
       ingamedim.y = 0;
       score = 0;
+      lives = 3;
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
@@ -396,4 +397,6 @@ void gamestart()
             SDL_Delay(1000 / 60);
       }
       Cal_highscore(score);
+      player.xPos = 0;
+      player.yPos = 280;
 }
