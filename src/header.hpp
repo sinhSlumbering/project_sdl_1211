@@ -2,12 +2,13 @@
 #define HEADER_H
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+#include <bits/stdc++.h>
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
- 
 enum screens {
       TITLE_SCREEN,
       MAIN_MENU,
@@ -40,10 +41,13 @@ void titlescreen();
 void gamestart();
 void close();
 void updatescreen();
-void textCreate(SDL_Renderer* renderer, int x, int y, std::string point, TTF_Font* font, SDL_Texture** texture, SDL_Rect *rect);
- 
-SDL_Texture* loadTex(std::string path);
- 
+void Cal_highscore(int a);
+SDL_Texture *loadTex(std::string path);
+void highscore_printing(int a,int x, int y);
+void printText(SDL_Renderer *renderer, int x, int y, std::string point,
+             TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
+
+
 extern SDL_Renderer* ren;
 extern SDL_Texture* titleBG;
 extern SDL_Texture* mainMenuBG;
@@ -52,6 +56,10 @@ extern SDL_Texture* aboutBG;
 extern SDL_Texture* inGameBG;
 extern SDL_Texture* backB;
 extern SDL_Texture* highScoreB;
+extern SDL_Texture* highScoreBG;
+extern SDL_Texture* OptionsB;
+extern SDL_Texture* pausenewB;
+extern SDL_Texture* pauseexitB;
 extern SDL_Texture* aboutB;
 extern SDL_Texture* newGameB;
 extern SDL_Texture* helpB;
@@ -63,10 +71,19 @@ extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
 extern SDL_Texture* scoretex;
 extern SDL_Texture* lifetex;
-extern SDL_Texture* towertex;
 extern SDL_Texture* dashtex;
+extern SDL_Texture* towertex;
 
 extern TTF_Font* font;
+
+extern SDL_Rect area;
+
+extern Mix_Music *gBackgroundMusic;
+extern Mix_Chunk *gScratch; 
+extern Mix_Chunk *gForward;
+extern Mix_Chunk *gBackword;
+extern Mix_Chunk *ghit;
+extern Mix_Chunk *gdie;
 
 struct upTimer 
 {

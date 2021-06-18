@@ -4,13 +4,13 @@
 Walls walls;
 Boss plane;
 Player player;
-SDL_Rect dashdim;
 //Battack attack;
 int lives = 3;
 int hits=0;
 bool invincible = false;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
+SDL_Rect dashdim;
 TTF_Font* font;
 
 char* font_path = "assets/Sans/Sans.ttf";
@@ -62,22 +62,31 @@ void Player::handleEvent()
       {
             angle=0.0;
             const Uint8 *keyState = SDL_GetKeyboardState(NULL);
-            if (keyState[SDL_SCANCODE_UP]||keyState[SDL_SCANCODE_W])
+            if (keyState[SDL_SCANCODE_UP]||keyState[SDL_SCANCODE_W]){
                   yPos -= yStep, angle=330.0;
-            else if (keyState[SDL_SCANCODE_DOWN]||keyState[SDL_SCANCODE_S])
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            else if (keyState[SDL_SCANCODE_DOWN]||keyState[SDL_SCANCODE_S]){
                   yPos += yStep, angle=30.0;
-            if (keyState[SDL_SCANCODE_RIGHT]||keyState[SDL_SCANCODE_D])
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            if (keyState[SDL_SCANCODE_RIGHT]||keyState[SDL_SCANCODE_D]){
                   xPos += xStep;
-            else if (keyState[SDL_SCANCODE_LEFT]||keyState[SDL_SCANCODE_A])
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            else if (keyState[SDL_SCANCODE_LEFT]||keyState[SDL_SCANCODE_A]){
                   xPos -= xStep;
-            if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]) 
+                  Mix_PlayChannel(-1,gForward,0);
+            }
+            if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]){ 
                   if(!cFrame.running)
-                       {
-                              dashdim = {player.xPos, player.yPos, player.width, player.height}; 
-                              xPos+=player.width*3/2;
-                              cFrame.start();
-                              invincible=true;
-                       }
+                  {
+                        dashdim = {player.xPos, player.yPos, player.width, player.height}; 
+                        xPos+=player.width*3/2;
+                        cFrame.start();
+                        invincible=true;
+                  }
+            }
 
             if (xPos < 0)
                   xPos = 0;
@@ -281,7 +290,7 @@ void gamestart()
       ingamedim.w = screen_width;
       ingamedim.x = 0;
       ingamedim.y = 0;
-
+      score = 0;
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
@@ -307,26 +316,32 @@ void gamestart()
             walls.move();
             walls.render();
             walls.colls();
-            if(checkCol(&player.htbx, &plane.htbx)==true) printf("ouch\n"), lives--;
+            if(checkCol(&player.htbx, &plane.htbx)==true){ 
+                  printf("ouch\n");
+                  lives--;
+                  Mix_PlayChannel(-1,ghit,0);
+            }
             if(iFrame.running)
             {
                   if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, invincible=false;
                   else player.tex=(!player.tex);
             }
             if(cFrame.running) {
-                  if(cFrame.getTicks()>300) cFrame.stop();
-                  invincible=false;
+                  Uint32 f=cFrame.getTicks();
+                  if(f>500) cFrame.stop();
+                  else if(f>300) invincible=false;
                   SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
             }
             if(lives<1) screen=MAIN_MENU, isrunning=false;
             std::string show_score = "Score: "+std::to_string(score);
-            textCreate(ren, 0, 0, show_score, font, &scoretex, &area);
+            printText(ren, 0, 0, show_score, font, &scoretex, &area);
             SDL_RenderCopy(ren, scoretex, NULL, &area);
             std::string show_lives = "Lives: "+std::to_string(lives);
-            textCreate(ren, 0, area.h, show_lives, font, &lifetex, &area);
+            printText(ren, 0, area.h, show_lives, font, &lifetex, &area);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
 
             SDL_RenderPresent(ren);
             SDL_Delay(1000 / 60);
       }
+      Cal_highscore(score);
 }

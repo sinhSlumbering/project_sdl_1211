@@ -155,11 +155,14 @@ void MainMenue::handleEvent()
 void MainMenue::run()
 {
       handleEvent();
+      if(Mix_PlayingMusic()==0){
+            Mix_PlayMusic(gBackgroundMusic,-1);
+      }
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
       SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
       SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
-      SDL_RenderCopy(ren, exitB, NULL, &optionsDim);
+      SDL_RenderCopy(ren, OptionsB, NULL, &optionsDim);
       SDL_RenderCopy(ren, helpB, NULL, &helpDim);
       SDL_RenderCopy(ren, aboutB, NULL, &aboutDim);
       SDL_RenderCopy(ren, exitB, NULL, &exitDim);
@@ -280,9 +283,9 @@ void Pause::run()
             handleEvent();
             SDL_RenderClear(ren);
             SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
+            SDL_RenderCopy(ren, pausenewB, NULL, &mainMenueDim);
             SDL_RenderCopy(ren, resumeB, NULL, &resumeDim);
-            SDL_RenderCopy(ren, resumeB, NULL, &mainMenueDim);
-            SDL_RenderCopy(ren, exitB, NULL, &exitDim);
+            SDL_RenderCopy(ren, pauseexitB, NULL, &exitDim);
             SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
             SDL_RenderPresent(ren);
             SDL_Delay(1000/60);
@@ -457,8 +460,21 @@ void HighScore::handleEvents()
 void HighScore::run() {
       
       SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, pauseBG, NULL, NULL);
+      SDL_RenderCopy(ren, highScoreBG, NULL, NULL);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
+      TTF_Init();
+      FILE *fptr = fopen("assets/highscore.txt", "r");
+      font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
+      int num, x, y;
+      x = 385;
+      y = 50;
+
+      while ((num = getw(fptr)) != EOF)
+      {
+            highscore_printing(num,x,y);
+            y += 50;
+      }
+      fclose(fptr);
       SDL_RenderPresent(ren);
       handleEvents();
 }

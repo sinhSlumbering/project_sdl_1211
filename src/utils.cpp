@@ -30,6 +30,10 @@ SDL_Texture* aboutBG;
 SDL_Texture* inGameBG;
 SDL_Texture* backB;
 SDL_Texture* highScoreB;
+SDL_Texture* highScoreBG;
+SDL_Texture* OptionsB;
+SDL_Texture* pausenewB;
+SDL_Texture* pauseexitB;
 SDL_Texture* aboutB;
 SDL_Texture* newGameB;
 SDL_Texture* helpB;
@@ -42,6 +46,12 @@ SDL_Texture* optionsToggle[2];
 SDL_Texture* towertex;
 SDL_Texture* dashtex;
 
+Mix_Music *gBackgroundMusic;
+Mix_Chunk *gScratch; 
+Mix_Chunk *gForward;
+Mix_Chunk *gBackword;
+Mix_Chunk *ghit;
+Mix_Chunk *gdie;
 
 gWindow::gWindow()
 {
@@ -182,23 +192,6 @@ void upTimer::stop()
       startTicks=0;
 }
 
-void textCreate(SDL_Renderer *renderer, int x, int y, std::string point,
-        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
-    int text_width;
-    int text_height;
-    SDL_Surface *surface;
-    SDL_Color white = {255, 255, 255, 0};
-    surface = TTF_RenderText_Solid(font, point.c_str(), white);
-    *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    text_width = surface->w;
-    text_height = surface->h;
-    SDL_FreeSurface(surface);
-    rect->x = x;
-    rect->y = y;
-    rect->w = text_width;
-    rect->h = text_height;
-}
-
 void Error(const std::string msg) {
       printf("%s Error: %s\n", msg, SDL_GetError());
 }
@@ -214,14 +207,19 @@ void imgLoadError(const std::string path) {
 bool init() {
       bool success = true;
  
-      if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+      if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0)
+      {
             Error("Initialization");
             success = false;
       } else {
             if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
                   printf("linear texture filtering disabled\n");
             }
-
+            if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+            {
+                  printf("SDL_mixer Error: %s\n", Mix_GetError());
+                  success = false;
+            }
             if(!win.init())
             {
                   Error("window creation");
@@ -291,6 +289,12 @@ bool loadMedia() {
             printf("failed to load highscore button\n");
             success = false;
       }
+      highScoreBG = loadTex("assets/highscore.png");
+      if (highScoreBG == NULL)
+      {
+            printf("failed to load highscore background\n");
+            success = false;
+      }
       newGameB = loadTex("assets/mainMenu/newgame.jpg");
       if (newGameB == NULL) {
             printf("failed to load newgame button\n");
@@ -308,8 +312,22 @@ bool loadMedia() {
             printf("failed to load resume button\n");
             success = false;
       }
- 
-      exitB = loadTex("assets/exit.png");
+      pausenewB = loadTex("assets/newgame.png");
+      if (pausenewB == NULL) {
+            printf("failed to load resume button\n");
+            success = false;
+      }
+      pauseexitB = loadTex("assets/exitpause.png");
+      if (pauseexitB == NULL) {
+            printf("failed to load resume button\n");
+            success = false;
+      }
+      OptionsB = loadTex("assets/mainMenu/Options.png");
+      if (OptionsB == NULL) {
+            printf("failed to load resume button\n");
+            success = false;
+      }
+      exitB = loadTex("assets/mainMenu/exit.png");
       if (exitB == NULL) {
             printf("failed to load exit button\n");
             success = false;
@@ -346,6 +364,30 @@ bool loadMedia() {
       {
             success = false;
       }
+      gBackgroundMusic = Mix_LoadMUS("assets/Fluffing-a-Duck.mp3");
+      if (gBackgroundMusic == NULL)
+      {
+            printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+            success = false;
+      }
+      ghit = Mix_LoadWAV("assets/hit.wav");
+      if (ghit == NULL)
+      {
+            printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+            success = false;
+      }
+      gForward = Mix_LoadWAV("assets/a.wav");
+      if (gForward == NULL)
+      {
+            printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+            success = false;
+      }
+      gBackword = Mix_LoadWAV("assets/sfx_swooshing.wav");
+      if (gBackword == NULL)
+      {
+            printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+            success = false;
+      }
       //rework dis later
       //DANGEROUS_STUFF_PLEASE CHANGE_FOR_THE_LOVE_OF_ALL_THATS_HOLY
       optionsToggle[0]=exitB;
@@ -369,7 +411,76 @@ SDL_Texture* loadTex(std::string path) {
       }
       return newTexture;
 }
+
+void Cal_highscore(int a)
+{
+      FILE *fptr;
+      int num[11];
+
+      num[10] = a;
+      int b;
+      fptr = fopen("assets/highscore.txt", "r");
+      int i = 0;
+      while ((b = getw(fptr)) != EOF)
+      {
+            num[i] = b;
+            // printf("%d ",num[i]);
+            i++;
+      }
+      int num2[10];
+      for (int i = 0; i < 10; i++)
+      {
+            for (int j = 0; j < 10 - i; j++)
+            {
+                  if (num[j] > num[j + 1])
+                  {
+                        int swap = num[j];
+                        num[j] = num[j + 1];
+                        num[j + 1] = swap;
+                  }
+            }
+      }
+      for (i = 0; i < 10; i++)
+      {
+            num2[i] = num[10 - i];
+      }
+      fclose(fptr);
+      remove("assets/highscore.txt");
+      fptr = fopen("assets/highscore.txt", "w");
+      for (int i = 0; i < 10; i++)
+      {
+            putw(num2[i], fptr);
+      }
+      fclose(fptr);
+}
  
+void printText(SDL_Renderer *renderer, int x, int y, std::string point,
+             TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect)
+{
+      int text_width;
+      int text_height;
+      SDL_Surface *surface;
+      SDL_Color white = {255, 255, 255, 0};
+
+      surface = TTF_RenderText_Solid(font, point.c_str(), white);
+      *texture = SDL_CreateTextureFromSurface(renderer, surface);
+      text_width = surface->w;
+      text_height = surface->h;
+      SDL_FreeSurface(surface);
+      rect->x = x;
+      rect->y = y;
+      rect->w = text_width;
+      rect->h = text_height;
+}
+
+void highscore_printing(int a, int x, int y)
+{
+
+      std::string show = std::to_string(a);
+      printText(ren, x, y, show, font, &scoretex, &area);
+      SDL_RenderCopy(ren, scoretex, NULL, &area);
+}
+
 void close() {
       SDL_DestroyTexture(titleBG);
       titleBG = NULL;
@@ -407,17 +518,17 @@ void close() {
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(scoretex);
       scoretex=NULL;
-      SDL_DestroyTexture(lifetex);
-      lifetex=NULL;
       SDL_DestroyTexture(towertex);
       towertex=NULL;
-      SDL_DestroyTexture(dashtex);
-      dashtex=NULL;
       
       SDL_DestroyRenderer(ren);
       ren = NULL;
       win.free();
- 
+      TTF_CloseFont(font);
+      Mix_FreeMusic(gBackgroundMusic);
+      Mix_FreeChunk(ghit);
+      Mix_FreeChunk(gForward);
+      Mix_FreeChunk(gBackword);
       TTF_Quit();
       IMG_Quit();
       SDL_Quit();
