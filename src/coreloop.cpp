@@ -9,6 +9,8 @@ int lives = 3;
 int hits=0;
 bool invincible = false;
 SDL_Texture* scoretex;
+SDL_Texture* lifetex;
+SDL_Rect dashdim;
 TTF_Font* font;
 
 char* font_path = "assets/Sans/Sans.ttf";
@@ -77,8 +79,12 @@ void Player::handleEvent()
                   Mix_PlayChannel(-1,gForward,0);
             }
             if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]){ 
-                  if(!cFrame.running){
-                        xPos+=player.width*3/2, cFrame.start(), invincible=true;
+                  if(!cFrame.running)
+                  {
+                        dashdim = {player.xPos, player.yPos, player.width, player.height}; 
+                        xPos+=player.width*3/2;
+                        cFrame.start();
+                        invincible=true;
                   }
             }
 
@@ -320,11 +326,20 @@ void gamestart()
                   if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, invincible=false;
                   else player.tex=(!player.tex);
             }
-            if(cFrame.running) if(cFrame.getTicks()>300) cFrame.stop(), invincible=false;
+            if(cFrame.running) {
+                  Uint32 f=cFrame.getTicks();
+                  if(f>500) 
+                  cFrame.stop();
+                  else if(f>300) invincible=false;
+                  SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
+            }
             if(lives<1) screen=MAIN_MENU, isrunning=false;
             std::string show_score = "Score: "+std::to_string(score);
-            Scoring(ren, 0, 0, show_score, font, &scoretex, &area);
+            printText(ren, 0, 0, show_score, font, &scoretex, &area);
             SDL_RenderCopy(ren, scoretex, NULL, &area);
+            std::string show_lives = "Lives: "+std::to_string(lives);
+            printText(ren, 0, area.h, show_lives, font, &lifetex, &area);
+            SDL_RenderCopy(ren, lifetex, NULL, &area);
 
             SDL_RenderPresent(ren);
             SDL_Delay(1000 / 60);

@@ -44,6 +44,7 @@ SDL_Texture* playertex[2];
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
 SDL_Texture* towertex;
+SDL_Texture* dashtex;
 
 Mix_Music *gBackgroundMusic;
 Mix_Chunk *gScratch; 
@@ -358,6 +359,11 @@ bool loadMedia() {
       {
             success = false;
       }
+      dashtex = loadTex("assets/dash.png");
+      if(dashtex==NULL)
+      {
+            success = false;
+      }
       gBackgroundMusic = Mix_LoadMUS("assets/Fluffing-a-Duck.mp3");
       if (gBackgroundMusic == NULL)
       {
@@ -448,7 +454,7 @@ void Cal_highscore(int a)
       fclose(fptr);
 }
  
-void Scoring(SDL_Renderer *renderer, int x, int y, std::string point,
+void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect)
 {
       int text_width;
@@ -471,7 +477,7 @@ void highscore_printing(int a, int x, int y)
 {
 
       std::string show = std::to_string(a);
-      Scoring(ren, x, y, show, font, &scoretex, &area);
+      printText(ren, x, y, show, font, &scoretex, &area);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
 

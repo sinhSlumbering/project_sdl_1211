@@ -44,7 +44,7 @@ void updatescreen();
 void Cal_highscore(int a);
 SDL_Texture *loadTex(std::string path);
 void highscore_printing(int a,int x, int y);
-void Scoring(SDL_Renderer *renderer, int x, int y, std::string point,
+void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
 
 
@@ -70,6 +70,8 @@ extern SDL_Texture* playertex[2];
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
 extern SDL_Texture* scoretex;
+extern SDL_Texture* lifetex;
+extern SDL_Texture* dashtex;
 extern SDL_Texture* towertex;
 
 extern TTF_Font* font;
