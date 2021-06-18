@@ -4,6 +4,7 @@
 Walls walls;
 Boss plane;
 Player player;
+Powerup powerup;
 //Battack attack;
 int lives = 3;
 int hits=0;
@@ -282,6 +283,55 @@ void Walls::colls()
 //             fireball->dim.y=plane.xPos+plane.height/2;
 //       }
 // }
+Powerup::Powerup()
+{
+      int width=player.width/2;
+      powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
+      vel = 10;
+      spawn = true;
+      running = false;
+}
+void Powerup::move()
+{
+      powerupdim.x-=vel;
+      if(powerupdim.x+powerupdim.w<0) powerupdim=initdim, spawn=true, running=false, ptimer.start();
+      SDL_RenderCopy(ren, poweruptex[current], NULL, &powerupdim);
+}
+
+void Powerup::choose()
+{
+      srand(time(0));
+      current = rand();
+      powerupdim.y=current%(screen_height);
+      current%=POWERUP_N+1;
+      spawn=false;
+      running = true;
+}
+
+void Powerup::run()
+{
+      Uint32 time=ptimer.getTicks();
+      if(spawn) choose();
+      else if(invincible)
+      {
+            if(time>10000) invincible=false, player.tex=0, ptimer.stop(), ptimer.start();
+      }
+      else if(time>POWERUP_INTERVAL) spawn=true, ptimer.stop();
+      if(running)
+      {
+            if(checkCol(&player.htbx, &powerupdim))
+                  {
+                        powerupdim=initdim;
+                        ptimer.start();
+                        running=false;
+                        if(current==LIFE) lives++;
+                        if(current==INVINCIBILE) invincible=true, player.tex=1;
+                  }
+            else move();
+      }
+      
+}
+
 void gamestart() 
 {
       font = TTF_OpenFont(font_path,24);
@@ -311,6 +361,7 @@ void gamestart()
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
+            powerup.run();
             plane.move();
             plane.render();
             walls.move();

@@ -9,6 +9,9 @@
 #include <bits/stdc++.h>
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+#define POWERUP_N 2
+#define POWERUP_INTERVAL 15000
+
 enum screens {
       TITLE_SCREEN,
       MAIN_MENU,
@@ -73,6 +76,7 @@ extern SDL_Texture* scoretex;
 extern SDL_Texture* lifetex;
 extern SDL_Texture* dashtex;
 extern SDL_Texture* towertex;
+extern SDL_Texture* poweruptex[POWERUP_N];
 
 extern TTF_Font* font;
 
@@ -97,7 +101,7 @@ struct upTimer
       void stop();
 };
 
-extern upTimer iFrame, cFrame;
+extern upTimer iFrame, cFrame, ptimer;
 
 struct gWindow
 {
@@ -341,5 +345,36 @@ extern Walls walls;
 // };
 
 // extern Battack attack;
+
+struct Entity
+{
+      int x;
+      int y;
+      int xVel;
+      int yVel;
+
+      void checkCol();
+};
+
+struct Powerup
+{
+      bool spawn;
+      bool running;
+      SDL_Rect powerupdim, initdim;
+      int vel;
+      enum pUP{
+            LIFE,
+            INVINCIBILE,
+            WAIT
+      };
+      int current;
+
+      Powerup();
+      void move();
+      void choose();
+      void run();
+};
+
+extern Powerup powerup;
 
 #endif

@@ -17,7 +17,7 @@ HighScore highScore;
 Pause pause;
 MainMenue mainMenu;
 Options options;
-upTimer iFrame, cFrame;
+upTimer iFrame, cFrame, ptimer;
 
 bool mouseMode=false;
 
@@ -45,6 +45,7 @@ SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
 SDL_Texture* towertex;
 SDL_Texture* dashtex;
+SDL_Texture* poweruptex[POWERUP_N];
 
 Mix_Music *gBackgroundMusic;
 Mix_Chunk *gScratch; 
@@ -364,6 +365,16 @@ bool loadMedia() {
       {
             success = false;
       }
+      poweruptex[0] = loadTex("assets/heart.png");
+      if(poweruptex[0]==NULL)
+      {
+            success = false;
+      }
+      poweruptex[1] = loadTex("assets/omniman.png");
+      if(poweruptex[1]==NULL)
+      {
+            success = false;
+      }
       gBackgroundMusic = Mix_LoadMUS("assets/Fluffing-a-Duck.mp3");
       if (gBackgroundMusic == NULL)
       {
@@ -520,6 +531,12 @@ void close() {
       scoretex=NULL;
       SDL_DestroyTexture(towertex);
       towertex=NULL;
+      SDL_DestroyTexture(dashtex);
+      dashtex=NULL;
+      SDL_DestroyTexture(poweruptex[0]);
+      poweruptex[0]=NULL;
+      SDL_DestroyTexture(poweruptex[1]);
+      poweruptex[1]=NULL;
       
       SDL_DestroyRenderer(ren);
       ren = NULL;
