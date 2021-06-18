@@ -55,6 +55,7 @@ Mix_Chunk *gForward;
 Mix_Chunk *gBackword;
 Mix_Chunk *ghit;
 Mix_Chunk *gdie;
+Mix_Chunk *gpoint;
 
 gWindow::gWindow()
 {
@@ -350,7 +351,7 @@ bool loadMedia() {
             printf("failed to load cursor\n");
             success = false;
       }
-      playertex[0] = loadTex("assets/player1.png");
+      playertex[0] = loadTex("assets/player1_new.png");
       if (playertex[0] == NULL)
       {
             printf("failed to load player\n");
@@ -362,7 +363,7 @@ bool loadMedia() {
             printf("failed to load player\n");
             success = false;
       }
-      bosstex = loadTex("assets/boss.png");
+      bosstex = loadTex("assets/Hilda_Berg_Intro_Sprite.png");
       if(bosstex==NULL)
       {
             success = false;
@@ -395,6 +396,12 @@ bool loadMedia() {
       }
       ghit = Mix_LoadWAV("assets/hit.wav");
       if (ghit == NULL)
+      {
+            printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+            success = false;
+      }
+      gpoint = Mix_LoadWAV("assets/point.wav");
+      if (gpoint == NULL)
       {
             printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
             success = false;
@@ -560,6 +567,8 @@ void close() {
       Mix_FreeChunk(ghit);
       Mix_FreeChunk(gForward);
       Mix_FreeChunk(gBackword);
+      Mix_FreeChunk(gpoint);
+      Mix_Quit();
       TTF_Quit();
       IMG_Quit();
       SDL_Quit();

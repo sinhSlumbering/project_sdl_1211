@@ -85,7 +85,7 @@ extern TTF_Font* font;
 extern SDL_Rect area;
 
 extern Mix_Music *gBackgroundMusic;
-extern Mix_Chunk *gScratch; 
+extern Mix_Chunk *gpoint; 
 extern Mix_Chunk *gForward;
 extern Mix_Chunk *gBackword;
 extern Mix_Chunk *ghit;

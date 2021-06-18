@@ -122,7 +122,7 @@ void Player::handleEvent()
 
 Boss::Boss()
 {
-      width = screen_width / 8;
+      width = screen_width / 6;
       height = screen_height / 3;
       yVel = screen_height / 100;
       scrolldir = 1;
@@ -324,8 +324,15 @@ void Powerup::run()
                         powerupdim=initdim;
                         ptimer.start();
                         running=false;
-                        if(current==LIFE) lives++;
-                        if(current==INVINCIBILE) invincible=true, player.tex=1;
+                        if(current==LIFE) {
+                              lives++;
+                              Mix_PlayChannel(-1,gpoint,0);
+                        }
+                        if(current==INVINCIBILE){
+                              invincible=true;
+                              player.tex=1;
+                              Mix_PlayChannel(-1,gpoint,0);
+                        }
                   }
             else move();
       }
