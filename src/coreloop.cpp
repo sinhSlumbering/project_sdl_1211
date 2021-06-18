@@ -5,10 +5,10 @@ Walls walls;
 Boss plane;
 Player player;
 Powerup powerup;
-//Battack attack;
+Attack attack;
 int lives = 3;
 int hits=0;
-bool invincible = false;
+bool Hinvincible = false, Pinvincible=false;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
@@ -25,7 +25,7 @@ Player::Player()
       height = screen_height / 8;
       xStep = screen_width / 100;
       yStep = screen_height / 80;
-      hbspX = screen_width / 15, hbspY = screen_height / 12;
+      hbspX = screen_width / 30, hbspY = screen_height / 30;
 
       tex=0;
       xPos = 0;
@@ -34,7 +34,8 @@ Player::Player()
       angle = 0.0;
       htbx.x = xPos + hbspX;
       htbx.y = yPos + hbspY;
-      htbx = { screen_width / 60, screen_height / 50, width / 15, height / 12 };
+      htbx.w = screen_width / 35;
+      htbx.h = screen_height / 22;
 };
 
 void Player::render()
@@ -83,9 +84,9 @@ void Player::handleEvent()
                   if(!cFrame.running)
                   {
                         dashdim = {player.xPos, player.yPos, player.width, player.height}; 
-                        xPos+=player.width*3/2;
+                        xPos+=player.width*2;
                         cFrame.start();
-                        invincible=true;
+                        Hinvincible=true;
                   }
             }
 
@@ -164,7 +165,7 @@ bool checkCol(SDL_Rect* a, SDL_Rect* b)
 {
 
       bool ret=false;
-      if(!invincible)
+      if(!Hinvincible&&!Pinvincible)
       {
             int leftA, leftB;
             int rightA, rightB;
@@ -196,10 +197,9 @@ bool checkCol(SDL_Rect* a, SDL_Rect* b)
             {
             ret=false;
             }
-            else ret=true;
-            
+            else ret=true;          
       }
-      if(ret) iFrame.start(), invincible=true;
+      if(ret) iFrame.start(), Hinvincible=true;
       return ret;
 }
 
@@ -258,31 +258,9 @@ void Walls::render()
 void Walls::colls()
 {
       for(int i=0; i<wall_number; i++)
-            if(checkCol(&player.htbx, &wallz[i].htbx)) printf("lives should be global %d\n", hits++);
+            if(checkCol(&player.htbx, &wallz[i].htbx)) lives--;
 }
-// Bullet::Bullet(int xV, int yV, int w, int h)
-// {
-//       dim={screen_width, screen_height, w, h};
-//       xVel=xV;
-//       yVel=yV;
-// }
-// void Bullet::move()
-// {
-//       dim.x-=xVel;
-//       dim.y-=yVel;
-// }
-// Battack::Battack()
-// {
-//       fireball(10, 10, screen_width/60, screen_width/60);
-//       fire=true;
-// }
-// void Battack::execute()
-// {
-//       if(fire)
-//       {
-//             fireball->dim.y=plane.xPos+plane.height/2;
-//       }
-// }
+
 Powerup::Powerup()
 {
       int width=player.width/2;
@@ -312,9 +290,9 @@ void Powerup::run()
 {
       Uint32 time=ptimer.getTicks();
       if(spawn) choose();
-      else if(invincible)
+      else if(Pinvincible)
       {
-            if(time>10000) invincible=false, player.tex=0, ptimer.stop(), ptimer.start();
+            if(time>10000) Pinvincible=false, player.tex=1, ptimer.stop(), ptimer.start();
       }
       else if(time>POWERUP_INTERVAL) spawn=true, ptimer.stop();
       if(running)
@@ -329,16 +307,69 @@ void Powerup::run()
                               Mix_PlayChannel(-1,gpoint,0);
                         }
                         if(current==INVINCIBILE){
-                              invincible=true;
+                              Pinvincible=true;
                               player.tex=1;
                               Mix_PlayChannel(-1,gpoint,0);
                         }
+
                   }
             else move();
       }
       
 }
-
+Attack::Attack()
+{
+      spawn = true;
+      int side=screen_width/20, arm=side/1.42;
+      bouncedim = homedim = { screen_width, screen_height, side, side };
+      bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
+      current = 0;
+      bXvel=10;
+      bYvel=-10;
+      hXvel=5;
+      hYvel=5;
+      angle=0.0;
+}
+void Attack::choose()
+{
+      srand(time(0));
+      current=rand()%2;
+      spawn=false;
+      bouncedim.y=plane.yPos+plane.height/2;
+      homedim.y=plane.yPos+plane.height/2;
+}
+void Attack::bounce()
+{
+      angle++;
+      if(angle>360) angle=0.0;
+      if (bouncedim.y<=0||bouncedim.y>=screen_height) bYvel*=-1;
+      if (bouncedim.x<=0) 
+            spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w;
+      if(checkCol(&player.htbx, &bouncedim))
+            spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w, lives--;
+      bouncedim.x-=bXvel, bouncedim.y-=bYvel;
+      SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
+}
+void Attack::home()
+{
+      angle++;
+      if(angle>360) angle=0.0;
+      if (homedim.y>player.htbx.y) homedim.y-=hXvel;
+      else if (homedim.y<player.htbx.y) homedim.y+=hXvel;
+      else if(homedim.y==player.htbx.y);
+      if (homedim.x<=0) 
+            spawn=true, homedim.x=homedim.y=screen_width+homedim.w;
+      if(checkCol(&player.htbx, &homedim))
+            spawn=true, homedim.x=homedim.y=screen_width+homedim.w, lives--;
+      homedim.x-=bXvel;
+      SDL_RenderCopyEx(ren, homingtex, NULL, &homedim, angle, NULL, SDL_FLIP_NONE);       
+}
+void Attack::run()
+{
+      if(spawn) choose();
+      else if(current==BOUNCING) bounce();
+      else if(current==HOMING) home();
+}
 void gamestart() 
 {
       font = TTF_OpenFont(font_path,24);
@@ -370,27 +401,30 @@ void gamestart()
             player.handleEvent();
             player.render();
             powerup.run();
+            attack.run();
             plane.move();
             plane.render();
             walls.move();
             walls.render();
             walls.colls();
+            if(iFrame.running)
+            {
+                  if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, Hinvincible=false;
+                  else if(player.tex==1) player.tex=0;
+                  else player.tex=0;
+            }
+            if(cFrame.running) {
+                  Uint32 f=cFrame.getTicks();
+                  player.tex=2;
+                  if(f>500) 
+                        cFrame.stop(), player.tex=0;
+                  else if(f>300) Hinvincible=false, dashdim={screen_width,screen_height,0,0};
+                  SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
+            }
             if(checkCol(&player.htbx, &plane.htbx)==true){ 
                   printf("ouch\n");
                   lives--;
                   Mix_PlayChannel(-1,ghit,0);
-            }
-            if(iFrame.running)
-            {
-                  if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, invincible=false;
-                  else player.tex=(!player.tex);
-            }
-            if(cFrame.running) {
-                  Uint32 f=cFrame.getTicks();
-                  if(f>500) 
-                  cFrame.stop();
-                  else if(f>300) invincible=false;
-                  SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
             }
             if(lives<1) screen=MAIN_MENU, isrunning=false;
             std::string show_score = "Score: "+std::to_string(score);
@@ -399,6 +433,10 @@ void gamestart()
             std::string show_lives = "Lives: "+std::to_string(lives);
             printText(ren, 0, area.h, show_lives, font, &lifetex, &area);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
+            
+            //debug hitbox
+            //SDL_RenderDrawRect(ren, &player.htbx);
+            
 
             SDL_RenderPresent(ren);
             SDL_Delay(1000 / 60);

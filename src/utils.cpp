@@ -42,12 +42,15 @@ SDL_Texture* helpB;
 SDL_Texture* resumeB;
 SDL_Texture* exitB;
 SDL_Texture* cursor;
-SDL_Texture* playertex[2];
+SDL_Texture* playertex[3];
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
 SDL_Texture* towertex;
 SDL_Texture* dashtex;
 SDL_Texture* poweruptex[POWERUP_N];
+SDL_Texture* fireballtex;
+SDL_Texture* homingtex;
+
 
 Mix_Music *gBackgroundMusic;
 Mix_Chunk *gScratch; 
@@ -363,6 +366,12 @@ bool loadMedia() {
             printf("failed to load player\n");
             success = false;
       }
+      playertex[2] = loadTex("assets/playerwithdash.png");
+      if (playertex[2] == NULL)
+      {
+            printf("failed to load player\n");
+            success = false;
+      }
       bosstex = loadTex("assets/Hilda_Berg_Intro_Sprite.png");
       if(bosstex==NULL)
       {
@@ -385,6 +394,16 @@ bool loadMedia() {
       }
       poweruptex[1] = loadTex("assets/omniman.png");
       if(poweruptex[1]==NULL)
+      {
+            success = false;
+      }
+      fireballtex = loadTex("assets/fireball.png");
+      if(fireballtex==NULL)
+      {
+            success = false;
+      }
+      homingtex = loadTex("assets/homing.png");
+      if(homingtex==NULL)
       {
             success = false;
       }
@@ -538,8 +557,10 @@ void close() {
       exitB = NULL;
       SDL_DestroyTexture(playertex[0]);
       playertex[0]=NULL;
-      SDL_DestroyTexture(playertex[0]);
-      playertex[0]=NULL;
+      SDL_DestroyTexture(playertex[2]);
+      playertex[2]=NULL;
+      SDL_DestroyTexture(playertex[2]);
+      playertex[2]=NULL;
       SDL_DestroyTexture(bosstex);
       bosstex=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
@@ -558,6 +579,10 @@ void close() {
       poweruptex[0]=NULL;
       SDL_DestroyTexture(poweruptex[1]);
       poweruptex[1]=NULL;
+      SDL_DestroyTexture(fireballtex);
+      fireballtex=NULL;
+      SDL_DestroyTexture(homingtex);
+      homingtex=NULL;
       
       SDL_DestroyRenderer(ren);
       ren = NULL;

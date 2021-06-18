@@ -33,7 +33,7 @@ extern bool quit;
 extern screens screen;
 extern bool isrunning;
 extern bool mouseMode;
-extern bool invincible;
+extern bool Hinvincible, Pinvincible;
  
 bool init();
 bool loadMedia();
@@ -71,7 +71,7 @@ extern SDL_Texture* helpB;
 extern SDL_Texture* resumeB;
 extern SDL_Texture* exitB;
 extern SDL_Texture* cursor;
-extern SDL_Texture* playertex[2];
+extern SDL_Texture* playertex[3];
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
 extern SDL_Texture* scoretex;
@@ -79,6 +79,8 @@ extern SDL_Texture* lifetex;
 extern SDL_Texture* dashtex;
 extern SDL_Texture* towertex;
 extern SDL_Texture* poweruptex[POWERUP_N];
+extern SDL_Texture* fireballtex;
+extern SDL_Texture* homingtex;
 
 extern TTF_Font* font;
 
@@ -255,7 +257,7 @@ struct Player
       int xStep = screen_width/50;
       int yStep = screen_height/25;
       int hbspX=screen_width/60, hbspY=screen_height/50;
-      bool tex;
+      int tex;
 
       SDL_Rect htbx;
       
@@ -324,39 +326,6 @@ struct Walls
 
 extern Walls walls;
 
-// struct Bullet 
-// {
-//       int xVel;
-//       int yVel;
-//       SDL_Rect dim;
-
-//       Bullet(int xV, int yV, int w, int h);
-//       void move();
-//       void init();
-//       void col();
-// };
-
-// struct Battack
-// {
-//       Bullet fireball(int xV, int yV, int w, int h);
-//       upTimer interval;
-//       bool fire;
-
-//       Battack();
-//       void execute();
-// };
-
-// extern Battack attack;
-
-struct Entity
-{
-      int x;
-      int y;
-      int xVel;
-      int yVel;
-
-      void checkCol();
-};
 
 struct Powerup
 {
@@ -378,5 +347,28 @@ struct Powerup
 };
 
 extern Powerup powerup;
+
+struct Attack
+{
+      bool spawn;
+      SDL_Rect bouncedim, homedim;
+      SDL_Rect bhtbx, hhtbx;
+      int bXvel, bYvel, hXvel, hYvel;
+      double angle;
+      enum att
+      {
+            BOUNCING,
+            HOMING
+      };
+      int current;
+
+      Attack();
+      void choose();
+      void bounce();
+      void home();
+      void run();
+};
+
+extern Attack attack;
 
 #endif
