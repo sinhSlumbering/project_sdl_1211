@@ -32,6 +32,8 @@ SDL_Texture* backB;
 SDL_Texture* highScoreB;
 SDL_Texture* highScoreBG;
 SDL_Texture* OptionsB;
+SDL_Texture* FullScreenB;
+SDL_Texture* MouseModeB;
 SDL_Texture* pausenewB;
 SDL_Texture* pauseexitB;
 SDL_Texture* aboutB;
@@ -325,7 +327,17 @@ bool loadMedia() {
       }
       OptionsB = loadTex("assets/mainMenu/Options.png");
       if (OptionsB == NULL) {
-            printf("failed to load resume button\n");
+            printf("failed to load option button\n");
+            success = false;
+      }
+      FullScreenB = loadTex("assets/Full Screen 0ption.png");
+      if (FullScreenB == NULL) {
+            printf("failed to load fullscreen button button\n");
+            success = false;
+      }
+      MouseModeB = loadTex("assets/Mouse Mode.png");
+      if (MouseModeB == NULL) {
+            printf("failed to load Mouse Mode button\n");
             success = false;
       }
       exitB = loadTex("assets/mainMenu/exit.png");
@@ -526,6 +538,8 @@ void close() {
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
+      SDL_DestroyTexture(FullScreenB);
+      SDL_DestroyTexture(MouseModeB);
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(scoretex);
       scoretex=NULL;

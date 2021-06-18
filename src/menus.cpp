@@ -295,8 +295,8 @@ Options::Options()
 {
       yVal = menumin = screen_height / 3; 
       step = screen_height / 10;
-      buttonH = screen_height / 20;
-      buttonW = screen_width / 6;
+      buttonH = screen_height / 10;
+      buttonW = screen_width / 4;
       xVal = screen_width - 3 * buttonW / 2;
       menumax = screen_height / 3 + screen_height / 10;
       bgdim = {0, 0, screen_width, screen_height};
@@ -411,8 +411,8 @@ void Options::run()
       handleEvent();
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
-      SDL_RenderCopy(ren, optionsToggle[win.fullScreen], NULL, &fullScreenDim);
-      SDL_RenderCopy(ren, optionsToggle[mouseMode], NULL, &mouseModeDim);
+      SDL_RenderCopy(ren, FullScreenB, NULL, &fullScreenDim);
+      SDL_RenderCopy(ren, MouseModeB, NULL, &mouseModeDim);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
       SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
       SDL_RenderPresent(ren);

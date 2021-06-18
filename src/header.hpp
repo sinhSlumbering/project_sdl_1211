@@ -61,6 +61,8 @@ extern SDL_Texture* backB;
 extern SDL_Texture* highScoreB;
 extern SDL_Texture* highScoreBG;
 extern SDL_Texture* OptionsB;
+extern SDL_Texture* FullScreenB;
+extern SDL_Texture* MouseModeB;
 extern SDL_Texture* pausenewB;
 extern SDL_Texture* pauseexitB;
 extern SDL_Texture* aboutB;
