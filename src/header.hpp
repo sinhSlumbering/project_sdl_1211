@@ -13,6 +13,9 @@
 #define POWERUP_INTERVAL 15000
 #define PLAYERBULLET_N 5
 #define PLAYERBULLET_RATE 300
+#define WALL_START_TIME 5000
+#define ATTACK_START_TIME 10000
+#define POWERUP_START_TIME 3000
 
 enum screens {
       TITLE_SCREEN,
@@ -112,7 +115,7 @@ struct upTimer
       void stop();
 };
 
-extern upTimer iFrame, cFrame, ptimer, btimer;
+extern upTimer iFrame, cFrame, ptimer, btimer, diffTimer;
 
 struct gWindow
 {
@@ -317,6 +320,7 @@ struct Wall
       int height;
       int xVel;
       int yVel;
+      int mod;
       //double val[10];
       
       SDL_Rect htbx;
