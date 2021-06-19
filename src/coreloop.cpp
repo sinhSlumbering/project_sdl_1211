@@ -26,10 +26,17 @@ Player::Player()
       xStep = screen_width / 100;
       yStep = screen_height / 80;
       hbspX = screen_width / 30, hbspY = screen_height / 30;
+      
+      bulletVel = 20;
+      bulletIndex = 0;
+      bulletW=player.width/3;
+      bulletH=player.height/4;
+      fire=true;
+      for(int i=0; i<PLAYERBULLET_N; i++) bulletdim[i]={-bulletW, -bulletH, bulletW, bulletH};
 
       tex=0;
-      xPos = 0;
 
+      xPos = 0;
       yPos = screen_height / 2 - ( width / 2 );
       angle = 0.0;
       htbx.x = xPos + hbspX;
@@ -120,6 +127,40 @@ void Player::handleEvent()
       }
        
 }
+void Player::bullet()
+{
+      if(btimer.running&&btimer.getTicks()>PLAYERBULLET_RATE) fire=true, btimer.stop();
+      if(fire)
+      {
+            if(bulletIndex==PLAYERBULLET_N) bulletIndex=0; 
+            bulletdim[bulletIndex].x = player.xPos+player.width;
+            bulletdim[bulletIndex].y = player.yPos+player.height/4;
+            bulletIndex++;
+            btimer.start();
+            fire=false;
+      }
+      for(int i=0; i<PLAYERBULLET_N; i++)
+      {
+            if(bulletdim[i].x>0)
+            {
+                  bulletdim[i].x+=bulletVel;
+                  if(bulletdim[i].x>screen_width) bulletdim[i].x=-bulletW, bulletdim[i].y=0;
+                  else {
+                        SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
+                        if(checkCol(&bulletdim[i], &plane.htbx)) printf("enemyhit\n");
+                  }
+            }
+      }
+}
+bool Player::col(SDL_Rect* projectile)
+{
+      bool ret=false;
+      if(!Hinvincible&&!Pinvincible){
+            ret=checkCol(&htbx, projectile);
+            if(ret) iFrame.start(), Hinvincible=true;
+      }
+      return ret;
+}
 
 Boss::Boss()
 {
@@ -144,63 +185,38 @@ void Boss::render()
       SDL_RenderCopyEx(ren, bosstex, NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
 }
 
-// void Scoring(SDL_Renderer *renderer, int x, int y, std::string point,
-//         TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
-//     int text_width;
-//     int text_height;
-//     SDL_Surface *surface;
-//     SDL_Color white = {255, 255, 255, 0};
-//     surface = TTF_RenderText_Solid(font, point.c_str(), white);
-//     *texture = SDL_CreateTextureFromSurface(renderer, surface);
-//     text_width = surface->w;
-//     text_height = surface->h;
-//     SDL_FreeSurface(surface);
-//     rect->x = x;
-//     rect->y = y;
-//     rect->w = text_width;
-//     rect->h = text_height;
-// }
 
 bool checkCol(SDL_Rect* a, SDL_Rect* b)
 {
-
-      bool ret=false;
-      if(!Hinvincible&&!Pinvincible)
+      int leftA, leftB;
+      int rightA, rightB;
+      int topA, topB;
+      int downA, downB;
+      leftA = a->x;
+      rightA = a->x + a->w;
+      topA = a->y;
+      downA = a->y + a->h;
+      leftB = b->x;
+      rightB = b->x + b->w;
+      topB = b->y;
+      downB = b->y + b->h;
+      if( downA <= topB )
       {
-            int leftA, leftB;
-            int rightA, rightB;
-            int topA, topB;
-            int downA, downB;
-
-            leftA = a->x;
-            rightA = a->x + a->w;
-            topA = a->y;
-            downA = a->y + a->h;
-
-            leftB = b->x;
-            rightB = b->x + b->w;
-            topB = b->y;
-            downB = b->y + b->h;
-            if( downA <= topB )
-            {
-            ret=false;
-            }     
-            else if( topA >= downB )
-            {
-            ret=false;
-            }     
-            else if( rightA <= leftB )
-            {
-            ret=false;
-            }     
-            else if( leftA >= rightB )
-            {
-            ret=false;
-            }
-            else ret=true;          
+      return false;
+      }     
+      else if( topA >= downB )
+      {
+      return false;
+      }     
+      else if( rightA <= leftB )
+      {
+      return false;
+      }     
+      else if( leftA >= rightB )
+      {
+      return false;
       }
-      if(ret) iFrame.start(), Hinvincible=true;
-      return ret;
+      else return true;          
 }
 
 Wall::Wall()
@@ -237,14 +253,7 @@ Walls::Walls()
       for(int i=0; i<wall_number; i++)
             wallz[i].xPos=wallz[i-1].xPos+padding;
 }
-// Walls::Walls(int pad)
-// {
-//       padding = pad;
-//       wall_number=3;
-//       wallz[0].xPos=screen_width;
-//       for(int i=0; i<wall_number; i++)
-//             wallz[i].xPos=wallz[i-1].xPos+padding;
-// }
+
 void Walls::move()
 {
       for(int i=0; i<wall_number; i++)
@@ -258,7 +267,7 @@ void Walls::render()
 void Walls::colls()
 {
       for(int i=0; i<wall_number; i++)
-            if(checkCol(&player.htbx, &wallz[i].htbx)){
+            if(player.col(&wallz[i].htbx)){
                   lives--;
                   Mix_PlayChannel(-1,ghit,0);
             }
@@ -348,7 +357,7 @@ void Attack::bounce()
       if (bouncedim.y<=0||bouncedim.y>=screen_height) bYvel*=-1;
       if (bouncedim.x<=0) 
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w;
-      if(checkCol(&player.htbx, &bouncedim)){
+      if(player.col(&bouncedim)){
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w, lives--;
             Mix_PlayChannel(-1,ghit,0);
       }
@@ -364,7 +373,7 @@ void Attack::home()
       else if(homedim.y==player.htbx.y);
       if (homedim.x<=0) 
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w;
-      if(checkCol(&player.htbx, &homedim)){
+      if(player.col(&homedim)){
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w, lives--;
       }
       homedim.x-=bXvel;
@@ -406,6 +415,7 @@ void gamestart()
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
+            player.bullet();
             powerup.run();
             attack.run();
             plane.move();
@@ -427,7 +437,7 @@ void gamestart()
                   else if(f>300) Hinvincible=false, dashdim={screen_width,screen_height,0,0};
                   SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
             }
-            if(checkCol(&player.htbx, &plane.htbx)==true){ 
+            if(player.col(&plane.htbx)==true){ 
                   printf("ouch\n");
                   lives--;
                   Mix_PlayChannel(-1,ghit,0);
@@ -445,7 +455,7 @@ void gamestart()
             
 
             SDL_RenderPresent(ren);
-            SDL_Delay(1000 / 60);
+            optimizeFPS(&prevtime, &remaintime);
       }
       Cal_highscore(score);
       player.xPos = 0;

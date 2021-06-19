@@ -11,6 +11,8 @@
 #define SCREEN_HEIGHT 600
 #define POWERUP_N 2
 #define POWERUP_INTERVAL 15000
+#define PLAYERBULLET_N 5
+#define PLAYERBULLET_RATE 300
 
 enum screens {
       TITLE_SCREEN,
@@ -28,12 +30,15 @@ enum screens {
 extern int  screen_width;
 extern int  screen_height;
 extern int  lives;
+extern long prevtime;
+extern float remaintime;
  
 extern bool quit;
 extern screens screen;
 extern bool isrunning;
 extern bool mouseMode;
 extern bool Hinvincible, Pinvincible;
+
  
 bool init();
 bool loadMedia();
@@ -49,6 +54,7 @@ SDL_Texture *loadTex(std::string path);
 void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
+void optimizeFPS(long *prevtime, float *remainder);
 
 
 extern SDL_Renderer* ren;
@@ -72,6 +78,7 @@ extern SDL_Texture* resumeB;
 extern SDL_Texture* exitB;
 extern SDL_Texture* cursor;
 extern SDL_Texture* playertex[3];
+extern SDL_Texture* playerbullet;
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
 extern SDL_Texture* scoretex;
@@ -105,7 +112,7 @@ struct upTimer
       void stop();
 };
 
-extern upTimer iFrame, cFrame, ptimer;
+extern upTimer iFrame, cFrame, ptimer, btimer;
 
 struct gWindow
 {
@@ -250,6 +257,12 @@ struct Pause
 };    
 extern Pause pause;
 
+struct Bulletpos
+{
+      int x;
+      int y;
+};
+
 struct Player
 {
       int width = screen_width/10;
@@ -258,8 +271,12 @@ struct Player
       int yStep = screen_height/25;
       int hbspX=screen_width/60, hbspY=screen_height/50;
       int tex;
+      int bulletVel, bulletIndex;
+      int bulletW, bulletH;
+      bool fire;
 
       SDL_Rect htbx;
+      SDL_Rect bulletdim[PLAYERBULLET_N];
       
       int xPos = 0;
       int yPos = screen_height/2-(width/2);
@@ -268,7 +285,9 @@ struct Player
 
       void handleEvent();
       void move(int x, int y);
+      void bullet();
       void render();
+      bool col(SDL_Rect*);
 };
 extern Player player;
 
