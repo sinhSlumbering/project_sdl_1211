@@ -276,7 +276,7 @@ bool loadMedia() {
             success = false;
       }
  
-      inGameBG = loadTex("assets/background3.png");
+      inGameBG = loadTex("assets/newbg.png");
       if (inGameBG == NULL) {
             printf("failed to load game screen\n");
             success = false;
@@ -517,7 +517,7 @@ void printText(SDL_Renderer *renderer, int x, int y, std::string point,
       int text_width;
       int text_height;
       SDL_Surface *surface;
-      SDL_Color white = {255, 255, 255, 0};
+      SDL_Color white = {236, 134, 134, 0};
 
       surface = TTF_RenderText_Solid(font, point.c_str(), white);
       *texture = SDL_CreateTextureFromSurface(renderer, surface);
