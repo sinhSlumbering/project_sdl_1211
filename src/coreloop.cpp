@@ -258,7 +258,10 @@ void Walls::render()
 void Walls::colls()
 {
       for(int i=0; i<wall_number; i++)
-            if(checkCol(&player.htbx, &wallz[i].htbx)) lives--;
+            if(checkCol(&player.htbx, &wallz[i].htbx)){
+                  lives--;
+                  Mix_PlayChannel(-1,ghit,0);
+            }
 }
 
 Powerup::Powerup()
@@ -345,8 +348,10 @@ void Attack::bounce()
       if (bouncedim.y<=0||bouncedim.y>=screen_height) bYvel*=-1;
       if (bouncedim.x<=0) 
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w;
-      if(checkCol(&player.htbx, &bouncedim))
+      if(checkCol(&player.htbx, &bouncedim)){
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w, lives--;
+            Mix_PlayChannel(-1,ghit,0);
+      }
       bouncedim.x-=bXvel, bouncedim.y-=bYvel;
       SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
 }
@@ -359,8 +364,9 @@ void Attack::home()
       else if(homedim.y==player.htbx.y);
       if (homedim.x<=0) 
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w;
-      if(checkCol(&player.htbx, &homedim))
+      if(checkCol(&player.htbx, &homedim)){
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w, lives--;
+      }
       homedim.x-=bXvel;
       SDL_RenderCopyEx(ren, homingtex, NULL, &homedim, angle, NULL, SDL_FLIP_NONE);       
 }
