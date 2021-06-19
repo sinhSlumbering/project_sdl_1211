@@ -35,6 +35,8 @@ extern int  screen_height;
 extern int  lives;
 extern long prevtime;
 extern float remaintime;
+extern int bosshealth;
+extern int score;
  
 extern bool quit;
 extern screens screen;
@@ -58,6 +60,8 @@ void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
 void optimizeFPS(long *prevtime, float *remainder);
+void save_game(int playerscore, int livesleft, int boss_health);
+void play(int *a, int *b, int *c);
 
 
 extern SDL_Renderer* ren;
@@ -164,7 +168,8 @@ struct MainMenue
       SDL_Rect helpDim;
       SDL_Rect exitDim;
       SDL_Rect cursorDim;
-      //SDL_Rect continueDim;
+      // SDL_Rect resumeDim;
+      SDL_Rect continueDim;
 
       void run();
       void updateUI();

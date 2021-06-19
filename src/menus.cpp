@@ -31,6 +31,8 @@ MainMenue::MainMenue()
       cursorDim.y = yVal;
       newGameDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
+      continueDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
       highScoreDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
       optionsDim = {xVal, yVal, buttonW, buttonH};
@@ -56,6 +58,8 @@ void MainMenue::updateUI()
       cursorDim.y = yVal;
       bgdim = {0, 0, screen_width, screen_height};
       newGameDim = {xVal, yVal, buttonW, buttonH};
+      yVal+=step;
+      continueDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
       highScoreDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
@@ -103,6 +107,10 @@ void MainMenue::handleEvent()
                         case SDLK_RETURN: {
                               if (cursorpoints(&newGameDim, &cursorDim))
                                     screen = IN_GAME, isrunning = true;
+                              if(cursorpoints(&continueDim, &cursorDim)){
+                                    screen = IN_GAME;
+                                    isrunning = true;
+                              }
                               else if(cursorpoints(&highScoreDim, &cursorDim))
                                     screen=HIGH_SCORES;
                               else if (cursorpoints(&optionsDim, &cursorDim))
@@ -124,6 +132,8 @@ void MainMenue::handleEvent()
       if (prevMousex != 0 && prevMousey != mousey) {
             if (mousey <= newGameDim.y||mousey<=newGameDim.y+newGameDim.h)
                   cursorJump(&newGameDim);
+            else if (mousey <= continueDim.y||mousey<= continueDim.y+ continueDim.h)
+                  cursorJump(&continueDim);
             else if (mousey >= highScoreDim.y && mousey < highScoreDim.y + highScoreDim.h + 1)
                   cursorJump(&highScoreDim);
             else if (mousey >= optionsDim.y && mousey < optionsDim.y + optionsDim.h + 1)
@@ -137,7 +147,11 @@ void MainMenue::handleEvent()
       }
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 
-            if (mouseIsInside(&newGameDim, mousex, mousey))
+            if (mouseIsInside(&newGameDim, mousex, mousey)){
+                  save_game(0,3,9999);
+                  isrunning = true, screen = IN_GAME;
+            }
+            if (mouseIsInside(&continueDim, mousex, mousey))
                   isrunning = true, screen = IN_GAME;
             else if (mouseIsInside(&highScoreDim, mousex, mousey))
                   screen = HIGH_SCORES;
@@ -161,6 +175,7 @@ void MainMenue::run()
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
       SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
+      SDL_RenderCopy(ren, newGameB, NULL, &continueDim);
       SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
       SDL_RenderCopy(ren, OptionsB, NULL, &optionsDim);
       SDL_RenderCopy(ren, helpB, NULL, &helpDim);

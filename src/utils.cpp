@@ -536,6 +536,20 @@ void highscore_printing(int a, int x, int y)
       printText(ren, x, y, show, font, &scoretex, &area);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
+void play(int *a, int *b, int *c){
+      FILE* fptr = fopen("assets/save game.txt","r");
+      *a = getw(fptr);
+      *b = getw(fptr);
+      *c = getw(fptr);
+}
+void save_game(int playerscore, int lifeleft, int boss_health){
+      remove("assets/save game.txt");
+      FILE* fptr = fopen("assets/save game.txt","w");
+      putw(playerscore,fptr);
+      putw(lifeleft,fptr);
+      putw(boss_health,fptr);
+      fclose(fptr);
+}
 void optimizeFPS(long *prevtime, float *remainder)
 {
       long wait, frameTime;
@@ -621,7 +635,7 @@ void close() {
       IMG_Quit();
       SDL_Quit();
 }
- 
+
 bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey) {
       return (mousex >= rect->x && mousex <= rect->x + rect->w) && (mousey >= rect->y && mousey <= rect->y + rect->h);
 }

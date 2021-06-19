@@ -15,7 +15,7 @@ SDL_Rect dashdim;
 TTF_Font* font;
 
 char* font_path = "assets/Sans/Sans.ttf";
-int score = 0;
+int score;
 int bosshealth = 9999; 
 SDL_Color white = {255, 255, 255, 0};
 SDL_Rect area;
@@ -149,7 +149,7 @@ void Player::bullet()
                   else {
                         SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
                         if(checkCol(&bulletdim[i], &plane.htbx)) {
-                              printf("enemyhit\n");
+                              // printf("enemyhit\n");
                               bosshealth-=5;
                         }
                   }
@@ -398,17 +398,17 @@ void gamestart()
       ingamedim.w = screen_width;
       ingamedim.x = 0;
       ingamedim.y = 0;
-      score = 0;
-      lives = 3;
-      bosshealth = 9999;
+
+      play(&score, &lives, &bosshealth);
+      printf("%d %d %d\n",score,lives,bosshealth);
       diffTimer.start();
+
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
             while (SDL_PollEvent(&e) != 0) {
                   if (e.type == SDL_QUIT){
                         quit = true, isrunning = false;
-                        FILE* fptr;
                   }
                   if (e.type == SDL_KEYDOWN) {
                         switch (e.key.keysym.sym) {
@@ -474,5 +474,11 @@ void gamestart()
       }
       Cal_highscore(score);
       player.xPos = 0;
-      player.yPos = 280;
+      player.yPos = screen_height/5;
+      if(lives==0){
+      save_game(0,3,9999);
+      }
+      else{
+            save_game(score,lives,bosshealth);
+      }
 }
