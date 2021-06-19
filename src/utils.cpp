@@ -17,10 +17,11 @@ HighScore highScore;
 Pause pause;
 MainMenue mainMenu;
 Options options;
-upTimer iFrame, cFrame, ptimer;
+upTimer iFrame, cFrame, ptimer, btimer;
 
 bool mouseMode=false;
-
+extern long prevtime=0;
+extern float remaintime=0;
 
 SDL_Renderer* ren;
 SDL_Texture* titleBG;
@@ -43,6 +44,7 @@ SDL_Texture* resumeB;
 SDL_Texture* exitB;
 SDL_Texture* cursor;
 SDL_Texture* playertex[3];
+SDL_Texture* playerbullet;
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
 SDL_Texture* towertex;
@@ -274,7 +276,7 @@ bool loadMedia() {
             success = false;
       }
  
-      inGameBG = loadTex("assets/background3.png");
+      inGameBG = loadTex("assets/newbg.png");
       if (inGameBG == NULL) {
             printf("failed to load game screen\n");
             success = false;
@@ -369,7 +371,13 @@ bool loadMedia() {
       playertex[2] = loadTex("assets/playerwithdash.png");
       if (playertex[2] == NULL)
       {
-            printf("failed to load player\n");
+            printf("failed to load playerdash\n");
+            success = false;
+      }
+      playerbullet= loadTex("assets/playerbullet.png");
+      if (playerbullet == NULL)
+      {
+            printf("failed to load playerbullet\n");
             success = false;
       }
       bosstex = loadTex("assets/Hilda_Berg_Intro_Sprite.png");
@@ -528,6 +536,22 @@ void highscore_printing(int a, int x, int y)
       std::string show = std::to_string(a);
       printText(ren, x, y, show, font, &scoretex, &area);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
+}
+void optimizeFPS(long *prevtime, float *remainder)
+{
+      long wait, frameTime;
+      wait = 16 + *remainder;
+      *remainder -= (int)*remainder;
+
+      frameTime = SDL_GetTicks() - *prevtime;
+      wait -= frameTime;
+
+	if (wait < 1)	wait = 1;
+
+	SDL_Delay(wait);
+
+	*remainder += 0.667;
+	*prevtime = SDL_GetTicks();
 }
 
 void close() {

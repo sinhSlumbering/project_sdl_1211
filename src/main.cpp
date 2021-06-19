@@ -45,7 +45,7 @@ int main(int argc, char const *argv[]) {
                         }
                   }
  
-                  SDL_Delay(1000 / 60);
+                  optimizeFPS(&prevtime, &remaintime);
             }
             close();
       }
