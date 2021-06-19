@@ -15,7 +15,8 @@ SDL_Rect dashdim;
 TTF_Font* font;
 
 char* font_path = "assets/Sans/Sans.ttf";
-int score = 0; 
+int score = 0;
+int bosshealth = 9999; 
 SDL_Color white = {255, 255, 255, 0};
 SDL_Rect area;
 
@@ -147,7 +148,10 @@ void Player::bullet()
                   if(bulletdim[i].x>screen_width) bulletdim[i].x=-bulletW, bulletdim[i].y=0;
                   else {
                         SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
-                        if(checkCol(&bulletdim[i], &plane.htbx)) printf("enemyhit\n");
+                        if(checkCol(&bulletdim[i], &plane.htbx)) {
+                              printf("enemyhit\n");
+                              bosshealth-=5;
+                        }
                   }
             }
       }
@@ -395,12 +399,15 @@ void gamestart()
       ingamedim.y = 0;
       score = 0;
       lives = 3;
+      bosshealth = 9999;
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
             while (SDL_PollEvent(&e) != 0) {
-                  if (e.type == SDL_QUIT)
+                  if (e.type == SDL_QUIT){
                         quit = true, isrunning = false;
+                        FILE* fptr;
+                  }
                   if (e.type == SDL_KEYDOWN) {
                         switch (e.key.keysym.sym) {
                               case SDLK_ESCAPE:
@@ -448,6 +455,9 @@ void gamestart()
             SDL_RenderCopy(ren, scoretex, NULL, &area);
             std::string show_lives = "Lives: "+std::to_string(lives);
             printText(ren, 0, area.h, show_lives, font, &lifetex, &area);
+            SDL_RenderCopy(ren, lifetex, NULL, &area);
+            std::string show_health = "Boss Health: "+std::to_string(bosshealth);
+            printText(ren, 600, 0, show_health, font, &lifetex, &area);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
             
             //debug hitbox

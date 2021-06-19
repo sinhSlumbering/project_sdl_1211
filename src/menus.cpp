@@ -108,8 +108,8 @@ void MainMenue::handleEvent()
                               else if (cursorpoints(&optionsDim, &cursorDim))
                                     screen=OPTIONS;
                               else if (cursorpoints(&helpDim, &cursorDim))
-                                    printf("implement help ffs. ;-;\n");
-                              else if (cursorpoints(&optionsDim, &cursorDim))
+                                    screen = HELP;
+                              else if (cursorpoints(&aboutDim, &cursorDim))
                                     screen=ABOUT;      
                               else if (cursorpoints(&exitDim, &cursorDim))
                                     quit = true;
@@ -144,7 +144,7 @@ void MainMenue::handleEvent()
             else if (mouseIsInside(&optionsDim, mousex, mousey))
                   screen=OPTIONS;
             else if (mouseIsInside(&helpDim, mousex, mousey))
-                  ;
+                  screen = HELP;
             else if (mouseIsInside(&aboutDim, mousex, mousey))
                   screen=ABOUT;      
             else if (mouseIsInside(&exitDim, mousex, mousey))
