@@ -262,7 +262,7 @@ void Pause::handleEvent()
                               if (cursorpoints(&resumeDim, &cursorDim))
                                     screen = IN_GAME, isrunning = true;
                               else if (cursorpoints(&mainMenueDim, &cursorDim))
-                                    screen = MAIN_MENU;
+                                    screen = MAIN_MENU, mainMenu.updateUI(), diffTimer.stop();
                               else if (cursorpoints(&exitDim, &cursorDim))
                                     quit = true;
                         }
@@ -286,7 +286,7 @@ void Pause::handleEvent()
             if (mouseIsInside(&resumeDim, mousex, mousey))
                   isrunning = true, screen = IN_GAME;
             else if (mouseIsInside(&mainMenueDim, mousex, mousey))
-                  screen = MAIN_MENU;
+                  screen = MAIN_MENU, mainMenu.updateUI(), diffTimer.stop();
             else if (mouseIsInside(&exitDim, mousex, mousey))
                   quit = true;
       }
@@ -389,7 +389,7 @@ void Options::handleEvent()
                               else if (cursorpoints(&mouseModeDim, &cursorDim))
                                     mouseMode=!mouseMode;
                               else if (cursorpoints(&backDim, &cursorDim))
-                                    screen=MAIN_MENU;
+                                    screen=MAIN_MENU, mainMenu.updateUI();
                         }
                   }
             }
@@ -417,7 +417,7 @@ void Options::handleEvent()
             else if (mouseIsInside(&mouseModeDim, mousex, mousey))
                   mouseMode=!mouseMode;
             else if (mouseIsInside(&backDim, mousex, mousey))
-                  screen = MAIN_MENU;
+                  screen = MAIN_MENU, mainMenu.updateUI();
       }
       prevMousex=mousex, prevMousey=mousey;
 }

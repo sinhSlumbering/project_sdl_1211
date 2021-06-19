@@ -1,6 +1,5 @@
 #include "header.hpp"
 
-
 gWindow win;
 
 void updatescreen()
@@ -17,7 +16,7 @@ HighScore highScore;
 Pause pause;
 MainMenue mainMenu;
 Options options;
-upTimer iFrame, cFrame, ptimer, btimer;
+upTimer iFrame, cFrame, ptimer, btimer, diffTimer;
 
 bool mouseMode=false;
 extern long prevtime=0;

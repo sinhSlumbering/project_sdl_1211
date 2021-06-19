@@ -229,7 +229,8 @@ Wall::Wall()
       height=screen_height;
       xVel=10;
       yPos=screen_height/2;
-      htbx={xPos, yPos, width, height};  
+      htbx={xPos, yPos, width, height};
+      mod=5;  
 }
 void Wall::move()
 {
@@ -237,9 +238,9 @@ void Wall::move()
       if(xPos+width<=0)
       {
        xPos=screen_width+width;
-       double val[10]={1.3, 1.5, 0.75, 0.6, 2, 1.6, 0.85, 0.9, 1.2, 0.8};
+       double val[10]={1.3, 1.5, 2, 1.6, 1.2, 0.9, 0.75, 0.6, 0.85,0.8};
        srand(time(0)+yPos);
-       yPos=(screen_height/2)*val[rand()%10];
+       yPos=(screen_height/2)*val[rand()%mod];
       }
       htbx.x=xPos;
       htbx.y=yPos;
@@ -254,14 +255,14 @@ Walls::Walls()
       padding = screen_width/3;
       wall_number=3;
       wallz[0].xPos=screen_width;
-      for(int i=0; i<wall_number; i++)
+      for(int i=1; i<wall_number; i++)
             wallz[i].xPos=wallz[i-1].xPos+padding;
 }
 
 void Walls::move()
 {
       for(int i=0; i<wall_number; i++)
-            wallz[i].move();
+            wallz[i].move(), wallz[i].mod=10;
 }
 void Walls::render()
 {
@@ -397,8 +398,11 @@ void gamestart()
       ingamedim.w = screen_width;
       ingamedim.x = 0;
       ingamedim.y = 0;
+
       play(&score, &lives, &bosshealth);
       printf("%d %d %d\n",score,lives,bosshealth);
+      diffTimer.start();
+
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
@@ -409,25 +413,28 @@ void gamestart()
                   if (e.type == SDL_KEYDOWN) {
                         switch (e.key.keysym.sym) {
                               case SDLK_ESCAPE:
-                                    screen = PAUSE, isrunning = false;
+                                    screen = PAUSE, isrunning = false, pause.updateUI();
                                     break;
                         }
                   }
             }
             score++;
+            Uint32 diff=diffTimer.getTicks();
             if(ingamedim.x>=2124) ingamedim.x =0;
             ingamedim.x+=5;
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
             player.bullet();
-            powerup.run();
-            attack.run();
+            if(diff>POWERUP_START_TIME)   powerup.run();
+            if(diff>ATTACK_START_TIME)    attack.run();
             plane.move();
             plane.render();
-            walls.move();
-            walls.render();
-            walls.colls();
+            if(diff>WALL_START_TIME){
+                  walls.move();
+                  walls.render();
+                  walls.colls();
+            }
             if(iFrame.running)
             {
                   if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, Hinvincible=false;
@@ -447,7 +454,7 @@ void gamestart()
                   lives--;
                   Mix_PlayChannel(-1,ghit,0);
             }
-            if(lives<1) screen=MAIN_MENU, isrunning=false;
+            if(lives<1) screen=MAIN_MENU, isrunning=false, diffTimer.stop(), mainMenu.updateUI();
             std::string show_score = "Score: "+std::to_string(score);
             printText(ren, 0, 0, show_score, font, &scoretex, &area);
             SDL_RenderCopy(ren, scoretex, NULL, &area);
@@ -455,7 +462,7 @@ void gamestart()
             printText(ren, 0, area.h, show_lives, font, &lifetex, &area);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
             std::string show_health = "Boss Health: "+std::to_string(bosshealth);
-            printText(ren, 600, 0, show_health, font, &lifetex, &area);
+            printText(ren, screen_width-area.w*3, 0, show_health, font, &lifetex, &area);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
             
             //debug hitbox
