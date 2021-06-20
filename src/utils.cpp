@@ -519,6 +519,7 @@ void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int
 }
 void difficulty(int a){
       walls.wall_number++;
+      if(walls.wall_number>3) walls.wall_number--;
       if(attack.bXvel < 0){
             attack.bXvel -= 2;
       }
