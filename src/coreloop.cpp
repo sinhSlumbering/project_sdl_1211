@@ -2,6 +2,7 @@
 #include<time.h>
 
 Walls walls;
+Wall wall;
 Boss plane;
 Player player;
 Powerup powerup;
@@ -9,6 +10,8 @@ Attack attack;
 int lives = 3;
 int hits=0;
 bool Hinvincible = false, Pinvincible=false;
+int wallspeed=5;
+int diffThreshold=8000, diffStep=500;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
@@ -227,14 +230,13 @@ Wall::Wall()
 {
       width=screen_width/15;
       height=screen_height;
-      xVel=5;
       yPos=screen_height/2;
       htbx={xPos, yPos, width, height};
       mod=5;  
 }
 void Wall::move()
 {
-      xPos-=xVel;
+      xPos-=wallspeed;
       if(xPos+width<=0)
       {
             xPos=screen_width+width;
@@ -282,7 +284,7 @@ Powerup::Powerup()
 {
       int width=player.width/2;
       powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
-      vel = 10;
+      vel = 5;
       spawn = true;
       running = false;
 }
@@ -405,7 +407,7 @@ void gamestart()
       ingamedim.x = 0;
       ingamedim.y = 0;
 
-      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel);
+      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed);
       printf("%d %d %d\n",score,lives,bosshealth);
       walls.wall_number = 0;
       diffTimer.start();
@@ -482,8 +484,9 @@ void gamestart()
             
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
-            if(score%1024==0){
-                  difficulty(score);
+            if(bosshealth<diffThreshold){
+                  difficulty();
+                  diffThreshold-=diffStep;
             }
 
             SDL_RenderPresent(ren);
@@ -493,9 +496,9 @@ void gamestart()
       player.xPos = 0;
       player.yPos = screen_height/5;
       if(lives==0){
-      save_game(0,3,9999,0, 5,-5);
+      save_game(0,3,9999,0, 5,-5, 5);
       }
       else{
-            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel);
+            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed);
       }
 }

@@ -43,6 +43,7 @@ extern screens screen;
 extern bool isrunning;
 extern bool mouseMode;
 extern bool Hinvincible, Pinvincible;
+extern int wallspeed;
 
  
 bool init();
@@ -60,9 +61,9 @@ void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
 void optimizeFPS(long *prevtime, float *remainder);
-void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c);
-void play(int *a, int *b, int *c, int *d, int *e, int *f);
-void difficulty(int a);
+void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d);
+void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g);
+void difficulty();
 
 
 extern SDL_Renderer* ren;
@@ -325,7 +326,7 @@ struct Wall
 {
       int width;
       int height;
-      int xVel;
+      //int xVel;
       int yVel;
       int mod;
       //double val[10];
@@ -340,6 +341,7 @@ struct Wall
       void move();
       void render();
 };
+
 
 struct Walls 
 {
