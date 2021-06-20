@@ -1,8 +1,13 @@
 #include "header.hpp"
 
+SDL_Rect tscreentextdim={screen_width/3, screen_height-(screen_height/8)*2, screen_width/2, screen_height/8};
+
 void titlescreen() {
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, titleBG, NULL, NULL);
+      font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
+      printText(ren, screen_width/4, screen_height-screen_height/4, "Press any key to continue", font, &tscreentex, &tscreentextdim); 
+      SDL_RenderCopy(ren, tscreentex, NULL, &tscreentextdim);
       SDL_RenderPresent(ren);
       SDL_Event e;
       while (SDL_PollEvent(&e) != 0) {
@@ -322,10 +327,15 @@ Options::Options()
       cursorDim.y = yVal;
 
       fullScreenDim = {xVal, yVal, buttonW, buttonH};
+      //fullScreenTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       yVal+=step;
       mouseModeDim = {xVal, yVal, buttonW, buttonH};
+      //mouseModeTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
+      // font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
+      // printText(ren, screen_width/8, fullScreenDim.y, "Fullscreen", font, &fullScreenText, &fullScreenTextDim);
+      // printText(ren, screen_width/8, mouseModeDim.y, "Mouse Mode", font, &mouseModeText, &mouseModeTextDim);
 }
 void Options::updateUI()
 {
@@ -343,8 +353,10 @@ void Options::updateUI()
       cursorDim.y = yVal;
 
       fullScreenDim = {xVal, yVal, buttonW, buttonH};
+      //fullScreenTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       yVal+=step;
       mouseModeDim = {xVal, yVal, buttonW, buttonH};
+      //mouseModeTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
 }
@@ -426,8 +438,10 @@ void Options::run()
       handleEvent();
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
-      SDL_RenderCopy(ren, FullScreenB, NULL, &fullScreenDim);
-      SDL_RenderCopy(ren, MouseModeB, NULL, &mouseModeDim);
+      SDL_RenderCopy(ren, optionsToggle[win.fullScreen], NULL, &fullScreenDim);
+      SDL_RenderCopy(ren, optionsToggle[mouseMode], NULL, &mouseModeDim);
+      // SDL_RenderCopy(ren, fullScreenText, NULL, &fullScreenTextDim);
+      // SDL_RenderCopy(ren, mouseModeText, NULL, &mouseModeTextDim);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
       SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
       SDL_RenderPresent(ren);

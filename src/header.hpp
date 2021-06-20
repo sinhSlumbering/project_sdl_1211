@@ -97,10 +97,14 @@ extern SDL_Texture* towertex;
 extern SDL_Texture* poweruptex[POWERUP_N];
 extern SDL_Texture* fireballtex;
 extern SDL_Texture* homingtex;
+extern SDL_Texture* tscreentex;
+extern SDL_Texture* fullScreenText;
+extern SDL_Texture* mouseModeText;
 
 extern TTF_Font* font;
 
 extern SDL_Rect area;
+extern SDL_Rect tscreentextdim;
 
 extern Mix_Music *gBackgroundMusic;
 extern Mix_Chunk *gpoint; 
@@ -225,11 +229,12 @@ struct Options
       int menumax;
       int prevMousex, prevMousey;
 
-
       SDL_Rect cursorDim;
       SDL_Rect bgdim;
       SDL_Rect fullScreenDim;
+      SDL_Rect fullScreenTextDim;
       SDL_Rect mouseModeDim;
+      SDL_Rect mouseModeTextDim;
       SDL_Rect backDim;
       
       void run();

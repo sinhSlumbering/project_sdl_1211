@@ -51,6 +51,9 @@ SDL_Texture* dashtex;
 SDL_Texture* poweruptex[POWERUP_N];
 SDL_Texture* fireballtex;
 SDL_Texture* homingtex;
+SDL_Texture* tscreentex;
+SDL_Texture* fullScreenText;
+SDL_Texture* mouseModeText;
 
 
 Mix_Music *gBackgroundMusic;
@@ -404,10 +407,18 @@ bool loadMedia() {
             printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
             success = false;
       }
-      //rework dis later
-      //DANGEROUS_STUFF_PLEASE CHANGE_FOR_THE_LOVE_OF_ALL_THATS_HOLY
-      optionsToggle[0]=exitB;
-      optionsToggle[1]=bosstex;
+      optionsToggle[0] = loadTex("assets/off.png");
+      if (optionsToggle[0] == NULL)
+      {
+            printf("failed to load optionstoggle\n");
+            success = false;
+      }
+      optionsToggle[1] = loadTex("assets/on.png");
+      if (optionsToggle[1] == NULL)
+      {
+            printf("failed to load optionstoggle\n");
+            success = false;
+      }
 
       return success;
 }
@@ -591,10 +602,10 @@ void close() {
       bosstex=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
-      SDL_DestroyTexture(optionsToggle[0]);
+      SDL_DestroyTexture(optionsToggle[1]);
+      optionsToggle[1]=NULL;
       SDL_DestroyTexture(FullScreenB);
       SDL_DestroyTexture(MouseModeB);
-      optionsToggle[0]=NULL;
       SDL_DestroyTexture(scoretex);
       scoretex=NULL;
       SDL_DestroyTexture(towertex);
