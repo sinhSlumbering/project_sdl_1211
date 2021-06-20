@@ -285,6 +285,7 @@ struct Player
       bool fire;
 
       SDL_Rect htbx;
+      SDL_Rect playerdim;
       SDL_Rect bulletdim[PLAYERBULLET_N];
       
       int xPos = 0;

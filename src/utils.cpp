@@ -123,49 +123,9 @@ bool gWindow::handleEvent( SDL_Event& e )
 			SDL_RenderPresent( ren );
 			break;
 
-			//Mouse entered window
-			case SDL_WINDOWEVENT_ENTER:
-		      mouseFocus = true;
-			//updateCaption = true;
-			break;
-			
-			//Mouse left window
-			case SDL_WINDOWEVENT_LEAVE:
-			mouseFocus = false;
-			//updateCaption = true;
-			break;
-
-			//Window has keyboard focus
-			case SDL_WINDOWEVENT_FOCUS_GAINED:
-			keyboardFocus = true;
-			//updateCaption = true;
-			break;
-
-			//Window lost keyboard focus
-			case SDL_WINDOWEVENT_FOCUS_LOST:
-			keyboardFocus = false;
-			//updateCaption = true;
-			break;
-
-			//Window minimized
-			case SDL_WINDOWEVENT_MINIMIZED:
-                  minimized = true;
-                  break;
-
-			//Window maxized
-			case SDL_WINDOWEVENT_MAXIMIZED:
-			minimized = false;
-                  break;
-			
-			//Window restored
-			case SDL_WINDOWEVENT_RESTORED:
-			minimized = false;
-                  break;
 		}
-
 	}
-      return update;
-	
+      return update;	
 }
 void gWindow::free()
 {
@@ -571,6 +531,7 @@ void difficulty(int a){
       else{
             attack.bYvel += 2;
       } 
+      //printf("\nwall %d\n", walls.wall_number);
 }
 void optimizeFPS(long *prevtime, float *remainder)
 {

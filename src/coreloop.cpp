@@ -48,8 +48,8 @@ Player::Player()
 
 void Player::render()
 {
-      SDL_Rect renderQuad = { xPos, yPos, width, height };
-      SDL_RenderCopyEx(ren, playertex[tex], NULL, &renderQuad, angle, NULL, SDL_FLIP_NONE);
+      playerdim = { xPos, yPos, width, height };
+      SDL_RenderCopyEx(ren, playertex[tex], NULL, &playerdim, angle, NULL, SDL_FLIP_NONE);
 }
 void Player::move(int x, int y)
 {
@@ -298,7 +298,7 @@ void Powerup::choose()
       srand(time(0));
       current = rand();
       powerupdim.y=current%(screen_height);
-      current%=POWERUP_N+1;
+      current%=POWERUP_N;
       spawn=false;
       running = true;
 }
@@ -315,7 +315,7 @@ void Powerup::run()
       else if(time>POWERUP_INTERVAL) spawn=true, ptimer.stop();
       if(running)
       {
-            if(checkCol(&player.htbx, &powerupdim))
+            if(checkCol(&player.playerdim, &powerupdim))
                   {
                         powerupdim=initdim;
                         ptimer.stop();
