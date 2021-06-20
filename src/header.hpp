@@ -60,8 +60,9 @@ void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
 void optimizeFPS(long *prevtime, float *remainder);
-void save_game(int playerscore, int livesleft, int boss_health);
-void play(int *a, int *b, int *c);
+void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c);
+void play(int *a, int *b, int *c, int *d, int *e, int *f);
+void difficulty(int a);
 
 
 extern SDL_Renderer* ren;
@@ -379,6 +380,7 @@ extern Powerup powerup;
 struct Attack
 {
       bool spawn;
+      bool spawned;
       SDL_Rect bouncedim, homedim;
       SDL_Rect bhtbx, hhtbx;
       int bXvel, bYvel, hXvel, hYvel;

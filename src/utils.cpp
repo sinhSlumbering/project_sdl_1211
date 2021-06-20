@@ -384,7 +384,7 @@ bool loadMedia() {
       {
             success = false;
       }
-      towertex = loadTex("assets/tower.png");
+      towertex = loadTex("assets/log.png");
       if(towertex==NULL)
       {
             success = false;
@@ -536,19 +536,41 @@ void highscore_printing(int a, int x, int y)
       printText(ren, x, y, show, font, &scoretex, &area);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
-void play(int *a, int *b, int *c){
+void play(int *a, int *b, int *c, int *d, int *e, int *f){
       FILE* fptr = fopen("assets/save game.txt","r");
       *a = getw(fptr);
       *b = getw(fptr);
       *c = getw(fptr);
+      *d = getw(fptr);
+      *e = getw(fptr);
+      *f = getw(fptr);
+      fclose(fptr);
 }
-void save_game(int playerscore, int lifeleft, int boss_health){
+void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c){
       remove("assets/save game.txt");
       FILE* fptr = fopen("assets/save game.txt","w");
       putw(playerscore,fptr);
       putw(lifeleft,fptr);
       putw(boss_health,fptr);
+      putw(a, fptr);
+      putw(b, fptr);
+      putw(c, fptr);
       fclose(fptr);
+}
+void difficulty(int a){
+      walls.wall_number++;
+      if(attack.bXvel < 0){
+            attack.bXvel -= 2;
+      }
+      else{
+            attack.bXvel += 2;
+      }
+      if(attack.bYvel < 0){
+            attack.bYvel -= 2;
+      }
+      else{
+            attack.bYvel += 2;
+      } 
 }
 void optimizeFPS(long *prevtime, float *remainder)
 {

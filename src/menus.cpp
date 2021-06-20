@@ -105,8 +105,10 @@ void MainMenue::handleEvent()
                               cursorUpdate(step); 
                               break;
                         case SDLK_RETURN: {
-                              if (cursorpoints(&newGameDim, &cursorDim))
+                              if (cursorpoints(&newGameDim, &cursorDim)){
                                     screen = IN_GAME, isrunning = true;
+                                    save_game(0,3,9999,0,5,-5);
+                              }
                               if(cursorpoints(&continueDim, &cursorDim)){
                                     screen = IN_GAME;
                                     isrunning = true;
@@ -148,7 +150,7 @@ void MainMenue::handleEvent()
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 
             if (mouseIsInside(&newGameDim, mousex, mousey)){
-                  save_game(0,3,9999);
+                  save_game(0,3,9999,0,5,-5);
                   isrunning = true, screen = IN_GAME;
             }
             if (mouseIsInside(&continueDim, mousex, mousey))

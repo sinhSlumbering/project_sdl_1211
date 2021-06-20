@@ -227,7 +227,7 @@ Wall::Wall()
 {
       width=screen_width/15;
       height=screen_height;
-      xVel=10;
+      xVel=5;
       yPos=screen_height/2;
       htbx={xPos, yPos, width, height};
       mod=5;  
@@ -237,10 +237,10 @@ void Wall::move()
       xPos-=xVel;
       if(xPos+width<=0)
       {
-       xPos=screen_width+width;
-       double val[10]={1.3, 1.5, 2, 1.6, 1.2, 0.9, 0.75, 0.6, 0.85,0.8};
-       srand(time(0)+yPos);
-       yPos=(screen_height/2)*val[rand()%mod];
+            xPos=screen_width+width;
+            double val[10]={1.3, 1.5, 2, 1.6, 1.2, 0.9, 0.75, 0.6, 0.85,0.8};
+            srand(time(0)+yPos);
+            yPos=(screen_height/2)*val[rand()%mod];
       }
       htbx.x=xPos;
       htbx.y=yPos;
@@ -253,7 +253,7 @@ void Wall::render()
 Walls::Walls()
 {
       padding = screen_width/3;
-      wall_number=3;
+      wall_number=0;
       wallz[0].xPos=screen_width;
       for(int i=1; i<wall_number; i++)
             wallz[i].xPos=wallz[i-1].xPos+padding;
@@ -309,6 +309,7 @@ void Powerup::run()
       if(spawn) choose();
       else if(Pinvincible)
       {
+            // printf("jsdhfg");
             if(time>10000) Pinvincible=false, player.tex=1, ptimer.stop(), ptimer.start();
       }
       else if(time>POWERUP_INTERVAL) spawn=true, ptimer.stop();
@@ -317,6 +318,7 @@ void Powerup::run()
             if(checkCol(&player.htbx, &powerupdim))
                   {
                         powerupdim=initdim;
+                        ptimer.stop();
                         ptimer.start();
                         running=false;
                         if(current==LIFE) {
@@ -337,12 +339,13 @@ void Powerup::run()
 Attack::Attack()
 {
       spawn = true;
+      spawned = false;
       int side=screen_width/20, arm=side/1.42;
       bouncedim = homedim = { screen_width, screen_height, side, side };
       bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
       current = 0;
-      bXvel=10;
-      bYvel=-10;
+      bXvel= 5;
+      bYvel=-5;
       hXvel=5;
       hYvel=5;
       angle=0.0;
@@ -352,6 +355,7 @@ void Attack::choose()
       srand(time(0));
       current=rand()%2;
       spawn=false;
+      spawned = true;
       bouncedim.y=plane.yPos+plane.height/2;
       homedim.y=plane.yPos+plane.height/2;
 }
@@ -387,8 +391,10 @@ void Attack::home()
 void Attack::run()
 {
       if(spawn) choose();
-      else if(current==BOUNCING) bounce();
+      else if(spawned){
+      if(current==BOUNCING) bounce();
       else if(current==HOMING) home();
+      }
 }
 void gamestart() 
 {
@@ -399,10 +405,11 @@ void gamestart()
       ingamedim.x = 0;
       ingamedim.y = 0;
 
-      play(&score, &lives, &bosshealth);
+      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel);
       printf("%d %d %d\n",score,lives,bosshealth);
+      walls.wall_number = 0;
       diffTimer.start();
-
+      Uint32 diff0 = diffTimer.getTicks();
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
@@ -426,15 +433,20 @@ void gamestart()
             player.handleEvent();
             player.render();
             player.bullet();
-            if(diff>POWERUP_START_TIME)   powerup.run();
-            if(diff>ATTACK_START_TIME)    attack.run();
+            if(diff>POWERUP_START_TIME){
+                  powerup.run();
+            }
+            if(diff>ATTACK_START_TIME){
+                  attack.run();
+            }
             plane.move();
             plane.render();
-            if(diff>WALL_START_TIME){
+            if(diff-diff0>WALL_START_TIME){
                   walls.move();
                   walls.render();
                   walls.colls();
             }
+            
             if(iFrame.running)
             {
                   if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, Hinvincible=false;
@@ -454,6 +466,9 @@ void gamestart()
                   lives--;
                   Mix_PlayChannel(-1,ghit,0);
             }
+            if(!Pinvincible){
+                  player.tex = 0;
+            }
             if(lives<1) screen=MAIN_MENU, isrunning=false, diffTimer.stop(), mainMenu.updateUI();
             std::string show_score = "Score: "+std::to_string(score);
             printText(ren, 0, 0, show_score, font, &scoretex, &area);
@@ -467,7 +482,9 @@ void gamestart()
             
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
-            
+            if(score%1024==0){
+                  difficulty(score);
+            }
 
             SDL_RenderPresent(ren);
             optimizeFPS(&prevtime, &remaintime);
@@ -476,9 +493,9 @@ void gamestart()
       player.xPos = 0;
       player.yPos = screen_height/5;
       if(lives==0){
-      save_game(0,3,9999);
+      save_game(0,3,9999,0, 5,-5);
       }
       else{
-            save_game(score,lives,bosshealth);
+            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel);
       }
 }
