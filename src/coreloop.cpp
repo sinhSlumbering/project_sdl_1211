@@ -6,6 +6,7 @@ Boss plane;
 Player player;
 Powerup powerup;
 Attack attack;
+Wall wall;
 int lives = 3;
 int hits=0;
 bool Hinvincible = false, Pinvincible=false;
@@ -150,7 +151,7 @@ void Player::bullet()
                         SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
                         if(checkCol(&bulletdim[i], &plane.htbx)) {
                               // printf("enemyhit\n");
-                              bosshealth-=5;
+                              bosshealth-= 5;
                         }
                   }
             }
@@ -282,7 +283,7 @@ Powerup::Powerup()
 {
       int width=player.width/2;
       powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
-      vel = 10;
+      vel = 5;
       spawn = true;
       running = false;
 }
@@ -298,7 +299,7 @@ void Powerup::choose()
       srand(time(0));
       current = rand();
       powerupdim.y=current%(screen_height);
-      current%=POWERUP_N+1;
+      current%=POWERUP_N;
       spawn=false;
       running = true;
 }
@@ -405,7 +406,7 @@ void gamestart()
       ingamedim.x = 0;
       ingamedim.y = 0;
 
-      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel);
+      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wall.xVel);
       printf("%d %d %d\n",score,lives,bosshealth);
       walls.wall_number = 0;
       diffTimer.start();
@@ -482,8 +483,9 @@ void gamestart()
             
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
-            if(score%1024==0){
-                  difficulty(score);
+           
+            if((score%1024==0){
+                  difficulty(1);
             }
 
             SDL_RenderPresent(ren);
@@ -493,9 +495,9 @@ void gamestart()
       player.xPos = 0;
       player.yPos = screen_height/5;
       if(lives==0){
-      save_game(0,3,9999,0, 5,-5);
+      save_game(0,3,9999,0, 5,-5,5);
       }
       else{
-            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel);
+            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wall.xVel);
       }
 }

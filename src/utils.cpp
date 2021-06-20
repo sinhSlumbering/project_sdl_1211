@@ -536,7 +536,7 @@ void highscore_printing(int a, int x, int y)
       printText(ren, x, y, show, font, &scoretex, &area);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
-void play(int *a, int *b, int *c, int *d, int *e, int *f){
+void play(int *a, int *b, int *c, int *d, int *e, int *f,int *g){
       FILE* fptr = fopen("assets/save game.txt","r");
       *a = getw(fptr);
       *b = getw(fptr);
@@ -544,9 +544,10 @@ void play(int *a, int *b, int *c, int *d, int *e, int *f){
       *d = getw(fptr);
       *e = getw(fptr);
       *f = getw(fptr);
+      *g = getw(fptr);
       fclose(fptr);
 }
-void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c){
+void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c,int d){
       remove("assets/save game.txt");
       FILE* fptr = fopen("assets/save game.txt","w");
       putw(playerscore,fptr);
@@ -555,10 +556,16 @@ void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int
       putw(a, fptr);
       putw(b, fptr);
       putw(c, fptr);
+      putw(d,fptr);
       fclose(fptr);
 }
 void difficulty(int a){
-      walls.wall_number++;
+      if(walls.wall_number == 3){
+            wall.xVel += 2;
+      }
+      else{
+            walls.wall_number++;
+      }
       if(attack.bXvel < 0){
             attack.bXvel -= 2;
       }

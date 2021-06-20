@@ -60,8 +60,8 @@ void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
 void optimizeFPS(long *prevtime, float *remainder);
-void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c);
-void play(int *a, int *b, int *c, int *d, int *e, int *f);
+void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c,int d);
+void play(int *a, int *b, int *c, int *d, int *e, int *f,int *g);
 void difficulty(int a);
 
 
@@ -339,7 +339,7 @@ struct Wall
       void move();
       void render();
 };
-
+extern Wall wall;
 struct Walls 
 {
       int padding;
