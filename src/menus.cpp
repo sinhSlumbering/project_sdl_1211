@@ -314,12 +314,12 @@ void Pause::run()
 
 Options::Options()
 {
-      yVal = menumin = screen_height / 3; 
+      yVal = menumin = screen_height / 10; 
       step = screen_height / 10;
       buttonH = screen_height / 10;
       buttonW = screen_width / 4;
       xVal = screen_width - 3 * buttonW / 2;
-      menumax = screen_height / 3 + screen_height / 10;
+      menumax = menumin + buttonH;
       bgdim = {0, 0, screen_width, screen_height};
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;
@@ -340,12 +340,12 @@ Options::Options()
 void Options::updateUI()
 {
       updatescreen();
-      yVal = menumin = screen_height / 3; 
+      yVal = menumin = screen_height / 10; 
       step = screen_height / 10;
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
       xVal = screen_width - 3 * buttonW / 2;
-      menumax = screen_height / 3 + screen_height / 10;
+      menumax = menumin + buttonH*2;
       bgdim = {0, 0, screen_width, screen_height};
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;
@@ -412,7 +412,7 @@ void Options::handleEvent()
       int mousex, mousey;
       int mbutton = SDL_GetMouseState(&mousex, &mousey);
       if (prevMousex != 0 && prevMousey != mousey) {
-            if (mousey < fullScreenDim.y)
+            if (mousey < mouseModeDim.y)
                   cursorJump(&fullScreenDim);
             else if (mousey >= mouseModeDim.y && mousey < mouseModeDim.y + mouseModeDim.h + 1)
                   cursorJump(&mouseModeDim);
@@ -441,9 +441,9 @@ void Options::run()
       SDL_RenderCopy(ren, optionsToggle[win.fullScreen], NULL, &fullScreenDim);
       SDL_RenderCopy(ren, optionsToggle[mouseMode], NULL, &mouseModeDim);
       SDL_Rect area;
-      printText(ren,0,0,"Full Screen", &tscreentex, &area, White);
+      printText(ren, screen_width/10, fullScreenDim.y,"Full Screen", &tscreentex, &area, White);
       SDL_RenderCopy(ren,tscreentex,NULL, &area);
-      printText(ren,0,50,"Mouse Mode", &tscreentex, &area, White);
+      printText(ren, screen_width/10, mouseModeDim.y,"Mouse Mode", &tscreentex, &area, White);
       SDL_RenderCopy(ren,tscreentex,NULL, &area);
       // SDL_RenderCopy(ren, fullScreenText, NULL, &fullScreenTextDim);
       // SDL_RenderCopy(ren, mouseModeText, NULL, &mouseModeTextDim);
