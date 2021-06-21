@@ -55,6 +55,10 @@ SDL_Texture* tscreentex;
 SDL_Texture* fullScreenText;
 SDL_Texture* mouseModeText;
 
+TTF_Font *font= TTF_OpenFont("assets/Sans/Sans.ttf",24);
+
+SDL_Color White = {255,255,255,0};
+SDL_Color Megenta = {236, 134, 134, 0};
 
 Mix_Music *gBackgroundMusic;
 Mix_Chunk *gScratch; 
@@ -482,12 +486,12 @@ void Cal_highscore(int a)
 }
  
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
-             TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect)
+              SDL_Texture **texture, SDL_Rect *rect, SDL_Color white)
 {
       int text_width;
       int text_height;
       SDL_Surface *surface;
-      SDL_Color white = {236, 134, 134, 0};
+      // SDL_Color white = {236, 134, 134, 0};
 
       surface = TTF_RenderText_Solid(font, point.c_str(), white);
       *texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -504,7 +508,7 @@ void highscore_printing(int a, int x, int y)
 {
 
       std::string show = std::to_string(a);
-      printText(ren, x, y, show, font, &scoretex, &area);
+      printText(ren, x, y, show, &scoretex, &area, White);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
 void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g){
@@ -531,7 +535,7 @@ void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int
       fclose(fptr);
 }
 void difficulty(){
-      if(walls.wall_number>=1)
+      if(walls.wall_number >= 1)
       {
             wallspeed += 5;
       }

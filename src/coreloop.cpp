@@ -15,9 +15,9 @@ int diffThreshold=8000, diffStep=500;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
-TTF_Font* font;
+// TTF_Font* font;
 
-char* font_path = "assets/Sans/Sans.ttf";
+// char* font_path = "assets/Sans/Sans.ttf";
 int score;
 int bosshealth = 9999; 
 SDL_Color white = {255, 255, 255, 0};
@@ -400,7 +400,7 @@ void Attack::run()
 }
 void gamestart() 
 {
-      font = TTF_OpenFont(font_path,24);
+      // font = TTF_OpenFont(font_path,24);
       SDL_Rect ingamedim;
       ingamedim.h = screen_height;
       ingamedim.w = screen_width;
@@ -473,13 +473,13 @@ void gamestart()
             }
             if(lives<1) screen=MAIN_MENU, isrunning=false, diffTimer.stop(), mainMenu.updateUI();
             std::string show_score = "Score: "+std::to_string(score);
-            printText(ren, 0, 0, show_score, font, &scoretex, &area);
+            printText(ren, 0, 0, show_score, &scoretex, &area,Megenta);
             SDL_RenderCopy(ren, scoretex, NULL, &area);
             std::string show_lives = "Lives: "+std::to_string(lives);
-            printText(ren, 0, area.h, show_lives, font, &lifetex, &area);
+            printText(ren, 0, area.h, show_lives, &lifetex, &area,Megenta);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
             std::string show_health = "Boss Health: "+std::to_string(bosshealth);
-            printText(ren, screen_width-area.w*3, 0, show_health, font, &lifetex, &area);
+            printText(ren, screen_width-area.w*3, 0, show_health, &lifetex, &area,Megenta);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
             
             //debug hitbox

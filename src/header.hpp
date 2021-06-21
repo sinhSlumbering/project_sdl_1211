@@ -59,7 +59,7 @@ void Cal_highscore(int a);
 SDL_Texture *loadTex(std::string path);
 void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
-             TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
+             SDL_Texture **texture, SDL_Rect *rect, SDL_Color white);
 void optimizeFPS(long *prevtime, float *remainder);
 void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d);
 void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g);
@@ -102,6 +102,9 @@ extern SDL_Texture* fullScreenText;
 extern SDL_Texture* mouseModeText;
 
 extern TTF_Font* font;
+
+extern SDL_Color White;
+extern SDL_Color Megenta;
 
 extern SDL_Rect area;
 extern SDL_Rect tscreentextdim;

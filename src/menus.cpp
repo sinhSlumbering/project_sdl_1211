@@ -5,8 +5,8 @@ SDL_Rect tscreentextdim={screen_width/3, screen_height-(screen_height/8)*2, scre
 void titlescreen() {
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, titleBG, NULL, NULL);
-      font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
-      printText(ren, screen_width/4, screen_height-screen_height/4, "Press any key to continue", font, &tscreentex, &tscreentextdim); 
+      font = TTF_OpenFont("assets/Sans/Sans.ttf", 24);
+      printText(ren, screen_width/4, screen_height-screen_height/4, "Press any key to continue", &tscreentex, &tscreentextdim, White); 
       SDL_RenderCopy(ren, tscreentex, NULL, &tscreentextdim);
       SDL_RenderPresent(ren);
       SDL_Event e;
@@ -440,6 +440,11 @@ void Options::run()
       SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
       SDL_RenderCopy(ren, optionsToggle[win.fullScreen], NULL, &fullScreenDim);
       SDL_RenderCopy(ren, optionsToggle[mouseMode], NULL, &mouseModeDim);
+      SDL_Rect area;
+      printText(ren,0,0,"Full Screen", &tscreentex, &area, White);
+      SDL_RenderCopy(ren,tscreentex,NULL, &area);
+      printText(ren,0,50,"Mouse Mode", &tscreentex, &area, White);
+      SDL_RenderCopy(ren,tscreentex,NULL, &area);
       // SDL_RenderCopy(ren, fullScreenText, NULL, &fullScreenTextDim);
       // SDL_RenderCopy(ren, mouseModeText, NULL, &mouseModeTextDim);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
@@ -492,7 +497,7 @@ void HighScore::run() {
       SDL_RenderCopy(ren, backB, NULL, &backDim);
       TTF_Init();
       FILE *fptr = fopen("assets/highscore.txt", "r");
-      font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
+      // font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
       int num, x, y;
       x = screen_width/2-area.w/2;
       y = screen/20;
