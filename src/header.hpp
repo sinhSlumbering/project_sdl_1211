@@ -52,6 +52,7 @@ bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey);
 bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim);
 bool checkCol(SDL_Rect* a, SDL_Rect* b);
 void titlescreen();
+void gameoverscreen();
 void gamestart();
 void close();
 void updatescreen();

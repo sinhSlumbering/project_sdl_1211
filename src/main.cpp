@@ -42,6 +42,9 @@ int main(int argc, char const *argv[]) {
                               case PAUSE:
                                     pause.run();
                                     break;
+                              case GAME_OVER:
+                                    gameoverscreen();
+                                    break;
                         }
                   }
  

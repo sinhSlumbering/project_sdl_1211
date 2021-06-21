@@ -499,7 +499,8 @@ void gamestart()
       player.xPos = 0;
       player.yPos = screen_height/5;
       if(lives==0){
-      save_game(0,3,9999,0, 5,-5, 5);
+            save_game(0,3,9999,0, 5,-5, 5);
+            screen = GAME_OVER;
       }
       else{
             save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed);
