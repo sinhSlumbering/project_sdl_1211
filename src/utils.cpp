@@ -535,11 +535,11 @@ void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int
       fclose(fptr);
 }
 void difficulty(){
-      if(walls.wall_number >= 1)
+      if(walls.wall_number >= 3)
       {
             wallspeed += 5;
       }
-      else walls.wall_number++;
+      else walls.wall_number++, walls.wallz[walls.wall_number-1].xPos=walls.wallz[walls.wall_number-2].xPos+walls.padding;
       if(attack.bXvel < 0){
             attack.bXvel -= 2;
       }

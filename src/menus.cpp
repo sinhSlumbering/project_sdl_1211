@@ -6,7 +6,7 @@ void titlescreen() {
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, titleBG, NULL, NULL);
       font = TTF_OpenFont("assets/Sans/Sans.ttf", 24);
-      printText(ren, screen_width/4, screen_height-screen_height/4, "Press any key to continue", &tscreentex, &tscreentextdim, White); 
+      printText(ren, screen_width/3, screen_height-screen_height/4, "Press any key to continue", &tscreentex, &tscreentextdim, White); 
       SDL_RenderCopy(ren, tscreentex, NULL, &tscreentextdim);
       SDL_RenderPresent(ren);
       SDL_Event e;

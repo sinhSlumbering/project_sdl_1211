@@ -12,7 +12,7 @@ int hits=0;
 bool Hinvincible = false, Pinvincible=false;
 bool prevtex=0;
 int wallspeed=5;
-int diffThreshold=8000, diffStep=500;
+int diffThreshold=9000, diffStep=1000;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
@@ -265,12 +265,13 @@ Walls::Walls()
 void Walls::move()
 {
       for(int i=0; i<wall_number; i++)
-            wallz[i].move(), wallz[i].mod=10;
+            wallz[i].move();
 }
 void Walls::render()
 {
       for(int i=0; i<wall_number; i++)
             wallz[i].render();
+      
 }
 void Walls::colls()
 {
@@ -345,7 +346,6 @@ void Powerup::run()
 Attack::Attack()
 {
       spawn = true;
-      spawned = false;
       int side=screen_width/20, arm=side/1.42;
       bouncedim = homedim = { screen_width, screen_height, side, side };
       bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
@@ -361,9 +361,8 @@ void Attack::choose()
       srand(time(0));
       current=rand()%2;
       spawn=false;
-      spawned = true;
-      bouncedim.y=plane.yPos+plane.height/2;
-      homedim.y=plane.yPos+plane.height/2;
+      homedim.y=bouncedim.y=plane.yPos+plane.height/2;
+      homedim.x=bouncedim.x=plane.xPos;
 }
 void Attack::bounce()
 {
@@ -397,7 +396,7 @@ void Attack::home()
 void Attack::run()
 {
       if(spawn) choose();
-      else if(spawned){
+      else{
       if(current==BOUNCING) bounce();
       else if(current==HOMING) home();
       }
