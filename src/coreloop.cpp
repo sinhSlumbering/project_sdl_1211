@@ -10,8 +10,9 @@ Attack attack;
 int lives = 3;
 int hits=0;
 bool Hinvincible = false, Pinvincible=false;
+bool prevtex=0;
 int wallspeed=5;
-int diffThreshold=8000, diffStep=500;
+int diffThreshold=9000, diffStep=1000;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
@@ -164,7 +165,7 @@ bool Player::col(SDL_Rect* projectile)
       bool ret=false;
       if(!Hinvincible&&!Pinvincible){
             ret=checkCol(&htbx, projectile);
-            if(ret) iFrame.start(), Hinvincible=true;
+            if(ret) iFrame.start(), Hinvincible=true, player.tex=1;
       }
       return ret;
 }
@@ -264,12 +265,13 @@ Walls::Walls()
 void Walls::move()
 {
       for(int i=0; i<wall_number; i++)
-            wallz[i].move(), wallz[i].mod=10;
+            wallz[i].move();
 }
 void Walls::render()
 {
       for(int i=0; i<wall_number; i++)
             wallz[i].render();
+      
 }
 void Walls::colls()
 {
@@ -291,7 +293,7 @@ Powerup::Powerup()
 void Powerup::move()
 {
       powerupdim.x-=vel;
-      if(powerupdim.x+powerupdim.w<0) powerupdim=initdim, spawn=true, running=false, ptimer.start();
+      if(powerupdim.x+powerupdim.w<0) powerupdim=initdim, spawn=true, running=false;
       SDL_RenderCopy(ren, poweruptex[current], NULL, &powerupdim);
 }
 
@@ -299,6 +301,7 @@ void Powerup::choose()
 {
       srand(time(0));
       current = rand();
+      powerupdim.x=screen_width;
       powerupdim.y=current%(screen_height);
       current%=POWERUP_N;
       spawn=false;
@@ -312,10 +315,10 @@ void Powerup::run()
       else if(Pinvincible)
       {
             // printf("jsdhfg");
-            if(time>10000) Pinvincible=false, player.tex=1, ptimer.stop(), ptimer.start();
+            if(time>10000) Pinvincible=false, player.tex=0, ptimer.stop();
       }
-      else if(time>POWERUP_INTERVAL) spawn=true, ptimer.stop();
-      if(running)
+      else if(running==false) spawn=true;
+      else if(running)
       {
             if(checkCol(&player.playerdim, &powerupdim))
                   {
@@ -327,21 +330,22 @@ void Powerup::run()
                               lives++;
                               Mix_PlayChannel(-1,gpoint,0);
                         }
-                        if(current==INVINCIBILE){
+                        else if(current==INVINCIBILE){
                               Pinvincible=true;
                               player.tex=1;
                               Mix_PlayChannel(-1,gpoint,0);
+                              ptimer.start();
                         }
 
                   }
             else move();
+            //if(time>POWERUP_INTERVAL) running=false;
       }
       
 }
 Attack::Attack()
 {
       spawn = true;
-      spawned = false;
       int side=screen_width/20, arm=side/1.42;
       bouncedim = homedim = { screen_width, screen_height, side, side };
       bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
@@ -357,9 +361,8 @@ void Attack::choose()
       srand(time(0));
       current=rand()%2;
       spawn=false;
-      spawned = true;
-      bouncedim.y=plane.yPos+plane.height/2;
-      homedim.y=plane.yPos+plane.height/2;
+      homedim.y=bouncedim.y=plane.yPos+plane.height/2;
+      homedim.x=bouncedim.x=plane.xPos;
 }
 void Attack::bounce()
 {
@@ -393,7 +396,7 @@ void Attack::home()
 void Attack::run()
 {
       if(spawn) choose();
-      else if(spawned){
+      else{
       if(current==BOUNCING) bounce();
       else if(current==HOMING) home();
       }
@@ -401,6 +404,7 @@ void Attack::run()
 void gamestart() 
 {
       // font = TTF_OpenFont(font_path,24);
+      Hinvincible=Pinvincible=false;
       SDL_Rect ingamedim;
       ingamedim.h = screen_height;
       ingamedim.w = screen_width;
@@ -435,41 +439,40 @@ void gamestart()
             player.handleEvent();
             player.render();
             player.bullet();
+            plane.move();
+            plane.render();
+            
+            if(iFrame.running)
+            {
+                  if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, Hinvincible=false;
+                  else if(player.tex==prevtex) player.tex=!prevtex;
+                  prevtex=player.tex;
+            }
+            else if(cFrame.running) {
+                  Uint32 f=cFrame.getTicks();
+                  if(!Pinvincible) player.tex=2;
+                  if(f>500){ 
+                        cFrame.stop();
+                        if (!Pinvincible) player.tex=0;
+                  }
+                  else if(f>300) Hinvincible=false, dashdim={screen_width,screen_height,0,0};
+                  SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
+            }
             if(diff>POWERUP_START_TIME){
                   powerup.run();
             }
             if(diff>ATTACK_START_TIME){
                   attack.run();
             }
-            plane.move();
-            plane.render();
             if(diff-diff0>WALL_START_TIME){
                   walls.move();
                   walls.render();
                   walls.colls();
             }
-            
-            if(iFrame.running)
-            {
-                  if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, Hinvincible=false;
-                  else if(player.tex==1) player.tex=0;
-                  else player.tex=0;
-            }
-            if(cFrame.running) {
-                  Uint32 f=cFrame.getTicks();
-                  player.tex=2;
-                  if(f>500) 
-                        cFrame.stop(), player.tex=0;
-                  else if(f>300) Hinvincible=false, dashdim={screen_width,screen_height,0,0};
-                  SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
-            }
             if(player.col(&plane.htbx)==true){ 
                   printf("ouch\n");
                   lives--;
                   Mix_PlayChannel(-1,ghit,0);
-            }
-            if(!Pinvincible){
-                  player.tex = 0;
             }
             if(lives<1) screen=MAIN_MENU, isrunning=false, diffTimer.stop(), mainMenu.updateUI();
             std::string show_score = "Score: "+std::to_string(score);

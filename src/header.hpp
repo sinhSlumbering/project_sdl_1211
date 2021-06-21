@@ -393,7 +393,6 @@ extern Powerup powerup;
 struct Attack
 {
       bool spawn;
-      bool spawned;
       SDL_Rect bouncedim, homedim;
       SDL_Rect bhtbx, hhtbx;
       int bXvel, bYvel, hXvel, hYvel;
