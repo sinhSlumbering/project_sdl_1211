@@ -24,6 +24,7 @@ MainMenue::MainMenue()
 {
       yVal = menumin = screen_height / 20; 
       step = screen_height / 10;
+      // printf("%d\n",yVal);
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
       xVal=screen_width-buttonW-buttonW/3;
@@ -107,6 +108,7 @@ void MainMenue::handleEvent()
                               break;
                         case SDLK_RETURN: {
                               if (cursorpoints(&newGameDim, &cursorDim)){
+                                    // printf("%d\n",newGameDim.x);
                                     screen = IN_GAME, isrunning = true;
                                     save_game(0,3,9999,0,5,-5, 5);
                                     updatescreen();
