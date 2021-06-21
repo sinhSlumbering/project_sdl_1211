@@ -2,20 +2,22 @@
 #include<time.h>
 
 Walls walls;
+Wall wall;
 Boss plane;
 Player player;
 Powerup powerup;
 Attack attack;
-Wall wall;
 int lives = 3;
 int hits=0;
 bool Hinvincible = false, Pinvincible=false;
+int wallspeed=5;
+int diffThreshold=8000, diffStep=500;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
-TTF_Font* font;
+// TTF_Font* font;
 
-char* font_path = "assets/Sans/Sans.ttf";
+// char* font_path = "assets/Sans/Sans.ttf";
 int score;
 int bosshealth = 9999; 
 SDL_Color white = {255, 255, 255, 0};
@@ -49,8 +51,8 @@ Player::Player()
 
 void Player::render()
 {
-      SDL_Rect renderQuad = { xPos, yPos, width, height };
-      SDL_RenderCopyEx(ren, playertex[tex], NULL, &renderQuad, angle, NULL, SDL_FLIP_NONE);
+      playerdim = { xPos, yPos, width, height };
+      SDL_RenderCopyEx(ren, playertex[tex], NULL, &playerdim, angle, NULL, SDL_FLIP_NONE);
 }
 void Player::move(int x, int y)
 {
@@ -151,7 +153,7 @@ void Player::bullet()
                         SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
                         if(checkCol(&bulletdim[i], &plane.htbx)) {
                               // printf("enemyhit\n");
-                              bosshealth-= 5;
+                              bosshealth-=5;
                         }
                   }
             }
@@ -228,14 +230,13 @@ Wall::Wall()
 {
       width=screen_width/15;
       height=screen_height;
-      xVel=5;
       yPos=screen_height/2;
       htbx={xPos, yPos, width, height};
       mod=5;  
 }
 void Wall::move()
 {
-      xPos-=xVel;
+      xPos-=wallspeed;
       if(xPos+width<=0)
       {
             xPos=screen_width+width;
@@ -316,7 +317,7 @@ void Powerup::run()
       else if(time>POWERUP_INTERVAL) spawn=true, ptimer.stop();
       if(running)
       {
-            if(checkCol(&player.htbx, &powerupdim))
+            if(checkCol(&player.playerdim, &powerupdim))
                   {
                         powerupdim=initdim;
                         ptimer.stop();
@@ -399,14 +400,14 @@ void Attack::run()
 }
 void gamestart() 
 {
-      font = TTF_OpenFont(font_path,24);
+      // font = TTF_OpenFont(font_path,24);
       SDL_Rect ingamedim;
       ingamedim.h = screen_height;
       ingamedim.w = screen_width;
       ingamedim.x = 0;
       ingamedim.y = 0;
 
-      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wall.xVel);
+      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed);
       printf("%d %d %d\n",score,lives,bosshealth);
       walls.wall_number = 0;
       diffTimer.start();
@@ -472,20 +473,20 @@ void gamestart()
             }
             if(lives<1) screen=MAIN_MENU, isrunning=false, diffTimer.stop(), mainMenu.updateUI();
             std::string show_score = "Score: "+std::to_string(score);
-            printText(ren, 0, 0, show_score, font, &scoretex, &area);
+            printText(ren, 0, 0, show_score, &scoretex, &area,Megenta);
             SDL_RenderCopy(ren, scoretex, NULL, &area);
             std::string show_lives = "Lives: "+std::to_string(lives);
-            printText(ren, 0, area.h, show_lives, font, &lifetex, &area);
+            printText(ren, 0, area.h, show_lives, &lifetex, &area,Megenta);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
             std::string show_health = "Boss Health: "+std::to_string(bosshealth);
-            printText(ren, screen_width-area.w*3, 0, show_health, font, &lifetex, &area);
+            printText(ren, screen_width-area.w*3, 0, show_health, &lifetex, &area,Megenta);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
             
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
-           
-            if((score%1024==0){
-                  difficulty(1);
+            if(bosshealth<diffThreshold){
+                  difficulty();
+                  diffThreshold-=diffStep;
             }
 
             SDL_RenderPresent(ren);
@@ -495,9 +496,9 @@ void gamestart()
       player.xPos = 0;
       player.yPos = screen_height/5;
       if(lives==0){
-      save_game(0,3,9999,0, 5,-5,5);
+      save_game(0,3,9999,0, 5,-5, 5);
       }
       else{
-            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wall.xVel);
+            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed);
       }
 }

@@ -43,6 +43,7 @@ extern screens screen;
 extern bool isrunning;
 extern bool mouseMode;
 extern bool Hinvincible, Pinvincible;
+extern int wallspeed;
 
  
 bool init();
@@ -58,11 +59,11 @@ void Cal_highscore(int a);
 SDL_Texture *loadTex(std::string path);
 void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
-             TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
+             SDL_Texture **texture, SDL_Rect *rect, SDL_Color white);
 void optimizeFPS(long *prevtime, float *remainder);
-void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c,int d);
-void play(int *a, int *b, int *c, int *d, int *e, int *f,int *g);
-void difficulty(int a);
+void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d);
+void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g);
+void difficulty();
 
 
 extern SDL_Renderer* ren;
@@ -96,10 +97,17 @@ extern SDL_Texture* towertex;
 extern SDL_Texture* poweruptex[POWERUP_N];
 extern SDL_Texture* fireballtex;
 extern SDL_Texture* homingtex;
+extern SDL_Texture* tscreentex;
+extern SDL_Texture* fullScreenText;
+extern SDL_Texture* mouseModeText;
 
 extern TTF_Font* font;
 
+extern SDL_Color White;
+extern SDL_Color Megenta;
+
 extern SDL_Rect area;
+extern SDL_Rect tscreentextdim;
 
 extern Mix_Music *gBackgroundMusic;
 extern Mix_Chunk *gpoint; 
@@ -224,11 +232,12 @@ struct Options
       int menumax;
       int prevMousex, prevMousey;
 
-
       SDL_Rect cursorDim;
       SDL_Rect bgdim;
       SDL_Rect fullScreenDim;
+      SDL_Rect fullScreenTextDim;
       SDL_Rect mouseModeDim;
+      SDL_Rect mouseModeTextDim;
       SDL_Rect backDim;
       
       void run();
@@ -285,6 +294,7 @@ struct Player
       bool fire;
 
       SDL_Rect htbx;
+      SDL_Rect playerdim;
       SDL_Rect bulletdim[PLAYERBULLET_N];
       
       int xPos = 0;
@@ -324,7 +334,7 @@ struct Wall
 {
       int width;
       int height;
-      int xVel;
+      //int xVel;
       int yVel;
       int mod;
       //double val[10];
@@ -339,7 +349,8 @@ struct Wall
       void move();
       void render();
 };
-extern Wall wall;
+
+
 struct Walls 
 {
       int padding;

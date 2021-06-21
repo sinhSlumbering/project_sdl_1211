@@ -1,18 +1,22 @@
 #include "header.hpp"
 
+SDL_Rect tscreentextdim={screen_width/3, screen_height-(screen_height/8)*2, screen_width/2, screen_height/8};
+
 void titlescreen() {
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, titleBG, NULL, NULL);
+      font = TTF_OpenFont("assets/Sans/Sans.ttf", 24);
+      printText(ren, screen_width/4, screen_height-screen_height/4, "Press any key to continue", &tscreentex, &tscreentextdim, White); 
+      SDL_RenderCopy(ren, tscreentex, NULL, &tscreentextdim);
       SDL_RenderPresent(ren);
       SDL_Event e;
       while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT)
                   quit = true;
             else if (e.type == SDL_KEYDOWN)
-                  screen = MAIN_MENU;
+                  screen = MAIN_MENU, mainMenu.updateUI();
             else if (e.type == SDL_MOUSEBUTTONDOWN)
-                  screen = MAIN_MENU;
-            
+                  screen = MAIN_MENU, mainMenu.updateUI();
       }
 }
 
@@ -47,6 +51,7 @@ MainMenue::MainMenue()
 }
 void MainMenue::updateUI()
 {
+      updatescreen();
       yVal = menumin = screen_height / 20; 
       step = screen_height / 10;
       buttonH = screen_height / 20;
@@ -90,12 +95,8 @@ void MainMenue::handleEvent()
             if(win.handleEvent(e)) updateUI();
             if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                              screen = IN_GAME, isrunning = true;
-                              break;
                         case SDLK_m:
                               win.toggleFullscreen();
-                              updatescreen();
                               updateUI();
                               break;
                         case SDLK_UP:
@@ -107,20 +108,22 @@ void MainMenue::handleEvent()
                         case SDLK_RETURN: {
                               if (cursorpoints(&newGameDim, &cursorDim)){
                                     screen = IN_GAME, isrunning = true;
-                                    save_game(0,3,9999,0,5,-5,5);
+                                    save_game(0,3,9999,0,5,-5, 5);
+                                    updatescreen();
                               }
                               if(cursorpoints(&continueDim, &cursorDim)){
                                     screen = IN_GAME;
                                     isrunning = true;
+                                    updatescreen();
                               }
                               else if(cursorpoints(&highScoreDim, &cursorDim))
-                                    screen=HIGH_SCORES;
+                                    screen=HIGH_SCORES, highScore.updateUI();
                               else if (cursorpoints(&optionsDim, &cursorDim))
-                                    screen=OPTIONS;
+                                    screen=OPTIONS, options.updateUI();
                               else if (cursorpoints(&helpDim, &cursorDim))
-                                    screen = HELP;
+                                    screen = HELP, help.updateUI();
                               else if (cursorpoints(&aboutDim, &cursorDim))
-                                    screen=ABOUT;      
+                                    screen=ABOUT, about.updateUI();      
                               else if (cursorpoints(&exitDim, &cursorDim))
                                     quit = true;
                         }
@@ -150,19 +153,20 @@ void MainMenue::handleEvent()
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 
             if (mouseIsInside(&newGameDim, mousex, mousey)){
-                  save_game(0,3,9999,0,5,-5,5);
+                  save_game(0,3,9999,0,5,-5, 5);
                   isrunning = true, screen = IN_GAME;
+                  updatescreen();
             }
             if (mouseIsInside(&continueDim, mousex, mousey))
-                  isrunning = true, screen = IN_GAME;
+                  isrunning = true, screen = IN_GAME, updatescreen();
             else if (mouseIsInside(&highScoreDim, mousex, mousey))
-                  screen = HIGH_SCORES;
+                  screen = HIGH_SCORES, highScore.updateUI();
             else if (mouseIsInside(&optionsDim, mousex, mousey))
-                  screen=OPTIONS;
+                  screen=OPTIONS, options.updateUI();
             else if (mouseIsInside(&helpDim, mousex, mousey))
-                  screen = HELP;
+                  screen = HELP, help.updateUI();
             else if (mouseIsInside(&aboutDim, mousex, mousey))
-                  screen=ABOUT;      
+                  screen=ABOUT, about.updateUI();      
             else if (mouseIsInside(&exitDim, mousex, mousey))
                   quit = true;
       }
@@ -208,6 +212,7 @@ Pause::Pause()
 }
 void Pause::updateUI()
 {
+      updatescreen();
       yVal = menumin = screen_height / 3; 
       step = screen_height / 10;
       buttonH = screen_height / 20;
@@ -251,7 +256,6 @@ void Pause::handleEvent()
                               break;
                         case SDLK_m:
                               win.toggleFullscreen();
-                              updatescreen();
                               updateUI();
                               break;
                         case SDLK_UP:
@@ -323,13 +327,19 @@ Options::Options()
       cursorDim.y = yVal;
 
       fullScreenDim = {xVal, yVal, buttonW, buttonH};
+      //fullScreenTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       yVal+=step;
       mouseModeDim = {xVal, yVal, buttonW, buttonH};
+      //mouseModeTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
+      // font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
+      // printText(ren, screen_width/8, fullScreenDim.y, "Fullscreen", font, &fullScreenText, &fullScreenTextDim);
+      // printText(ren, screen_width/8, mouseModeDim.y, "Mouse Mode", font, &mouseModeText, &mouseModeTextDim);
 }
 void Options::updateUI()
 {
+      updatescreen();
       yVal = menumin = screen_height / 3; 
       step = screen_height / 10;
       buttonH = screen_height / 20;
@@ -343,8 +353,10 @@ void Options::updateUI()
       cursorDim.y = yVal;
 
       fullScreenDim = {xVal, yVal, buttonW, buttonH};
+      //fullScreenTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       yVal+=step;
       mouseModeDim = {xVal, yVal, buttonW, buttonH};
+      //mouseModeTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
 }
@@ -373,7 +385,7 @@ void Options::handleEvent()
                   switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:
                         case SDLK_BACKSPACE:
-                              screen = IN_GAME, isrunning = true;
+                              screen = MAIN_MENU, isrunning = true, mainMenu.updateUI();
                               break;
                         case SDLK_UP:
                               cursorUpdate(-step);
@@ -385,7 +397,6 @@ void Options::handleEvent()
                               if (cursorpoints(&fullScreenDim, &cursorDim))
                                     {
                                           win.toggleFullscreen();
-                                          updatescreen();
                                           updateUI();
                                     }
                               else if (cursorpoints(&mouseModeDim, &cursorDim))
@@ -413,7 +424,6 @@ void Options::handleEvent()
             if (mouseIsInside(&fullScreenDim, mousex, mousey))
                         {
                               win.toggleFullscreen();
-                              updatescreen();
                               updateUI();
                         }
             else if (mouseIsInside(&mouseModeDim, mousex, mousey))
@@ -428,8 +438,15 @@ void Options::run()
       handleEvent();
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
-      SDL_RenderCopy(ren, FullScreenB, NULL, &fullScreenDim);
-      SDL_RenderCopy(ren, MouseModeB, NULL, &mouseModeDim);
+      SDL_RenderCopy(ren, optionsToggle[win.fullScreen], NULL, &fullScreenDim);
+      SDL_RenderCopy(ren, optionsToggle[mouseMode], NULL, &mouseModeDim);
+      SDL_Rect area;
+      printText(ren,0,0,"Full Screen", &tscreentex, &area, White);
+      SDL_RenderCopy(ren,tscreentex,NULL, &area);
+      printText(ren,0,50,"Mouse Mode", &tscreentex, &area, White);
+      SDL_RenderCopy(ren,tscreentex,NULL, &area);
+      // SDL_RenderCopy(ren, fullScreenText, NULL, &fullScreenTextDim);
+      // SDL_RenderCopy(ren, mouseModeText, NULL, &mouseModeTextDim);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
       SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
       SDL_RenderPresent(ren);
@@ -441,6 +458,7 @@ HighScore::HighScore()
 }
 void HighScore::updateUI()
 {
+      updatescreen();
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
 
 }
@@ -454,24 +472,22 @@ void HighScore::handleEvents()
                   switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:
                         case SDLK_BACKSPACE:
-                              screen = MAIN_MENU;
+                              screen = MAIN_MENU, mainMenu.updateUI();
                               break;
                         case SDLK_m:
                               win.toggleFullscreen();
-                              updatescreen();
                               updateUI();
                               break;
                   }
             }
             if(win.handleEvent(e)) updateUI();
-            
       }
 
       int mousex, mousey;
       int mbutton = SDL_GetMouseState(&mousex, &mousey);
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
             if (mouseIsInside(&backDim, mousex, mousey))
-                  screen = MAIN_MENU;
+                  screen = MAIN_MENU, mainMenu.updateUI();
       }
 }
 void HighScore::run() {
@@ -481,10 +497,10 @@ void HighScore::run() {
       SDL_RenderCopy(ren, backB, NULL, &backDim);
       TTF_Init();
       FILE *fptr = fopen("assets/highscore.txt", "r");
-      font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
+      // font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
       int num, x, y;
-      x = 385;
-      y = 50;
+      x = screen_width/2-area.w/2;
+      y = screen/20;
 
       while ((num = getw(fptr)) != EOF)
       {
@@ -504,6 +520,7 @@ About::About()
 }
 void About::updateUI()
 {
+      updatescreen();
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
 
 }
@@ -517,11 +534,10 @@ void About::handleEvents()
                   switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:
                         case SDLK_BACKSPACE:
-                              screen = MAIN_MENU;
+                              screen = MAIN_MENU, mainMenu.updateUI();
                               break;
                         case SDLK_m:
                               win.toggleFullscreen();
-                              updatescreen();
                               updateUI();
                               break;
                   }
@@ -534,7 +550,7 @@ void About::handleEvents()
       int mbutton = SDL_GetMouseState(&mousex, &mousey);
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
             if (mouseIsInside(&backDim, mousex, mousey))
-                  screen = MAIN_MENU;
+                  screen = MAIN_MENU, mainMenu.updateUI();
       }
 }
 void About::run() {
@@ -554,6 +570,7 @@ Help::Help()
 }
 void Help::updateUI()
 {
+      updatescreen();
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
 
 }
@@ -567,11 +584,10 @@ void Help::handleEvents()
                   switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:
                         case SDLK_BACKSPACE:
-                              screen = MAIN_MENU;
+                              screen = MAIN_MENU, mainMenu.updateUI();
                               break;
                         case SDLK_m:
                               win.toggleFullscreen();
-                              updatescreen();
                               updateUI();
                               break;
                   }
@@ -584,7 +600,7 @@ void Help::handleEvents()
       int mbutton = SDL_GetMouseState(&mousex, &mousey);
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
             if (mouseIsInside(&backDim, mousex, mousey))
-                  screen = MAIN_MENU;
+                  screen = MAIN_MENU, mainMenu.updateUI();
       }
 }
 void Help::run() {

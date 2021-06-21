@@ -51,7 +51,14 @@ SDL_Texture* dashtex;
 SDL_Texture* poweruptex[POWERUP_N];
 SDL_Texture* fireballtex;
 SDL_Texture* homingtex;
+SDL_Texture* tscreentex;
+SDL_Texture* fullScreenText;
+SDL_Texture* mouseModeText;
 
+TTF_Font *font= TTF_OpenFont("assets/Sans/Sans.ttf",24);
+
+SDL_Color White = {255,255,255,0};
+SDL_Color Megenta = {236, 134, 134, 0};
 
 Mix_Music *gBackgroundMusic;
 Mix_Chunk *gScratch; 
@@ -123,49 +130,9 @@ bool gWindow::handleEvent( SDL_Event& e )
 			SDL_RenderPresent( ren );
 			break;
 
-			//Mouse entered window
-			case SDL_WINDOWEVENT_ENTER:
-		      mouseFocus = true;
-			//updateCaption = true;
-			break;
-			
-			//Mouse left window
-			case SDL_WINDOWEVENT_LEAVE:
-			mouseFocus = false;
-			//updateCaption = true;
-			break;
-
-			//Window has keyboard focus
-			case SDL_WINDOWEVENT_FOCUS_GAINED:
-			keyboardFocus = true;
-			//updateCaption = true;
-			break;
-
-			//Window lost keyboard focus
-			case SDL_WINDOWEVENT_FOCUS_LOST:
-			keyboardFocus = false;
-			//updateCaption = true;
-			break;
-
-			//Window minimized
-			case SDL_WINDOWEVENT_MINIMIZED:
-                  minimized = true;
-                  break;
-
-			//Window maxized
-			case SDL_WINDOWEVENT_MAXIMIZED:
-			minimized = false;
-                  break;
-			
-			//Window restored
-			case SDL_WINDOWEVENT_RESTORED:
-			minimized = false;
-                  break;
 		}
-
 	}
-      return update;
-	
+      return update;	
 }
 void gWindow::free()
 {
@@ -444,10 +411,18 @@ bool loadMedia() {
             printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
             success = false;
       }
-      //rework dis later
-      //DANGEROUS_STUFF_PLEASE CHANGE_FOR_THE_LOVE_OF_ALL_THATS_HOLY
-      optionsToggle[0]=exitB;
-      optionsToggle[1]=bosstex;
+      optionsToggle[0] = loadTex("assets/off.png");
+      if (optionsToggle[0] == NULL)
+      {
+            printf("failed to load optionstoggle\n");
+            success = false;
+      }
+      optionsToggle[1] = loadTex("assets/on.png");
+      if (optionsToggle[1] == NULL)
+      {
+            printf("failed to load optionstoggle\n");
+            success = false;
+      }
 
       return success;
 }
@@ -511,12 +486,12 @@ void Cal_highscore(int a)
 }
  
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
-             TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect)
+              SDL_Texture **texture, SDL_Rect *rect, SDL_Color white)
 {
       int text_width;
       int text_height;
       SDL_Surface *surface;
-      SDL_Color white = {236, 134, 134, 0};
+      // SDL_Color white = {236, 134, 134, 0};
 
       surface = TTF_RenderText_Solid(font, point.c_str(), white);
       *texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -533,10 +508,10 @@ void highscore_printing(int a, int x, int y)
 {
 
       std::string show = std::to_string(a);
-      printText(ren, x, y, show, font, &scoretex, &area);
+      printText(ren, x, y, show, &scoretex, &area, White);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
-void play(int *a, int *b, int *c, int *d, int *e, int *f,int *g){
+void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g){
       FILE* fptr = fopen("assets/save game.txt","r");
       *a = getw(fptr);
       *b = getw(fptr);
@@ -547,7 +522,7 @@ void play(int *a, int *b, int *c, int *d, int *e, int *f,int *g){
       *g = getw(fptr);
       fclose(fptr);
 }
-void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c,int d){
+void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c, int d){
       remove("assets/save game.txt");
       FILE* fptr = fopen("assets/save game.txt","w");
       putw(playerscore,fptr);
@@ -556,16 +531,15 @@ void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int
       putw(a, fptr);
       putw(b, fptr);
       putw(c, fptr);
-      putw(d,fptr);
+      putw(d, fptr);
       fclose(fptr);
 }
-void difficulty(int a){
-      if(walls.wall_number == 3){
-            wall.xVel += 2;
+void difficulty(){
+      if(walls.wall_number >= 1)
+      {
+            wallspeed += 5;
       }
-      else{
-            walls.wall_number++;
-      }
+      else walls.wall_number++;
       if(attack.bXvel < 0){
             attack.bXvel -= 2;
       }
@@ -578,6 +552,7 @@ void difficulty(int a){
       else{
             attack.bYvel += 2;
       } 
+      //printf("\nwall %d\n", walls.wall_number);
 }
 void optimizeFPS(long *prevtime, float *remainder)
 {
@@ -631,10 +606,10 @@ void close() {
       bosstex=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
-      SDL_DestroyTexture(optionsToggle[0]);
+      SDL_DestroyTexture(optionsToggle[1]);
+      optionsToggle[1]=NULL;
       SDL_DestroyTexture(FullScreenB);
       SDL_DestroyTexture(MouseModeB);
-      optionsToggle[0]=NULL;
       SDL_DestroyTexture(scoretex);
       scoretex=NULL;
       SDL_DestroyTexture(towertex);
