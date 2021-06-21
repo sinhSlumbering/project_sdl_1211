@@ -108,7 +108,7 @@ void MainMenue::handleEvent()
                               break;
                         case SDLK_RETURN: {
                               if (cursorpoints(&newGameDim, &cursorDim)){
-                                    printf("%d\n",newGameDim.x);
+                                    // printf("%d\n",newGameDim.x);
                                     screen = IN_GAME, isrunning = true;
                                     save_game(0,3,9999,0,5,-5, 5);
                                     updatescreen();
