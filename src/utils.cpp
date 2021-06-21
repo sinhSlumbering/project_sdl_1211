@@ -38,7 +38,9 @@ SDL_Texture* pausenewB;
 SDL_Texture* pauseexitB;
 SDL_Texture* aboutB;
 SDL_Texture* newGameB;
+SDL_Texture* continueB;
 SDL_Texture* helpB;
+SDL_Texture* inhelp;
 SDL_Texture* resumeB;
 SDL_Texture* exitB;
 SDL_Texture* cursor;
@@ -254,12 +256,12 @@ bool loadMedia() {
             success = false;
       }
  
-      aboutB = loadTex("assets/mainMenu/about.jpg");
+      aboutB = loadTex("assets/mainMenu/about.png");
       if (aboutB == NULL) {
             printf("failed to load about button\n");
             success = false;
       }
-      highScoreB = loadTex("assets/mainMenu/highscore.jpg");
+      highScoreB = loadTex("assets/mainMenu/highscore.png");
       if (highScoreB == NULL) {
             printf("failed to load highscore button\n");
             success = false;
@@ -270,18 +272,26 @@ bool loadMedia() {
             printf("failed to load highscore background\n");
             success = false;
       }
-      newGameB = loadTex("assets/mainMenu/newgame.jpg");
+      newGameB = loadTex("assets/mainMenu/new game.png");
       if (newGameB == NULL) {
             printf("failed to load newgame button\n");
             success = false;
       }
- 
-      helpB = loadTex("assets/mainMenu/help.jpg");
+      continueB = loadTex("assets/mainMenu/continue.png");
+      if (continueB == NULL) {
+            printf("failed to load continue button\n");
+            success = false;
+      }
+      helpB = loadTex("assets/mainMenu/help.png");
       if (helpB == NULL) {
             printf("failed to load help button\n");
             success = false;
       }
- 
+      inhelp = loadTex("assets/Help.png");
+      if (inhelp == NULL) {
+            printf("failed to load help button\n");
+            success = false;
+      }
       resumeB = loadTex("assets/resume.png");
       if (resumeB == NULL) {
             printf("failed to load resume button\n");
@@ -297,7 +307,7 @@ bool loadMedia() {
             printf("failed to load resume button\n");
             success = false;
       }
-      OptionsB = loadTex("assets/mainMenu/Options.png");
+      OptionsB = loadTex("assets/mainMenu/options.png");
       if (OptionsB == NULL) {
             printf("failed to load option button\n");
             success = false;

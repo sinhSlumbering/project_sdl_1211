@@ -181,7 +181,7 @@ void MainMenue::run()
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
       SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
-      SDL_RenderCopy(ren, newGameB, NULL, &continueDim);
+      SDL_RenderCopy(ren, continueB, NULL, &continueDim);
       SDL_RenderCopy(ren, highScoreB, NULL, &highScoreDim);
       SDL_RenderCopy(ren, OptionsB, NULL, &optionsDim);
       SDL_RenderCopy(ren, helpB, NULL, &helpDim);
@@ -606,7 +606,7 @@ void Help::handleEvents()
 void Help::run() {
       
       SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, pauseBG, NULL, NULL);
+      SDL_RenderCopy(ren, inhelp, NULL, NULL);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
       SDL_RenderPresent(ren);
       handleEvents();
