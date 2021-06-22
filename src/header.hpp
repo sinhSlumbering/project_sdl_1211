@@ -52,6 +52,7 @@ bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey);
 bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim);
 bool checkCol(SDL_Rect* a, SDL_Rect* b);
 void titlescreen();
+void gameoverscreen();
 void gamestart();
 void close();
 void updatescreen();
@@ -61,8 +62,8 @@ void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              SDL_Texture **texture, SDL_Rect *rect, SDL_Color white);
 void optimizeFPS(long *prevtime, float *remainder);
-void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d);
-void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g);
+void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d, int e);
+void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h);
 void difficulty();
 
 

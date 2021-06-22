@@ -20,6 +20,27 @@ void titlescreen() {
       }
 }
 
+void gameoverscreen()
+{
+      SDL_RenderClear(ren);
+      SDL_RenderCopy(ren, titleBG, NULL, NULL);
+      std::string yourscore = "Your Score: "+ std::to_string(score);
+      printText(ren,screen_width/2 - screen_width/10, screen_height/2 - screen_height/20, yourscore, &tscreentex, &tscreentextdim,White);
+      SDL_RenderCopy(ren,tscreentex, NULL, &tscreentextdim);
+      printText(ren, screen_width/3, screen_height-screen_height/4, "Press any key to continue", &tscreentex, &tscreentextdim, White); 
+      SDL_RenderCopy(ren, tscreentex, NULL, &tscreentextdim);
+      SDL_RenderPresent(ren);
+      SDL_Event e;
+      while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT)
+                  quit = true;
+            else if (e.type == SDL_KEYDOWN)
+                  screen = MAIN_MENU, mainMenu.updateUI();
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+                  screen = MAIN_MENU, mainMenu.updateUI();
+      }
+}
+
 MainMenue::MainMenue()
 {
       yVal = menumin = screen_height / 20; 
@@ -110,7 +131,7 @@ void MainMenue::handleEvent()
                               if (cursorpoints(&newGameDim, &cursorDim)){
                                     // printf("%d\n",newGameDim.x);
                                     screen = IN_GAME, isrunning = true;
-                                    save_game(0,3,9999,0,5,-5, 5);
+                                    save_game(0,3,9999,0,5,-5, 5, 9000);
                                     updatescreen();
                               }
                               if(cursorpoints(&continueDim, &cursorDim)){
@@ -155,7 +176,7 @@ void MainMenue::handleEvent()
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 
             if (mouseIsInside(&newGameDim, mousex, mousey)){
-                  save_game(0,3,9999,0,5,-5, 5);
+                  save_game(0,3,9999,0,5,-5, 5, 9000);
                   isrunning = true, screen = IN_GAME;
                   updatescreen();
             }
