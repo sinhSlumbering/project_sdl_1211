@@ -32,6 +32,8 @@ enum screens {
  
 extern int  screen_width;
 extern int  screen_height;
+extern float screen_x_frac;
+extern float screen_y_frac;
 extern int  lives;
 extern long prevtime;
 extern float remaintime;
@@ -65,6 +67,10 @@ void optimizeFPS(long *prevtime, float *remainder);
 void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d, int e);
 void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h);
 void difficulty();
+void scaleIntX(int *x);
+void scaleIntY(int *y);
+void scaleRect(SDL_Rect* r);
+void scaleGame();
 
 
 extern SDL_Renderer* ren;
@@ -305,6 +311,7 @@ struct Player
       double angle = 0.0;
       Player();
 
+      void scale();
       void handleEvent();
       void move(int x, int y);
       void bullet();
@@ -327,6 +334,7 @@ struct Boss
       int yPos = screen_height/3;
       Boss();
 
+      void scale();
       void move();
       void render();
 };
@@ -361,7 +369,7 @@ struct Walls
       Wall wallz[3];
       Walls();
 
-      Walls(int pad);
+      void scale();
       void move();
       void render();
       void colls();
@@ -384,6 +392,7 @@ struct Powerup
       int current;
 
       Powerup();
+      void scale();
       void move();
       void choose();
       void run();
@@ -406,6 +415,7 @@ struct Attack
       int current;
 
       Attack();
+      void scale();
       void choose();
       void bounce();
       void home();

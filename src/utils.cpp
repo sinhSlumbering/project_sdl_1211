@@ -4,11 +4,17 @@ gWindow win;
 
 void updatescreen()
 {
+      screen_x_frac=(float)screen_width;
+      screen_y_frac=(float)screen_height;
       SDL_GetWindowSize(win.window, &screen_width, &screen_height);
+      screen_x_frac=screen_width/screen_x_frac;
+      screen_y_frac=screen_height/screen_y_frac;
 }
 
 int screen_width=SCREEN_WIDTH;
 int screen_height=SCREEN_HEIGHT;
+float screen_x_frac=1;
+float screen_y_frac=1;
 
 About about;
 Help help;
@@ -453,6 +459,33 @@ SDL_Texture* loadTex(std::string path) {
       return newTexture;
 }
 
+void scaleIntX(int *x){
+      *x=(int)( *x * screen_x_frac);
+}
+void scaleIntY(int *y){
+      int c=*y;
+      *y=(int)(*y * screen_y_frac);
+      if(*y==0) *y=c;
+}
+void scaleRect(SDL_Rect* r)
+{
+      scaleIntX(&r->x);
+      scaleIntY(&r->y);
+      scaleIntX(&r->w);
+      scaleIntY(&r->h);
+      if(r->h<=10) r->h=1;
+      if(r->w<=10) r->w=1;
+}
+void scaleSqr(SDL_Rect* r)
+{
+      printf("before %d %d\n", r->w, r->h);
+      scaleIntX(&r->x);
+      scaleIntY(&r->y);
+      scaleIntY(&r->w);
+      if(r->w<=10) r->w=10;
+      else r->h=r->w;
+      printf("after %d %d\n", r->w, r->h);
+}
 void Cal_highscore(int a)
 {
       FILE *fptr;

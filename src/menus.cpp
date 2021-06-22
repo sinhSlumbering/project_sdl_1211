@@ -49,7 +49,7 @@ MainMenue::MainMenue()
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
       xVal=screen_width-buttonW-buttonW/3;
-      menumax = 6 * screen_height / 10;
+      menumax = 7 * screen_height / 10;
       bgdim = {0, 0, screen_width, screen_height};
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;

@@ -48,28 +48,51 @@ Player::Player()
       htbx.y = yPos + hbspY;
       htbx.w = screen_width / 35;
       htbx.h = screen_height / 22;
-};
+}
+void Player::scale()
+{
+      width = screen_width / 10;
+      height = screen_height / 8;
+      xStep = screen_width / 100;
+      yStep = screen_height / 80;
+      hbspX = screen_width / 30, hbspY = screen_height / 30;
+      
+      bulletVel = 20;
+      bulletIndex = 0;
+      bulletW=player.width/3;
+      bulletH=player.height/4;
+      for(int i=0; i<PLAYERBULLET_N; i++) bulletdim[i]={-bulletW, -bulletH, bulletW, bulletH};
+      scaleIntX(&xPos);
+      scaleIntY(&yPos);
+      angle = 0.0;
+      htbx.x = xPos + hbspX;
+      htbx.y = yPos + hbspY;
+      htbx.w = screen_width / 35;
+      htbx.h = screen_height / 22;
+}
 
 void Player::render()
 {
       playerdim = { xPos, yPos, width, height };
+      if(Pinvincible) tex=1;
       SDL_RenderCopyEx(ren, playertex[tex], NULL, &playerdim, angle, NULL, SDL_FLIP_NONE);
 }
-void Player::move(int x, int y)
-{
-      xPos += x * xStep;
-      yPos += y * yStep;
-      if (xPos < 0)
-            xPos = 0;
-      else if (xPos + width > screen_width)
-            xPos = screen_width - width;
-      if (yPos < 0)
-            yPos = 0;
-      else if (yPos + height > screen_height)
-            yPos = screen_height - height;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
-}
+// reduntant?
+// void Player::move(int x, int y)
+// {
+//       xPos += x * xStep;
+//       yPos += y * yStep;
+//       if (xPos < 0)
+//             xPos = 0;
+//       else if (xPos + width > screen_width)
+//             xPos = screen_width - width;
+//       if (yPos < 0)
+//             yPos = 0;
+//       else if (yPos + height > screen_height)
+//             yPos = screen_height - height;
+//       htbx.x = xPos + hbspX;
+//       htbx.y = yPos + hbspY;
+// }
 void Player::handleEvent()
 {
       if ( !mouseMode )
@@ -181,6 +204,15 @@ Boss::Boss()
       yPos = screen_height / 3;
       htbx = {xPos, yPos, width, height};
 }
+void Boss::scale()
+{
+      scaleIntX(&width);
+      scaleIntX(&xPos);
+      scaleIntX(&htbx.h);
+      scaleIntY(&height);
+      scaleIntX(&yVel);
+      yPos=screen_height/2;
+}
 void Boss::move()
 {
       if ((yPos < 0) || (yPos + height > screen_height))
@@ -237,16 +269,14 @@ Wall::Wall()
 }
 void Wall::move()
 {
-      xPos-=wallspeed;
-      if(xPos+width<=0)
+      htbx.x-=wallspeed;
+      if(htbx.x+width<=0)
       {
-            xPos=screen_width+width;
+            htbx.x=screen_width+width;
             double val[10]={1.3, 1.5, 2, 1.6, 1.2, 0.9, 0.75, 0.6, 0.85,0.8};
             srand(time(0)+yPos);
-            yPos=(screen_height/2)*val[rand()%mod];
+            htbx.y=(screen_height/2)*val[rand()%mod];
       }
-      htbx.x=xPos;
-      htbx.y=yPos;
       htbx.h=screen_height-htbx.y;
 }
 void Wall::render()
@@ -257,9 +287,16 @@ Walls::Walls()
 {
       padding = screen_width/3;
       wall_number=0;
-      wallz[0].xPos=screen_width;
-      for(int i=1; i<wall_number; i++)
-            wallz[i].xPos=wallz[i-1].xPos+padding;
+      wallz[0].htbx.x=screen_width;
+      for(int i=1; i<3; i++)
+            wallz[i].htbx.x=wallz[i-1].htbx.x+padding;
+}
+void Walls::scale()
+{
+      scaleIntX(&padding);
+      for(int i=0; i<3; i++){
+            scaleRect(&wallz[i].htbx);
+      }
 }
 
 void Walls::move()
@@ -290,6 +327,16 @@ Powerup::Powerup()
       spawn = true;
       running = false;
 }
+void Powerup::scale()
+{
+      int wid=player.width/2;
+      scaleIntX(&powerupdim.x);
+      scaleIntX(&initdim.x);
+      scaleIntY(&powerupdim.y);
+      scaleIntY(&initdim.y);
+      powerupdim.h=powerupdim.w=initdim.h=initdim.w=wid;
+      scaleIntX(&vel);
+}
 void Powerup::move()
 {
       powerupdim.x-=vel;
@@ -315,7 +362,7 @@ void Powerup::run()
       else if(Pinvincible)
       {
             // printf("jsdhfg");
-            if(time>10000) Pinvincible=false, player.tex=0, ptimer.stop();
+            if(time>10000) Pinvincible=false, player.tex=0, ptimer.stop(), iFrame.start(), Hinvincible=true;
       }
       else if(running==false) spawn=true;
       else if(running)
@@ -339,7 +386,6 @@ void Powerup::run()
 
                   }
             else move();
-            //if(time>POWERUP_INTERVAL) running=false;
       }
       
 }
@@ -355,6 +401,24 @@ Attack::Attack()
       hXvel=5;
       hYvel=5;
       angle=0.0;
+}
+void Attack::scale()
+{
+      int side=screen_width/20, arm=side/1.42;
+      scaleIntX(&bouncedim.x);
+      scaleIntY(&bouncedim.y);
+      homedim.w=homedim.h=bouncedim.h=bouncedim.w=side;
+      scaleIntX(&homedim.x);
+      scaleIntY(&homedim.y);
+      scaleIntX(&bhtbx.x);
+      scaleIntY(&bhtbx.y);
+      hhtbx.w=hhtbx.h=bhtbx.h=bhtbx.w=arm;
+      scaleIntX(&hhtbx.x);
+      scaleIntY(&hhtbx.y);
+      scaleIntX(&bXvel);
+      scaleIntX(&hXvel);
+      scaleIntX(&bYvel);
+      scaleIntX(&hYvel);
 }
 void Attack::choose()
 {
@@ -401,6 +465,14 @@ void Attack::run()
       else if(current==HOMING) home();
       }
 }
+void scaleGame()
+{
+      player.scale();
+      plane.scale();
+      walls.scale();
+      powerup.scale();
+      attack.scale();
+}
 void gamestart() 
 {
       // font = TTF_OpenFont(font_path,24);
@@ -423,7 +495,8 @@ void gamestart()
                   if (e.type == SDL_QUIT){
                         quit = true, isrunning = false;
                   }
-                  if (e.type == SDL_KEYDOWN) {
+                  else if (win.handleEvent(e)) scaleGame();
+                  else if (e.type == SDL_KEYDOWN) {
                         switch (e.key.keysym.sym) {
                               case SDLK_ESCAPE:
                                     screen = PAUSE, isrunning = false, pause.updateUI();
@@ -434,7 +507,7 @@ void gamestart()
             score++;
             Uint32 diff=diffTimer.getTicks();
             if(ingamedim.x>=2124) ingamedim.x =0;
-            ingamedim.x+=5;
+            ingamedim.x+=screen_width/50;
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
@@ -470,7 +543,7 @@ void gamestart()
                   walls.colls();
             }
             if(player.col(&plane.htbx)==true){ 
-                  printf("ouch\n");
+                  //printf("ouch\n");
                   lives--;
                   Mix_PlayChannel(-1,ghit,0);
             }
