@@ -187,7 +187,8 @@ void imgError(const std::string msg) {
 void imgLoadError(const std::string path) {
       printf("failed to load %s IMGERROR: %s\n", path, IMG_GetError());
 }
- 
+
+// SDL initialisation
 bool init() {
       bool success = true;
  
@@ -223,7 +224,7 @@ bool init() {
       return success;
 }
 
-
+//Loads necessary textures and musics
 bool loadMedia() {
       bool success = true;
  
@@ -447,7 +448,7 @@ bool loadMedia() {
       }
       return success;
 }
- 
+//takes the path and makes a texture
 SDL_Texture* loadTex(std::string path) {
       SDL_Texture* newTexture = NULL;
  
@@ -493,6 +494,7 @@ void scaleSqr(SDL_Rect* r)
       else r->h=r->w;
       printf("after %d %d\n", r->w, r->h);
 }
+// Stores top 10 scores in a file
 void Cal_highscore(int a)
 {
       FILE *fptr;
@@ -534,6 +536,7 @@ void Cal_highscore(int a)
       }
       fclose(fptr);
 }
+// Clears pre existing high scores
 void highscoreclear(){
       FILE* fptr;
       remove("assets/highscore.txt");
@@ -544,6 +547,7 @@ void highscoreclear(){
       }
       fclose(fptr);
 }
+//makes a texture of a string to present in the renderer
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
               SDL_Texture **texture, SDL_Rect *rect, SDL_Color white)
 {
@@ -562,7 +566,7 @@ void printText(SDL_Renderer *renderer, int x, int y, std::string point,
       rect->w = text_width;
       rect->h = text_height;
 }
-
+//Prints highscores using printtext
 void highscore_printing(int a, int x, int y)
 {
 
@@ -570,6 +574,7 @@ void highscore_printing(int a, int x, int y)
       printText(ren, x, y, show, &scoretex, &area, White);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
+//Gets the current playing environment from a text file
 void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h){
       FILE* fptr = fopen("assets/save game.txt","r");
       *a = getw(fptr);
@@ -582,6 +587,7 @@ void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h){
       *h = getw(fptr);
       fclose(fptr);
 }
+// saves the last playing environment in a text file
 void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c, int d, int e){
       remove("assets/save game.txt");
       FILE* fptr = fopen("assets/save game.txt","w");
@@ -595,6 +601,7 @@ void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int
       putw(e,fptr);
       fclose(fptr);
 }
+//increases difficulty as boss health decreases
 void difficulty(){
       if(walls.wall_number >= 3)
       {
@@ -632,6 +639,7 @@ void optimizeFPS(long *prevtime, float *remainder)
 	*prevtime = SDL_GetTicks();
 }
 
+//frees ram
 void close() {
       SDL_DestroyTexture(titleBG);
       titleBG = NULL;
