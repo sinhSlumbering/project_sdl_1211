@@ -71,6 +71,7 @@ void scaleIntX(int *x);
 void scaleIntY(int *y);
 void scaleRect(SDL_Rect* r);
 void scaleGame();
+void highscoreclear();
 
 
 extern SDL_Renderer* ren;
@@ -99,6 +100,7 @@ extern SDL_Texture* playertex[3];
 extern SDL_Texture* playerbullet;
 extern SDL_Texture* bosstex;
 extern SDL_Texture* optionsToggle[2];
+extern SDL_Texture* cleartex;
 extern SDL_Texture* scoretex;
 extern SDL_Texture* lifetex;
 extern SDL_Texture* dashtex;
@@ -247,6 +249,7 @@ struct Options
       SDL_Rect fullScreenTextDim;
       SDL_Rect mouseModeDim;
       SDL_Rect mouseModeTextDim;
+      SDL_Rect clearDim;
       SDL_Rect backDim;
       
       void run();

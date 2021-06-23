@@ -350,15 +350,11 @@ Options::Options()
       cursorDim.y = yVal;
 
       fullScreenDim = {xVal, yVal, buttonW, buttonH};
-      //fullScreenTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       yVal+=step;
       mouseModeDim = {xVal, yVal, buttonW, buttonH};
-      //mouseModeTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
-      
+      yVal += step;
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
-      // font = TTF_OpenFont("assets/Sans/Sans.ttf", 22);
-      // printText(ren, screen_width/8, fullScreenDim.y, "Fullscreen", font, &fullScreenText, &fullScreenTextDim);
-      // printText(ren, screen_width/8, mouseModeDim.y, "Mouse Mode", font, &mouseModeText, &mouseModeTextDim);
+      clearDim = {xVal, yVal, buttonW, buttonH};
 }
 void Options::updateUI()
 {
@@ -376,10 +372,10 @@ void Options::updateUI()
       cursorDim.y = yVal;
 
       fullScreenDim = {xVal, yVal, buttonW, buttonH};
-      //fullScreenTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
       yVal+=step;
       mouseModeDim = {xVal, yVal, buttonW, buttonH};
-      //mouseModeTextDim = {screen_width/8, yVal, buttonW*2, buttonH};
+      yVal += step;
+      clearDim = {xVal, yVal, buttonW, buttonH};
       
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
 }
@@ -439,6 +435,8 @@ void Options::handleEvent()
                   cursorJump(&fullScreenDim);
             else if (mousey >= mouseModeDim.y && mousey < mouseModeDim.y + mouseModeDim.h + 1)
                   cursorJump(&mouseModeDim);
+            else if (mousey >= clearDim.y && mousey < clearDim.y + clearDim.h + 1)
+                  cursorJump(&clearDim);
             else if (mousey >= backDim.y)
                   cursorJump(&backDim);
       }
@@ -451,6 +449,8 @@ void Options::handleEvent()
                         }
             else if (mouseIsInside(&mouseModeDim, mousex, mousey))
                   mouseMode=!mouseMode;
+            else if (mouseIsInside(&clearDim, mousex, mousey))
+                  highscoreclear();
             else if (mouseIsInside(&backDim, mousex, mousey))
                   screen = MAIN_MENU, mainMenu.updateUI();
       }
@@ -463,10 +463,13 @@ void Options::run()
       SDL_RenderCopy(ren, pauseBG, NULL, &bgdim);
       SDL_RenderCopy(ren, optionsToggle[win.fullScreen], NULL, &fullScreenDim);
       SDL_RenderCopy(ren, optionsToggle[mouseMode], NULL, &mouseModeDim);
+      SDL_RenderCopy(ren,cleartex,NULL, &clearDim);
       SDL_Rect area;
       printText(ren, screen_width/10, fullScreenDim.y,"Full Screen", &tscreentex, &area, White);
       SDL_RenderCopy(ren,tscreentex,NULL, &area);
       printText(ren, screen_width/10, mouseModeDim.y,"Mouse Mode", &tscreentex, &area, White);
+      SDL_RenderCopy(ren,tscreentex,NULL, &area);
+      printText(ren, screen_width/10, clearDim.y,"Highscore Reset", &tscreentex, &area, White);
       SDL_RenderCopy(ren,tscreentex,NULL, &area);
       // SDL_RenderCopy(ren, fullScreenText, NULL, &fullScreenTextDim);
       // SDL_RenderCopy(ren, mouseModeText, NULL, &mouseModeTextDim);

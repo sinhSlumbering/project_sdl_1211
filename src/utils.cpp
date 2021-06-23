@@ -54,6 +54,7 @@ SDL_Texture* playertex[3];
 SDL_Texture* playerbullet;
 SDL_Texture* bosstex;
 SDL_Texture* optionsToggle[2];
+SDL_Texture* cleartex;
 SDL_Texture* towertex;
 SDL_Texture* dashtex;
 SDL_Texture* poweruptex[POWERUP_N];
@@ -439,7 +440,11 @@ bool loadMedia() {
             printf("failed to load optionstoggle\n");
             success = false;
       }
-
+      cleartex = loadTex("assets/clear.png");
+      if(cleartex == NULL){
+            printf("failed to load clear button\n");
+            success = false;
+      }
       return success;
 }
  
@@ -460,11 +465,13 @@ SDL_Texture* loadTex(std::string path) {
 }
 
 void scaleIntX(int *x){
-      *x=(int)( *x * screen_x_frac);
+      double y = (double)(*x);
+      *x=(int)( y * screen_x_frac);
 }
 void scaleIntY(int *y){
       int c=*y;
-      *y=(int)(*y * screen_y_frac);
+      double x = (double)(*y);
+      *y=(int)(x * screen_y_frac);
       if(*y==0) *y=c;
 }
 void scaleRect(SDL_Rect* r)
@@ -527,7 +534,16 @@ void Cal_highscore(int a)
       }
       fclose(fptr);
 }
- 
+void highscoreclear(){
+      FILE* fptr;
+      remove("assets/highscore.txt");
+      fptr = fopen("assets/highscore.txt", "w");
+      for (int i = 0; i < 10; i++)
+      {
+            putw(0, fptr);
+      }
+      fclose(fptr);
+}
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
               SDL_Texture **texture, SDL_Rect *rect, SDL_Color white)
 {
@@ -653,6 +669,8 @@ void close() {
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(optionsToggle[1]);
       optionsToggle[1]=NULL;
+      SDL_DestroyTexture(cleartex);
+      cleartex=NULL;
       SDL_DestroyTexture(FullScreenB);
       SDL_DestroyTexture(MouseModeB);
       SDL_DestroyTexture(scoretex);

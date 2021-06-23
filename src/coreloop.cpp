@@ -476,6 +476,8 @@ void scaleGame()
 void gamestart() 
 {
       // font = TTF_OpenFont(font_path,24);
+      SDL_Event f;
+      // if(win.handleEvent(f))scaleGame();
       Hinvincible=Pinvincible=false;
       SDL_Rect ingamedim;
       ingamedim.h = screen_height;
@@ -507,7 +509,7 @@ void gamestart()
             score++;
             Uint32 diff=diffTimer.getTicks();
             if(ingamedim.x>=2124) ingamedim.x =0;
-            ingamedim.x+=screen_width/50;
+            ingamedim.x+=screen_width/160;
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
