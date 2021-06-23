@@ -127,6 +127,14 @@ void MainMenue::handleEvent()
                         case SDLK_DOWN:
                               cursorUpdate(step); 
                               break;
+                        case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
+                              break;
                         case SDLK_RETURN: {
                               if (cursorpoints(&newGameDim, &cursorDim)){
                                     // printf("%d\n",newGameDim.x);
@@ -287,6 +295,14 @@ void Pause::handleEvent()
                         case SDLK_DOWN:
                               cursorUpdate(step); 
                               break;
+                        case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
+                              break;
                         case SDLK_RETURN: {
                               if (cursorpoints(&resumeDim, &cursorDim))
                                     screen = IN_GAME, isrunning = true;
@@ -412,6 +428,14 @@ void Options::handleEvent()
                         case SDLK_DOWN:
                               cursorUpdate(step); 
                               break;
+                        case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
+                              break;
                         case SDLK_RETURN: {
                               if (cursorpoints(&fullScreenDim, &cursorDim))
                                     {
@@ -504,6 +528,14 @@ void HighScore::handleEvents()
                               win.toggleFullscreen();
                               updateUI();
                               break;
+                        case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
+                              break;
                   }
             }
             if(win.handleEvent(e)) updateUI();
@@ -566,6 +598,14 @@ void About::handleEvents()
                               win.toggleFullscreen();
                               updateUI();
                               break;
+                        case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
+                              break;
                   }
             }
             if(win.handleEvent(e)) updateUI();
@@ -615,6 +655,14 @@ void Help::handleEvents()
                         case SDLK_m:
                               win.toggleFullscreen();
                               updateUI();
+                              break;
+                        case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
                               break;
                   }
             }

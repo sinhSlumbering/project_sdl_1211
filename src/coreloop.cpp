@@ -101,19 +101,28 @@ void Player::handleEvent()
             const Uint8 *keyState = SDL_GetKeyboardState(NULL);
             if (keyState[SDL_SCANCODE_UP]||keyState[SDL_SCANCODE_W]){
                   yPos -= yStep, angle=330.0;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             else if (keyState[SDL_SCANCODE_DOWN]||keyState[SDL_SCANCODE_S]){
                   yPos += yStep, angle=30.0;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             if (keyState[SDL_SCANCODE_RIGHT]||keyState[SDL_SCANCODE_D]){
                   xPos += xStep;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             else if (keyState[SDL_SCANCODE_LEFT]||keyState[SDL_SCANCODE_A]){
                   xPos -= xStep;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]){ 
                   if(!cFrame.running)
@@ -315,7 +324,9 @@ void Walls::colls()
       for(int i=0; i<wall_number; i++)
             if(player.col(&wallz[i].htbx)){
                   lives--;
-                  Mix_PlayChannel(-1,ghit,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,ghit,0);
+                  }
             }
 }
 
@@ -375,12 +386,16 @@ void Powerup::run()
                         running=false;
                         if(current==LIFE) {
                               lives++;
-                              Mix_PlayChannel(-1,gpoint,0);
+                              if(Mix_PausedMusic()==0){
+                                    Mix_PlayChannel(-1,gpoint,0);
+                              }
                         }
                         else if(current==INVINCIBILE){
                               Pinvincible=true;
                               player.tex=1;
-                              Mix_PlayChannel(-1,gpoint,0);
+                              if(Mix_PausedMusic()==0){
+                                    Mix_PlayChannel(-1,gpoint,0);
+                              }
                               ptimer.start();
                         }
 
@@ -437,7 +452,9 @@ void Attack::bounce()
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w;
       if(player.col(&bouncedim)){
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w, lives--;
+            if(Mix_PausedMusic()==0){
             Mix_PlayChannel(-1,ghit,0);
+            }
       }
       bouncedim.x-=bXvel, bouncedim.y-=bYvel;
       SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
@@ -453,6 +470,9 @@ void Attack::home()
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w;
       if(player.col(&homedim)){
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w, lives--;
+            if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,ghit,0);
+                  }
       }
       homedim.x-=bXvel;
       SDL_RenderCopyEx(ren, homingtex, NULL, &homedim, angle, NULL, SDL_FLIP_NONE);       
@@ -503,6 +523,14 @@ void gamestart()
                               case SDLK_ESCAPE:
                                     screen = PAUSE, isrunning = false, pause.updateUI();
                                     break;
+                              case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
+                              break;
                         }
                   }
             }
