@@ -212,6 +212,7 @@ Boss::Boss()
       xPos = screen_width - width;
       yPos = screen_height / 3;
       htbx = {xPos, yPos, width, height};
+      renderQuad = {xPos, yPos, width, height};
 }
 void Boss::scale()
 {
@@ -230,8 +231,8 @@ void Boss::move()
 }
 void Boss::render()
 {
-      SDL_Rect renderQuad = {xPos, yPos, width, height};
-      SDL_RenderCopyEx(ren, bosstex, NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
+      renderQuad = {xPos, yPos, width, height};
+      SDL_RenderCopyEx(ren, bosstex[phase], NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
 }
 
 
@@ -453,7 +454,7 @@ void Attack::bounce()
       if(player.col(&bouncedim)){
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w, lives--;
             if(Mix_PausedMusic()==0){
-            Mix_PlayChannel(-1,ghit,0);
+                  Mix_PlayChannel(-1,ghit,0);
             }
       }
       bouncedim.x-=bXvel, bouncedim.y-=bYvel;
@@ -495,9 +496,6 @@ void scaleGame()
 }
 void gamestart() 
 {
-      // font = TTF_OpenFont(font_path,24);
-      SDL_Event f;
-      // if(win.handleEvent(f))scaleGame();
       Hinvincible=Pinvincible=false;
       SDL_Rect ingamedim;
       ingamedim.h = screen_height;
@@ -505,7 +503,7 @@ void gamestart()
       ingamedim.x = 0;
       ingamedim.y = 0;
 
-      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed, &diffThreshold);
+      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed, &diffThreshold, &phase);
       printf("%d %d %d\n",score,lives,bosshealth);
       walls.wall_number = 0;
       diffTimer.start();
@@ -567,7 +565,7 @@ void gamestart()
             if(diff>ATTACK_START_TIME){
                   attack.run();
             }
-            if(diff-diff0>WALL_START_TIME){
+            if(diff>WALL_START_TIME){
                   walls.move();
                   walls.render();
                   walls.colls();
@@ -590,6 +588,11 @@ void gamestart()
             
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
+            if(bosshealth<= 0){
+                  boss_change_phase(plane.renderQuad,ingamedim);
+                  bosshealth = 9999;
+                  diffThreshold = 9000;
+            }
             if(bosshealth<diffThreshold){
                   difficulty();
                   diffThreshold-=diffStep;
@@ -602,10 +605,10 @@ void gamestart()
       player.xPos = 0;
       player.yPos = screen_height/5;
       if(lives==0){
-            save_game(0,3,9999,0, 5,-5, 5, 9000);
+            save_game(0,3,9999,0, 5,-5, 5, 9000,0);
             screen = GAME_OVER;
       }
       else{
-            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed,diffThreshold);
+            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed,diffThreshold,phase);
       }
 }

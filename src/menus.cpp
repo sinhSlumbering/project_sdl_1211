@@ -139,7 +139,7 @@ void MainMenue::handleEvent()
                               if (cursorpoints(&newGameDim, &cursorDim)){
                                     // printf("%d\n",newGameDim.x);
                                     screen = IN_GAME, isrunning = true;
-                                    save_game(0,3,9999,0,5,-5, 5, 9000);
+                                    save_game(0,3,9999,0,5,-5, 5, 9000,0);
                                     updatescreen();
                               }
                               if(cursorpoints(&continueDim, &cursorDim)){
@@ -184,7 +184,7 @@ void MainMenue::handleEvent()
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 
             if (mouseIsInside(&newGameDim, mousex, mousey)){
-                  save_game(0,3,9999,0,5,-5, 5, 9000);
+                  save_game(0,3,9999,0,5,-5, 5, 9000,0);
                   isrunning = true, screen = IN_GAME;
                   updatescreen();
             }
