@@ -1,572 +1,15 @@
-#include "header.hpp"
-#include<time.h>
-
-Walls walls;
-Wall wall;
-Boss plane;
-Player player;
-Powerup powerup;
-Attack attack;
-int lives = 3;
-int hits=0;
-bool Hinvincible = false, Pinvincible=false;
-bool prevtex=0;
-int wallspeed=5;
-int diffThreshold=9000, diffStep=1000;
-SDL_Texture* scoretex;
-SDL_Texture* lifetex;
-SDL_Rect dashdim;
-
-int score;
-int bosshealth = 9999; 
-SDL_Color white = {255, 255, 255, 0};
-SDL_Rect area;
-
-Player::Player()
-{
-      width = screen_width / 10;
-      height = screen_height / 8;
-      xStep = screen_width / 100;
-      yStep = screen_height / 80;
-      hbspX = screen_width / 30, hbspY = screen_height / 30;
-      
-      bulletVel = 20;
-      bulletIndex = 0;
-      bulletW=player.width/3;
-      bulletH=player.height/4;
-      fire=true;
-      for(int i=0; i<PLAYERBULLET_N; i++) bulletdim[i]={-bulletW, -bulletH, bulletW, bulletH};
-
-      tex=0;
-
-      xPos = 0;
-      yPos = screen_height / 2 - ( width / 2 );
-      angle = 0.0;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
-      htbx.w = screen_width / 35;
-      htbx.h = screen_height / 22;
-}
-void Player::init()
-{
-      width = screen_width / 10;
-      height = screen_height / 8;
-      xStep = screen_width / 100;
-      yStep = screen_height / 80;
-      hbspX = screen_width / 30, hbspY = screen_height / 30;
-      
-      bulletVel = 20;
-      bulletIndex = 0;
-      bulletW=player.width/3;
-      bulletH=player.height/4;
-      fire=true;
-      for(int i=0; i<PLAYERBULLET_N; i++) bulletdim[i]={-bulletW, -bulletH, bulletW, bulletH};
-
-      tex=0;
-
-      xPos = 0;
-      yPos = screen_height / 2 - ( width / 2 );
-      angle = 0.0;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
-      htbx.w = screen_width / 35;
-      htbx.h = screen_height / 22;
-}
-void Player::scale()
-{
-      width = screen_width / 10;
-      height = screen_height / 8;
-      xStep = screen_width / 100;
-      yStep = screen_height / 80;
-      hbspX = screen_width / 30, hbspY = screen_height / 30;
-      
-      bulletVel = 20;
-      bulletIndex = 0;
-      bulletW=player.width/3;
-      bulletH=player.height/4;
-      for(int i=0; i<PLAYERBULLET_N; i++) bulletdim[i]={-bulletW, -bulletH, bulletW, bulletH};
-      scaleIntX(&xPos);
-      scaleIntY(&yPos);
-      angle = 0.0;
-      htbx.x = xPos + hbspX;
-      htbx.y = yPos + hbspY;
-      htbx.w = screen_width / 35;
-      htbx.h = screen_height / 22;
-}
-
-void Player::render()
-{
-      playerdim = { xPos, yPos, width, height };
-      if(Pinvincible) tex=1;
-      SDL_RenderCopyEx(ren, playertex[tex], NULL, &playerdim, angle, NULL, SDL_FLIP_NONE);
-}
-// reduntant?
-// void Player::move(int x, int y)
-// {
-//       xPos += x * xStep;
-//       yPos += y * yStep;
-//       if (xPos < 0)
-//             xPos = 0;
-//       else if (xPos + width > screen_width)
-//             xPos = screen_width - width;
-//       if (yPos < 0)
-//             yPos = 0;
-//       else if (yPos + height > screen_height)
-//             yPos = screen_height - height;
-//       htbx.x = xPos + hbspX;
-//       htbx.y = yPos + hbspY;
-// }
-void Player::handleEvent()
-{
-      if ( !mouseMode )
-      {
-            angle=0.0;
-            const Uint8 *keyState = SDL_GetKeyboardState(NULL);
-            if (keyState[SDL_SCANCODE_UP]||keyState[SDL_SCANCODE_W]){
-                  yPos -= yStep, angle=330.0;
-                  if(Mix_PausedMusic()==0){
-                        
-                        Mix_PlayChannel(-1,gForward,0);
-                  }
-            }
-            else if (keyState[SDL_SCANCODE_DOWN]||keyState[SDL_SCANCODE_S]){
-                  yPos += yStep, angle=30.0;
-                  if(Mix_PausedMusic()==0){
-                        Mix_PlayChannel(-1,gForward,0);
-                  }
-            }
-            if (keyState[SDL_SCANCODE_RIGHT]||keyState[SDL_SCANCODE_D]){
-                  xPos += xStep;
-                  if(Mix_PausedMusic()==0){
-                        Mix_PlayChannel(-1,gForward,0);
-                  }
-            }
-            else if (keyState[SDL_SCANCODE_LEFT]||keyState[SDL_SCANCODE_A]){
-                  xPos -= xStep;
-                  if(Mix_PausedMusic()==0){
-                        Mix_PlayChannel(-1,gForward,0);
-                  }
-            }
-            if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]){ 
-                  if(!cFrame.running)
-                  {
-                        dashdim = {player.xPos, player.yPos, player.width, player.height}; 
-                        xPos+=player.width*2;
-                        cFrame.start();
-                        Hinvincible=true;
-                  }
-            }
-
-            if (xPos < 0)
-                  xPos = 0;
-            else if (xPos + width > screen_width)
-                  xPos = screen_width - width;
-            if (yPos < 0)
-                  yPos = 0;
-            else if (yPos + height > screen_height)
-                  yPos = screen_height - height;
-
-            htbx.x = xPos + hbspX;
-            htbx.y = yPos + hbspY;
-      }
-      else
-      {
-            int mousex, mousey;
-            int mMouse = SDL_GetMouseState(&mousex, &mousey);
-            xPos = mousex, yPos = mousey;
-            if (xPos + width > screen_width)
-                  xPos = screen_width - width;
-            else if (xPos < 0)
-                  xPos = 0;
-            if (yPos + height > screen_height)
-                  yPos = screen_height - height;
-            else if (yPos < 0)
-                  yPos = 0;
-            htbx.x = xPos + hbspX;
-            htbx.y = yPos + hbspY;
-      }
-       
-}
-void Player::bullet()
-{
-      if(btimer.running&&btimer.getTicks()>PLAYERBULLET_RATE) fire=true, btimer.stop();
-      if(fire)
-      {
-            if(bulletIndex==PLAYERBULLET_N) bulletIndex=0; 
-            bulletdim[bulletIndex].x = player.xPos+player.width;
-            bulletdim[bulletIndex].y = player.yPos+player.height/4;
-            bulletIndex++;
-            btimer.start();
-            fire=false;
-      }
-      for(int i=0; i<PLAYERBULLET_N; i++)
-      {
-            if(bulletdim[i].x>0)
-            {
-                  bulletdim[i].x+=bulletVel;
-                  if(bulletdim[i].x>screen_width) bulletdim[i].x=-bulletW, bulletdim[i].y=0;
-                  else {
-                        SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
-                        if(checkCol(&bulletdim[i], &plane.htbx)) {
-                              // printf("enemyhit\n");
-                              bosshealth-=5;
-                        }
-                  }
-            }
-      }
-}
-bool Player::col(SDL_Rect* projectile)
-{
-      bool ret=false;
-      if(!Hinvincible&&!Pinvincible){
-            ret=checkCol(&htbx, projectile);
-            if(ret) iFrame.start(), Hinvincible=true, player.tex=1;
-      }
-      return ret;
-}
-
-Boss::Boss()
-{
-      width = screen_width / 6;
-      height = screen_height / 3;
-      yVel = screen_height / 100;
-      scrolldir = 1;
-
-      xPos = screen_width - width;
-      yPos = screen_height / 3;
-      htbx = {xPos, yPos, width, height};
-}
-void Boss::init()
-{
-      width = screen_width / 6;
-      height = screen_height / 3;
-      yVel = screen_height / 100;
-      scrolldir = 1;
-
-      xPos = screen_width - width;
-      yPos = screen_height / 3;
-      htbx = {xPos, yPos, width, height};
-}
-void Boss::scale()
-{
-      htbx.w=screen_width/6;
-      htbx.h=screen_height/3;
-      yVel=screen_height/100;
-      htbx.x=screen_width-htbx.w;
-      htbx.y=screen_height/3;
-}
-void Boss::move()
-{
-      if ((htbx.y < 0) || (htbx.y + htbx.h > screen_height))
-            scrolldir *= -1;
-      htbx.y += scrolldir*yVel;
-}
-void Boss::render()
-{
-      SDL_RenderCopyEx(ren, bosstex[phase], NULL, &htbx, 0.0, NULL, SDL_FLIP_NONE);
-}
+#include "preprocessor.hpp"
+#include "textureMusic.hpp"
+#include "globalvars.hpp"
+#include "utills.hpp"
+#include "menu.hpp"
+#include "gameElements.hpp"
+#include "gameUtills.hpp"
 
 
-bool checkCol(SDL_Rect* a, SDL_Rect* b)
+void gamestart()
 {
-      int leftA, leftB;
-      int rightA, rightB;
-      int topA, topB;
-      int downA, downB;
-      leftA = a->x;
-      rightA = a->x + a->w;
-      topA = a->y;
-      downA = a->y + a->h;
-      leftB = b->x;
-      rightB = b->x + b->w;
-      topB = b->y;
-      downB = b->y + b->h;
-      if( downA <= topB )
-      {
-      return false;
-      }     
-      else if( topA >= downB )
-      {
-      return false;
-      }     
-      else if( rightA <= leftB )
-      {
-      return false;
-      }     
-      else if( leftA >= rightB )
-      {
-      return false;
-      }
-      else return true;          
-}
-
-Wall::Wall()
-{
-      width=screen_width/15;
-      height=screen_height;
-      yPos=screen_height/2;
-      xPos=screen_width;
-      htbx={xPos, yPos, width, height};
-      mod=5;  
-}
-void Wall::move()
-{
-      htbx.x-=wallspeed;
-      if(htbx.x+width<=0)
-      {
-            htbx.x=screen_width+width;
-            double val[10]={1.3, 1.5, 2, 1.6, 1.2, 0.9, 0.75, 0.6, 0.85,0.8};
-            srand(time(0)+yPos);
-            htbx.y=(screen_height/2)*val[rand()%mod];
-      }
-      htbx.h=screen_height-htbx.y;
-}
-void Wall::render()
-{     
-      SDL_RenderCopyEx(ren, towertex, NULL, &htbx, 0.0, NULL, SDL_FLIP_NONE);
-}
-Walls::Walls()
-{
-      padding = screen_width/3;
-      wall_number=0;
-      wallz[0].htbx.x=screen_width;
-      for(int i=1; i<3; i++)
-            wallz[i].htbx.x=wallz[i-1].htbx.x+padding;
-}
-void Walls::init()
-{
-      padding = screen_width/3;
-      wall_number=0;
-      wallz[0].htbx={screen_width, screen_height/2, screen_width/15, screen_height};
-      for(int i=1; i<3; i++)
-            wallz[i].htbx={wallz[i-1].htbx.x+padding, screen_height/2, screen_width/15, screen_height};
-}
-void Walls::scale()
-{
-      scaleIntX(&padding);
-      for(int i=0; i<3; i++){
-            scaleRect(&wallz[i].htbx);
-      }
-}
-
-void Walls::move()
-{
-      for(int i=0; i<wall_number; i++)
-            wallz[i].move();
-}
-void Walls::render()
-{
-      for(int i=0; i<wall_number; i++)
-            wallz[i].render();
-      
-}
-void Walls::colls()
-{
-      for(int i=0; i<wall_number; i++)
-            if(player.col(&wallz[i].htbx)){
-                  lives--;
-                  if(Mix_PausedMusic()==0){
-                        Mix_PlayChannel(-1,ghit,0);
-                  }
-            }
-}
-
-Powerup::Powerup()
-{
-      int width=player.width/2;
-      powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
-      vel = 5;
-      spawn = true;
-      running = false;
-}
-void Powerup::init()
-{
-      int width=player.width/2;
-      powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
-      vel = 5;
-      spawn = true;
-      running = false;
-}
-void Powerup::scale()
-{
-      int wid=player.width/2;
-      scaleIntX(&powerupdim.x);
-      scaleIntX(&initdim.x);
-      scaleIntY(&powerupdim.y);
-      scaleIntY(&initdim.y);
-      powerupdim.h=powerupdim.w=initdim.h=initdim.w=wid;
-      scaleIntX(&vel);
-}
-void Powerup::move()
-{
-      powerupdim.x-=vel;
-      if(powerupdim.x+powerupdim.w<0) powerupdim=initdim, spawn=true, running=false;
-      SDL_RenderCopy(ren, poweruptex[current], NULL, &powerupdim);
-}
-
-void Powerup::choose()
-{
-      srand(time(0));
-      current = rand();
-      powerupdim.x=screen_width;
-      powerupdim.y=current%(screen_height);
-      current%=POWERUP_N;
-      spawn=false;
-      running = true;
-}
-
-void Powerup::run()
-{
-      Uint32 time=ptimer.getTicks();
-      if(spawn) choose();
-      else if(Pinvincible)
-      {
-            // printf("jsdhfg");
-            if(time>10000) Pinvincible=false, player.tex=0, ptimer.stop(), iFrame.start(), Hinvincible=true;
-      }
-      else if(running==false) spawn=true;
-      else if(running)
-      {
-            if(checkCol(&player.playerdim, &powerupdim))
-                  {
-                        powerupdim=initdim;
-                        ptimer.stop();
-                        ptimer.start();
-                        running=false;
-                        if(current==LIFE) {
-                              lives++;
-                              if(Mix_PausedMusic()==0){
-                                    Mix_PlayChannel(-1,gpoint,0);
-                              }
-                        }
-                        else if(current==INVINCIBILE){
-                              Pinvincible=true;
-                              player.tex=1;
-                              if(Mix_PausedMusic()==0){
-                                    Mix_PlayChannel(-1,gpoint,0);
-                              }
-                              ptimer.start();
-                        }
-
-                  }
-            else move();
-      }
-      
-}
-Attack::Attack()
-{
-      spawn = true;
-      int side=screen_width/20, arm=side/1.42;
-      bouncedim = homedim = { screen_width, screen_height, side, side };
-      bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
-      current = 0;
-      bXvel= 5;
-      bYvel=-5;
-      hXvel=5;
-      hYvel=5;
-      angle=0.0;
-}
-void Attack::init()
-{
-      spawn = true;
-      int side=screen_width/20, arm=side/1.42;
-      bouncedim = homedim = { screen_width, screen_height, side, side };
-      bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
-      current = 0;
-      bXvel= 5;
-      bYvel=-5;
-      hXvel=5;
-      hYvel=5;
-      angle=0.0;
-}
-void Attack::scale()
-{
-      int side=screen_width/20, arm=side/1.42;
-      scaleIntX(&bouncedim.x);
-      scaleIntY(&bouncedim.y);
-      homedim.w=homedim.h=bouncedim.h=bouncedim.w=side;
-      scaleIntX(&homedim.x);
-      scaleIntY(&homedim.y);
-      scaleIntX(&bhtbx.x);
-      scaleIntY(&bhtbx.y);
-      hhtbx.w=hhtbx.h=bhtbx.h=bhtbx.w=arm;
-      scaleIntX(&hhtbx.x);
-      scaleIntY(&hhtbx.y);
-      scaleIntX(&bXvel);
-      scaleIntX(&hXvel);
-      scaleIntX(&bYvel);
-      scaleIntX(&hYvel);
-}
-void Attack::choose()
-{
-      srand(time(0));
-      current=rand()%2;
-      spawn=false;
-      homedim.y=bouncedim.y=plane.htbx.y+plane.height/2;
-      homedim.x=bouncedim.x=plane.htbx.x;
-}
-void Attack::bounce()
-{
-      angle++;
-      if(angle>360) angle=0.0;
-      if (bouncedim.y<=0||bouncedim.y>=screen_height) bYvel*=-1;
-      if (bouncedim.x<=0) 
-            spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w;
-      if(player.col(&bouncedim)){
-            spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w, lives--;
-            if(Mix_PausedMusic()==0){
-                  Mix_PlayChannel(-1,ghit,0);
-            }
-      }
-      bouncedim.x-=bXvel, bouncedim.y-=bYvel;
-      SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
-}
-void Attack::home()
-{
-      angle++;
-      if(angle>360) angle=0.0;
-      if (homedim.y>player.htbx.y) homedim.y-=hXvel;
-      else if (homedim.y<player.htbx.y) homedim.y+=hXvel;
-      else if(homedim.y==player.htbx.y);
-      if (homedim.x<=0) 
-            spawn=true, homedim.x=homedim.y=screen_width+homedim.w;
-      if(player.col(&homedim)){
-            spawn=true, homedim.x=homedim.y=screen_width+homedim.w, lives--;
-            if(Mix_PausedMusic()==0){
-                        Mix_PlayChannel(-1,ghit,0);
-                  }
-      }
-      homedim.x-=bXvel;
-      SDL_RenderCopyEx(ren, homingtex, NULL, &homedim, angle, NULL, SDL_FLIP_NONE);       
-}
-void Attack::run()
-{
-      if(spawn) choose();
-      else{
-      if(current==BOUNCING) bounce();
-      else if(current==HOMING) home();
-      }
-}
-void scaleGame()
-{
-      player.scale();
-      plane.scale();
-      walls.scale();
-      powerup.scale();
-      attack.scale();
-      //ingamedim={0,0, screen_width, screen_height};
-}
-void initGame()
-{
-      plane.init();
-      player.init();
-      powerup.init();
-      walls.init();
-      attack.init();
-}
-void gamestart() 
-{
-      Hinvincible=Pinvincible=false;
+      Hinvincible = Pinvincible = false;
       SDL_Rect ingamedim;
       ingamedim.h = screen_height;
       ingamedim.w = screen_width;
@@ -574,29 +17,37 @@ void gamestart()
       ingamedim.y = 0;
 
       play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed, &diffThreshold, &phase);
-      printf("%d %d %d\n",score,lives,bosshealth);
+      printf("%d %d %d\n", score, lives, bosshealth);
       walls.wall_number = 0;
       diffTimer.start();
       Uint32 diff0 = diffTimer.getTicks();
       //initGame();
-      while (isrunning) {
+      while (isrunning)
+      {
             SDL_RenderClear(ren);
             SDL_Event e;
-            while (SDL_PollEvent(&e) != 0) {
-                  if (e.type == SDL_QUIT){
+            while (SDL_PollEvent(&e) != 0)
+            {
+                  if (e.type == SDL_QUIT)
+                  {
                         quit = true, isrunning = false;
                   }
-                  else if (win.handleEvent(e)) scaleGame();
-                  else if (e.type == SDL_KEYDOWN) {
-                        switch (e.key.keysym.sym) {
-                              case SDLK_ESCAPE:
-                                    screen = PAUSE, isrunning = false, pause.updateUI();
-                                    break;
-                              case SDLK_o:
-                              if(Mix_PausedMusic()==1){
+                  else if (win.handleEvent(e))
+                        scaleGame();
+                  else if (e.type == SDL_KEYDOWN)
+                  {
+                        switch (e.key.keysym.sym)
+                        {
+                        case SDLK_ESCAPE:
+                              screen = PAUSE, isrunning = false, pause.updateUI();
+                              break;
+                        case SDLK_o:
+                              if (Mix_PausedMusic() == 1)
+                              {
                                     Mix_ResumeMusic();
                               }
-                              else{
+                              else
+                              {
                                     Mix_PauseMusic();
                               }
                               break;
@@ -604,71 +55,87 @@ void gamestart()
                   }
             }
             score++;
-            Uint32 diff=diffTimer.getTicks();
-            if(ingamedim.x>=2124) ingamedim.x =0;
-            ingamedim.x+=screen_width/160;
+            Uint32 diff = diffTimer.getTicks();
+            if (ingamedim.x >= 2124)
+                  ingamedim.x = 0;
+            ingamedim.x += screen_width / 160;
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
             player.bullet();
             plane.move();
             plane.render();
-            
-            if(iFrame.running)
+
+            if (iFrame.running)
             {
-                  if(iFrame.getTicks()>1500) iFrame.stop(), player.tex=0, Hinvincible=false;
-                  else if(player.tex==prevtex) player.tex=!prevtex;
-                  prevtex=player.tex;
+                  if (iFrame.getTicks() > 1500)
+                        iFrame.stop(), player.tex = 0, Hinvincible = false;
+                  else if (player.tex == prevtex)
+                        player.tex = !prevtex;
+                  prevtex = player.tex;
             }
-            else if(cFrame.running) {
-                  Uint32 f=cFrame.getTicks();
-                  if(!Pinvincible) player.tex=2;
-                  if(f>500){ 
+            else if (cFrame.running)
+            {
+                  Uint32 f = cFrame.getTicks();
+                  if (!Pinvincible)
+                        player.tex = 2;
+                  if (f > 500)
+                  {
                         cFrame.stop();
-                        if (!Pinvincible) player.tex=0;
+                        if (!Pinvincible)
+                              player.tex = 0;
                   }
-                  else if(f>300) Hinvincible=false, dashdim={screen_width,screen_height,0,0};
+                  else if (f > 300)
+                        Hinvincible = false, dashdim = {screen_width, screen_height, 0, 0};
                   SDL_RenderCopy(ren, dashtex, NULL, &dashdim);
             }
-            if(diff>POWERUP_START_TIME){
+            if (diff > POWERUP_START_TIME)
+            {
                   powerup.run();
             }
-            if(diff>ATTACK_START_TIME){
+            if (diff > ATTACK_START_TIME)
+            {
                   attack.run();
             }
-            if(diff>WALL_START_TIME){
+            if (diff > WALL_START_TIME)
+            {
                   walls.move();
                   walls.render();
                   walls.colls();
             }
-            if(player.col(&plane.htbx)==true){ 
+            if (player.col(&plane.htbx) == true)
+            {
                   //printf("ouch\n");
                   lives--;
-                  if(Mix_PausedMusic()==0){
-                        Mix_PlayChannel(-1,ghit,0);
+                  if (Mix_PausedMusic() == 0)
+                  {
+                        Mix_PlayChannel(-1, ghit, 0);
                   }
             }
-            if(lives<1) screen=MAIN_MENU, isrunning=false, diffTimer.stop(), mainMenu.updateUI();
-            std::string show_score = "Score: "+std::to_string(score);
-            printText(ren, 0, 0, show_score, &scoretex, &area,Megenta);
+            if (lives < 1)
+                  screen = MAIN_MENU, isrunning = false, diffTimer.stop(), mainMenu.updateUI();
+            std::string show_score = "Score: " + std::to_string(score);
+            printText(ren, 0, 0, show_score, &scoretex, &area, Megenta);
             SDL_RenderCopy(ren, scoretex, NULL, &area);
-            std::string show_lives = "Lives: "+std::to_string(lives);
-            printText(ren, 0, area.h, show_lives, &lifetex, &area,Megenta);
+            std::string show_lives = "Lives: " + std::to_string(lives);
+            printText(ren, 0, area.h, show_lives, &lifetex, &area, Megenta);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
-            std::string show_health = "Boss Health: "+std::to_string(bosshealth);
-            printText(ren, screen_width-area.w*3, 0, show_health, &lifetex, &area,Megenta);
+            std::string show_health = "Boss Health: " + std::to_string(bosshealth);
+            printText(ren, screen_width - area.w * 3, 0, show_health, &lifetex, &area, Megenta);
             SDL_RenderCopy(ren, lifetex, NULL, &area);
-            
+
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
-            if(bosshealth<= 0){
-                  boss_change_phase(plane.htbx,ingamedim);
+            if (bosshealth <= 0)
+            {
+                  boss_change_phase(plane.htbx, ingamedim);
                   bosshealth = 9999;
                   diffThreshold = 9000;
             }
-            if(bosshealth<diffThreshold){
+            if (bosshealth < diffThreshold)
+            {
                   difficulty();
-                  diffThreshold-=diffStep;
+                  diffThreshold -= diffStep;
             }
 
             SDL_RenderPresent(ren);
@@ -676,12 +143,14 @@ void gamestart()
       }
       Cal_highscore(score);
       player.xPos = 0;
-      player.yPos = screen_height/5;
-      if(lives==0){
-            save_game(0,3,9999,0, 5,-5, 5, 9000,0);
+      player.yPos = screen_height / 5;
+      if (lives == 0)
+      {
+            save_game(0, 3, 9999, 0, 5, -5, 5, 9000, 0);
             screen = GAME_OVER;
       }
-      else{
-            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed,diffThreshold,phase);
+      else
+      {
+            save_game(score, lives, bosshealth, walls.wall_number, attack.bXvel, attack.bYvel, wallspeed, diffThreshold, phase);
       }
 }

@@ -1,4 +1,4 @@
-#include "header.hpp" 
+#include "header.hpp"
 bool quit = false;
 screens screen = TITLE_SCREEN;
 bool isrunning = true;

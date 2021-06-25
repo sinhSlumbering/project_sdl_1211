@@ -1,4 +1,17 @@
-#include "header.hpp"
+#include "preprocessor.hpp"
+#include "menu.hpp"
+#include "textureMusic.hpp"
+#include "globalvars.hpp"
+#include "utills.hpp"
+#include "gameElements.hpp"
+#include "gameUtills.hpp"
+
+About about;
+Help help;
+HighScore highScore;
+Pause pause;
+MainMenue mainMenu;
+Options options;
 
 SDL_Rect tscreentextdim={screen_width/3, screen_height-(screen_height/8)*2, screen_width/2, screen_height/8};
 
@@ -406,16 +419,11 @@ void Options::cursorJump(SDL_Rect* r)
 }
 void Options::cursorUpdate(int step)
 {
-      // if (cursorDim.y + step < menumin) cursorJump(&backDim); 
-      // //else if (cursorDim.y> menumax && step<0) cursorJump(&mouseModeDim);
-      // else if (cursorDim.y> menumax && step>0) cursorJump(&clearDim);
-      // else if (cursorDim.y + step > menumax) cursorJump(&backDim);
-      // else cursorDim.y +=step;
-             if (cursorDim.y + step < menumin) cursorJump(&backDim);
-             else if (cursorDim.y >= backDim.y && step>0) cursorJump(&fullScreenDim);
-             else if (cursorDim.y>=backDim.y && step<0) cursorJump(&musicDim);
-             else if(cursorDim.y + step > menumax) cursorJump(&backDim);
-             else cursorDim.y += step;
+       if (cursorDim.y + step < menumin) cursorJump(&backDim);
+       else if (cursorDim.y >= backDim.y && step>0) cursorJump(&fullScreenDim);
+       else if (cursorDim.y>=backDim.y && step<0) cursorJump(&musicDim);
+       else if(cursorDim.y + step > menumax) cursorJump(&backDim);
+       else cursorDim.y += step;
 }
 
 void Options::handleEvent()
