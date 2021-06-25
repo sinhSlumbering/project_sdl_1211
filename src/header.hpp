@@ -134,6 +134,7 @@ the notable exception being the options toggle and cursor which are self explana
 and tscreentex used for displaying text on screen
 */
 extern SDL_Texture* titleBG;
+extern SDL_Texture* gameoverBG;
 extern SDL_Texture* mainMenuBG;
 extern SDL_Texture* pauseBG;
 extern SDL_Texture* aboutBG;

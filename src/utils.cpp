@@ -31,6 +31,7 @@ extern float remaintime=0;
 
 SDL_Renderer* ren;
 SDL_Texture* titleBG;
+SDL_Texture* gameoverBG;
 SDL_Texture* mainMenuBG;
 SDL_Texture* pauseBG;
 SDL_Texture* aboutBG;
@@ -234,7 +235,11 @@ bool loadMedia() {
             printf("failed to load title screen\n");
             success = false;
       }
- 
+      gameoverBG = loadTex("assets/titlescreen.jpg");
+      if (gameoverBG == NULL) {
+            printf("failed to load title screen\n");
+            success = false;
+      }
       mainMenuBG = loadTex("assets/mainMenu/mainmenu.jpg");
       if (mainMenuBG == NULL) {
             printf("failed to load menu screen\n");
@@ -306,7 +311,7 @@ bool loadMedia() {
             printf("failed to load resume button\n");
             success = false;
       }
-      pausenewB = loadTex("assets/newgame.png");
+      pausenewB = loadTex("assets/new game.png");
       if (pausenewB == NULL) {
             printf("failed to load resume button\n");
             success = false;
@@ -700,6 +705,8 @@ void optimizeFPS(long *prevtime, float *remainder)
 void close() {
       SDL_DestroyTexture(titleBG);
       titleBG = NULL;
+      SDL_DestroyTexture(gameoverBG);
+      gameoverBG = NULL;
       SDL_DestroyTexture(mainMenuBG);
       mainMenuBG = NULL;
       SDL_DestroyTexture(pauseBG);
@@ -777,7 +784,3 @@ bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey) {
 bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim) {
       return (cursorDim->y >= rect->y) && ((cursorDim->h + cursorDim->y) <= (rect->y + rect->h));
 }
-  
-
- 
-
