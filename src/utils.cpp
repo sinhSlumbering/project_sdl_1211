@@ -15,6 +15,7 @@ int screen_width=SCREEN_WIDTH;
 int screen_height=SCREEN_HEIGHT;
 float screen_x_frac=1;
 float screen_y_frac=1;
+int phase = 0;
 
 About about;
 Help help;
@@ -52,8 +53,9 @@ SDL_Texture* exitB;
 SDL_Texture* cursor;
 SDL_Texture* playertex[3];
 SDL_Texture* playerbullet;
-SDL_Texture* bosstex;
+SDL_Texture* bosstex[2];
 SDL_Texture* optionsToggle[2];
+SDL_Texture* cleartex;
 SDL_Texture* towertex;
 SDL_Texture* dashtex;
 SDL_Texture* poweruptex[POWERUP_N];
@@ -186,7 +188,8 @@ void imgError(const std::string msg) {
 void imgLoadError(const std::string path) {
       printf("failed to load %s IMGERROR: %s\n", path, IMG_GetError());
 }
- 
+
+// SDL initialisation
 bool init() {
       bool success = true;
  
@@ -222,7 +225,7 @@ bool init() {
       return success;
 }
 
-
+//Loads necessary textures and musics
 bool loadMedia() {
       bool success = true;
  
@@ -362,8 +365,13 @@ bool loadMedia() {
             printf("failed to load playerbullet\n");
             success = false;
       }
-      bosstex = loadTex("assets/Hilda_Berg_Intro_Sprite.png");
-      if(bosstex==NULL)
+      bosstex[0] = loadTex("assets/Hilda_Berg_Intro_Sprite.png");
+      if(bosstex[0]==NULL)
+      {
+            success = false;
+      }
+      bosstex[1] = loadTex("assets/hilda breg phase 2.png");
+      if(bosstex[1]==NULL)
       {
             success = false;
       }
@@ -439,10 +447,14 @@ bool loadMedia() {
             printf("failed to load optionstoggle\n");
             success = false;
       }
-
+      cleartex = loadTex("assets/clear.png");
+      if(cleartex == NULL){
+            printf("failed to load clear button\n");
+            success = false;
+      }
       return success;
 }
- 
+//takes the path and makes a texture
 SDL_Texture* loadTex(std::string path) {
       SDL_Texture* newTexture = NULL;
  
@@ -460,11 +472,13 @@ SDL_Texture* loadTex(std::string path) {
 }
 
 void scaleIntX(int *x){
-      *x=(int)( *x * screen_x_frac);
+      double y = (double)(*x);
+      *x=(int)( y * screen_x_frac);
 }
 void scaleIntY(int *y){
       int c=*y;
-      *y=(int)(*y * screen_y_frac);
+      double x = (double)(*y);
+      *y=(int)(x * screen_y_frac);
       if(*y==0) *y=c;
 }
 void scaleRect(SDL_Rect* r)
@@ -486,6 +500,7 @@ void scaleSqr(SDL_Rect* r)
       else r->h=r->w;
       printf("after %d %d\n", r->w, r->h);
 }
+// Stores top 10 scores in a file
 void Cal_highscore(int a)
 {
       FILE *fptr;
@@ -527,7 +542,18 @@ void Cal_highscore(int a)
       }
       fclose(fptr);
 }
- 
+// Clears pre existing high scores
+void highscoreclear(){
+      FILE* fptr;
+      remove("assets/highscore.txt");
+      fptr = fopen("assets/highscore.txt", "w");
+      for (int i = 0; i < 10; i++)
+      {
+            putw(0, fptr);
+      }
+      fclose(fptr);
+}
+//makes a texture of a string to present in the renderer
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
               SDL_Texture **texture, SDL_Rect *rect, SDL_Color white)
 {
@@ -546,7 +572,7 @@ void printText(SDL_Renderer *renderer, int x, int y, std::string point,
       rect->w = text_width;
       rect->h = text_height;
 }
-
+//Prints highscores using printtext
 void highscore_printing(int a, int x, int y)
 {
 
@@ -554,7 +580,10 @@ void highscore_printing(int a, int x, int y)
       printText(ren, x, y, show, &scoretex, &area, White);
       SDL_RenderCopy(ren, scoretex, NULL, &area);
 }
-void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h){
+//Gets the current playing environment from a text file in the following variables
+//score,lives,bosshealth,wall number, attack speed in x direction, attack speed in y direction,
+//wall speed, difficulty, boss phase
+void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h,int *i){
       FILE* fptr = fopen("assets/save game.txt","r");
       *a = getw(fptr);
       *b = getw(fptr);
@@ -564,9 +593,13 @@ void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h){
       *f = getw(fptr);
       *g = getw(fptr);
       *h = getw(fptr);
+      *i = getw(fptr);
       fclose(fptr);
 }
-void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c, int d, int e){
+//Saves the current playing environment to a text file in the following variables
+//score,lives,bosshealth,wall number, attack speed in x direction, attack speed in y direction,
+//wall speed, difficulty, boss phase
+void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int c, int d, int e, int f){
       remove("assets/save game.txt");
       FILE* fptr = fopen("assets/save game.txt","w");
       putw(playerscore,fptr);
@@ -577,8 +610,10 @@ void save_game(int playerscore, int lifeleft, int boss_health, int a, int b, int
       putw(c, fptr);
       putw(d, fptr);
       putw(e,fptr);
+      putw(f,fptr);
       fclose(fptr);
 }
+//increases difficulty as boss health decreases
 void difficulty(){
       if(walls.wall_number >= 3)
       {
@@ -599,6 +634,51 @@ void difficulty(){
       } 
       //printf("\nwall %d\n", walls.wall_number);
 }
+void boss_change_phase(SDL_Rect r, SDL_Rect background){
+      SDL_Rect source = {0,0,441, 689};
+      int speed = screen_width/160;
+      int step = (133+speed-1)/speed;
+      int speed2 = 441/step;
+      while (r.x < 800)
+      {
+            SDL_RenderClear(ren);
+            SDL_RenderCopy(ren, inGameBG, &background, NULL);
+            SDL_RenderCopy(ren,bosstex[phase],&source,&r);
+            SDL_RenderPresent(ren);
+            r.x+=speed;
+            r.w-=speed;
+            source.w-=speed2;
+            if(r.x >= 800){
+                  r.x = 800;
+                  r.w = 0;
+            }
+            if(source.w <= 0){
+                  source.w = 0;
+            }
+            SDL_Delay(60);
+      }
+      phase = 1;
+      while (r.x > 667)
+      {
+            SDL_RenderClear(ren);
+            player.render();
+            SDL_RenderCopy(ren, inGameBG, &background, NULL);
+            walls.render();
+            SDL_RenderCopy(ren,bosstex[phase],&source,&r);
+            SDL_RenderPresent(ren);
+            r.x-=speed;
+            r.w+=speed;
+            source.w+=speed2;
+            if(r.x <= 667){
+                  r.x = 667;
+                  r.w = 133;
+            }
+            if(source.w >= 441){
+                  source.w = 441;
+            }
+            SDL_Delay(60);
+      }
+}
 void optimizeFPS(long *prevtime, float *remainder)
 {
       long wait, frameTime;
@@ -616,6 +696,7 @@ void optimizeFPS(long *prevtime, float *remainder)
 	*prevtime = SDL_GetTicks();
 }
 
+//frees ram
 void close() {
       SDL_DestroyTexture(titleBG);
       titleBG = NULL;
@@ -647,12 +728,16 @@ void close() {
       playertex[2]=NULL;
       SDL_DestroyTexture(playertex[2]);
       playertex[2]=NULL;
-      SDL_DestroyTexture(bosstex);
-      bosstex=NULL;
+      SDL_DestroyTexture(bosstex[0]);
+      bosstex[0]=NULL;
+      SDL_DestroyTexture(bosstex[1]);
+      bosstex[1]=NULL;
       SDL_DestroyTexture(optionsToggle[0]);
       optionsToggle[0]=NULL;
       SDL_DestroyTexture(optionsToggle[1]);
       optionsToggle[1]=NULL;
+      SDL_DestroyTexture(cleartex);
+      cleartex=NULL;
       SDL_DestroyTexture(FullScreenB);
       SDL_DestroyTexture(MouseModeB);
       SDL_DestroyTexture(scoretex);

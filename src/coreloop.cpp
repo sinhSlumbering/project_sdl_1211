@@ -101,19 +101,28 @@ void Player::handleEvent()
             const Uint8 *keyState = SDL_GetKeyboardState(NULL);
             if (keyState[SDL_SCANCODE_UP]||keyState[SDL_SCANCODE_W]){
                   yPos -= yStep, angle=330.0;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             else if (keyState[SDL_SCANCODE_DOWN]||keyState[SDL_SCANCODE_S]){
                   yPos += yStep, angle=30.0;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             if (keyState[SDL_SCANCODE_RIGHT]||keyState[SDL_SCANCODE_D]){
                   xPos += xStep;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             else if (keyState[SDL_SCANCODE_LEFT]||keyState[SDL_SCANCODE_A]){
                   xPos -= xStep;
-                  Mix_PlayChannel(-1,gForward,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,gForward,0);
+                  }
             }
             if (keyState[SDL_SCANCODE_SPACE]||keyState[SDL_SCANCODE_0]){ 
                   if(!cFrame.running)
@@ -203,6 +212,7 @@ Boss::Boss()
       xPos = screen_width - width;
       yPos = screen_height / 3;
       htbx = {xPos, yPos, width, height};
+      renderQuad = {xPos, yPos, width, height};
 }
 void Boss::scale()
 {
@@ -221,8 +231,8 @@ void Boss::move()
 }
 void Boss::render()
 {
-      SDL_Rect renderQuad = {xPos, yPos, width, height};
-      SDL_RenderCopyEx(ren, bosstex, NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
+      renderQuad = {xPos, yPos, width, height};
+      SDL_RenderCopyEx(ren, bosstex[phase], NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
 }
 
 
@@ -315,7 +325,9 @@ void Walls::colls()
       for(int i=0; i<wall_number; i++)
             if(player.col(&wallz[i].htbx)){
                   lives--;
-                  Mix_PlayChannel(-1,ghit,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,ghit,0);
+                  }
             }
 }
 
@@ -375,12 +387,16 @@ void Powerup::run()
                         running=false;
                         if(current==LIFE) {
                               lives++;
-                              Mix_PlayChannel(-1,gpoint,0);
+                              if(Mix_PausedMusic()==0){
+                                    Mix_PlayChannel(-1,gpoint,0);
+                              }
                         }
                         else if(current==INVINCIBILE){
                               Pinvincible=true;
                               player.tex=1;
-                              Mix_PlayChannel(-1,gpoint,0);
+                              if(Mix_PausedMusic()==0){
+                                    Mix_PlayChannel(-1,gpoint,0);
+                              }
                               ptimer.start();
                         }
 
@@ -437,7 +453,9 @@ void Attack::bounce()
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w;
       if(player.col(&bouncedim)){
             spawn=true, bouncedim.x=bouncedim.y=screen_width+bouncedim.w, lives--;
-            Mix_PlayChannel(-1,ghit,0);
+            if(Mix_PausedMusic()==0){
+                  Mix_PlayChannel(-1,ghit,0);
+            }
       }
       bouncedim.x-=bXvel, bouncedim.y-=bYvel;
       SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
@@ -453,6 +471,9 @@ void Attack::home()
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w;
       if(player.col(&homedim)){
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w, lives--;
+            if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,ghit,0);
+                  }
       }
       homedim.x-=bXvel;
       SDL_RenderCopyEx(ren, homingtex, NULL, &homedim, angle, NULL, SDL_FLIP_NONE);       
@@ -475,7 +496,6 @@ void scaleGame()
 }
 void gamestart() 
 {
-      // font = TTF_OpenFont(font_path,24);
       Hinvincible=Pinvincible=false;
       SDL_Rect ingamedim;
       ingamedim.h = screen_height;
@@ -483,7 +503,7 @@ void gamestart()
       ingamedim.x = 0;
       ingamedim.y = 0;
 
-      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed, &diffThreshold);
+      play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed, &diffThreshold, &phase);
       printf("%d %d %d\n",score,lives,bosshealth);
       walls.wall_number = 0;
       diffTimer.start();
@@ -501,13 +521,21 @@ void gamestart()
                               case SDLK_ESCAPE:
                                     screen = PAUSE, isrunning = false, pause.updateUI();
                                     break;
+                              case SDLK_o:
+                              if(Mix_PausedMusic()==1){
+                                    Mix_ResumeMusic();
+                              }
+                              else{
+                                    Mix_PauseMusic();
+                              }
+                              break;
                         }
                   }
             }
             score++;
             Uint32 diff=diffTimer.getTicks();
             if(ingamedim.x>=2124) ingamedim.x =0;
-            ingamedim.x+=screen_width/50;
+            ingamedim.x+=screen_width/160;
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
@@ -537,7 +565,7 @@ void gamestart()
             if(diff>ATTACK_START_TIME){
                   attack.run();
             }
-            if(diff-diff0>WALL_START_TIME){
+            if(diff>WALL_START_TIME){
                   walls.move();
                   walls.render();
                   walls.colls();
@@ -560,6 +588,11 @@ void gamestart()
             
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
+            if(bosshealth<= 0){
+                  boss_change_phase(plane.renderQuad,ingamedim);
+                  bosshealth = 9999;
+                  diffThreshold = 9000;
+            }
             if(bosshealth<diffThreshold){
                   difficulty();
                   diffThreshold-=diffStep;
@@ -572,10 +605,10 @@ void gamestart()
       player.xPos = 0;
       player.yPos = screen_height/5;
       if(lives==0){
-            save_game(0,3,9999,0, 5,-5, 5, 9000);
+            save_game(0,3,9999,0, 5,-5, 5, 9000,0);
             screen = GAME_OVER;
       }
       else{
-            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed,diffThreshold);
+            save_game(score,lives,bosshealth, walls.wall_number, attack.bXvel,attack.bYvel, wallspeed,diffThreshold,phase);
       }
 }

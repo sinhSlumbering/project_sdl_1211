@@ -39,6 +39,7 @@ extern long prevtime;
 extern float remaintime;
 extern int bosshealth;
 extern int score;
+extern int phase;
  
 extern bool quit;
 extern screens screen;
@@ -64,14 +65,15 @@ void highscore_printing(int a,int x, int y);
 void printText(SDL_Renderer *renderer, int x, int y, std::string point,
              SDL_Texture **texture, SDL_Rect *rect, SDL_Color white);
 void optimizeFPS(long *prevtime, float *remainder);
-void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d, int e);
-void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h);
+void save_game(int playerscore, int livesleft, int boss_health, int a, int b, int c, int d, int e, int f);
+void play(int *a, int *b, int *c, int *d, int *e, int *f, int *g, int *h, int *i);
 void difficulty();
 void scaleIntX(int *x);
 void scaleIntY(int *y);
 void scaleRect(SDL_Rect* r);
 void scaleGame();
-
+void highscoreclear();
+void boss_change_phase(SDL_Rect r, SDL_Rect background);
 
 extern SDL_Renderer* ren;
 extern SDL_Texture* titleBG;
@@ -97,8 +99,9 @@ extern SDL_Texture* exitB;
 extern SDL_Texture* cursor;
 extern SDL_Texture* playertex[3];
 extern SDL_Texture* playerbullet;
-extern SDL_Texture* bosstex;
+extern SDL_Texture* bosstex[2];
 extern SDL_Texture* optionsToggle[2];
+extern SDL_Texture* cleartex;
 extern SDL_Texture* scoretex;
 extern SDL_Texture* lifetex;
 extern SDL_Texture* dashtex;
@@ -247,6 +250,7 @@ struct Options
       SDL_Rect fullScreenTextDim;
       SDL_Rect mouseModeDim;
       SDL_Rect mouseModeTextDim;
+      SDL_Rect clearDim;
       SDL_Rect backDim;
       
       void run();
@@ -329,7 +333,8 @@ struct Boss
       int scrolldir=1;
 
       SDL_Rect htbx;
-      
+      SDL_Rect renderQuad;
+
       int xPos = screen_width-width;
       int yPos = screen_height/3;
       Boss();
