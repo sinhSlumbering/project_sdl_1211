@@ -16,9 +16,7 @@ int diffThreshold=9000, diffStep=1000;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
-// TTF_Font* font;
 
-// char* font_path = "assets/Sans/Sans.ttf";
 int score;
 int bosshealth = 9999; 
 SDL_Color white = {255, 255, 255, 0};
@@ -646,7 +644,9 @@ void gamestart()
             if(player.col(&plane.htbx)==true){ 
                   //printf("ouch\n");
                   lives--;
-                  Mix_PlayChannel(-1,ghit,0);
+                  if(Mix_PausedMusic()==0){
+                        Mix_PlayChannel(-1,ghit,0);
+                  }
             }
             if(lives<1) screen=MAIN_MENU, isrunning=false, diffTimer.stop(), mainMenu.updateUI();
             std::string show_score = "Score: "+std::to_string(score);
