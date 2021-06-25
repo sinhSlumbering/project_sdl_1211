@@ -235,7 +235,7 @@ bool loadMedia() {
             printf("failed to load title screen\n");
             success = false;
       }
-      gameoverBG = loadTex("assets/titlescreen.jpg");
+      gameoverBG = loadTex("assets/game over.jpg");
       if (gameoverBG == NULL) {
             printf("failed to load title screen\n");
             success = false;
