@@ -5,12 +5,7 @@
 #include "gameUtills.hpp"
 #include "textureMusic.hpp"
 
-Walls walls;
-Wall wall;
-Boss plane;
-Player player;
-Powerup powerup;
-Attack attack;
+
 upTimer iFrame, cFrame, ptimer, btimer, diffTimer;
 
 int lives = 3;

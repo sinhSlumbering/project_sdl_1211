@@ -35,5 +35,9 @@ void difficulty();
 void boss_change_phase(SDL_Rect r, SDL_Rect background);
 //checks colission
 bool checkCol(SDL_Rect* a, SDL_Rect* b);
+//scales game elements
+void scaleGame();
+//initializes game elements
+void initGame();
 
 #endif

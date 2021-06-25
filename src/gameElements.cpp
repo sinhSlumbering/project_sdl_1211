@@ -5,6 +5,13 @@
 #include "gameUtills.hpp"
 #include "textureMusic.hpp"
 
+Walls walls;
+Wall wall;
+Boss plane;
+Player player;
+Powerup powerup;
+Attack attack;
+
 Player::Player()
 {
       width = screen_width / 10;

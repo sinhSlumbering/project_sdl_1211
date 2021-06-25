@@ -45,13 +45,7 @@ Mix_Chunk *ghit;
 Mix_Chunk *gdie;
 Mix_Chunk *gpoint;
 
-void imgError(const std::string msg) {
-      printf("%s IMG_Error: %s\n", msg, IMG_GetError());
-}
- 
-void imgLoadError(const std::string path) {
-      printf("failed to load %s IMGERROR: %s\n", path, IMG_GetError());
-}
+
 
 
 //Loads necessary textures and musics
@@ -293,7 +287,7 @@ SDL_Texture* loadTex(std::string path) {
  
       SDL_Surface* loadedSurface = IMG_Load(path.c_str());
       if (loadedSurface == NULL) {
-            imgLoadError(path.c_str());
+            printf("%s IMG_Error: %s\n", path.c_str(), IMG_GetError());
       } else {
             newTexture = SDL_CreateTextureFromSurface(ren, loadedSurface);
             if (newTexture == NULL) {

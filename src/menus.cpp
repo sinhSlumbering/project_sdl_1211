@@ -15,6 +15,14 @@ Options options;
 
 SDL_Rect tscreentextdim={screen_width/3, screen_height-(screen_height/8)*2, screen_width/2, screen_height/8};
 
+bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey) {
+      return (mousex >= rect->x && mousex <= rect->x + rect->w) && (mousey >= rect->y && mousey <= rect->y + rect->h);
+}
+ 
+bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim) {
+      return (cursorDim->y >= rect->y) && ((cursorDim->h + cursorDim->y) <= (rect->y + rect->h));
+}
+
 void titlescreen() {
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, titleBG, NULL, NULL);
@@ -56,19 +64,28 @@ void gameoverscreen()
 
 MainMenue::MainMenue()
 {
+      //1st button y position and menus minimum position
       yVal = menumin = screen_height / 20; 
+      //the padding between the buttons
       step = screen_height / 10;
       // printf("%d\n",yVal);
+      //button dimensions
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
+      //the buttons xvalues 
       xVal=screen_width-buttonW-buttonW/3;
+      //max value of the menue found by multiplying the padding with the number of elements
       menumax = 7 * screen_height / 10;
+      //background dimension
       bgdim = {0, 0, screen_width, screen_height};
+      //cursordimensions
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;
       cursorDim.x = xVal-cursorDim.w;
       cursorDim.y = yVal;
+      //button dimensions
       newGameDim = {xVal, yVal, buttonW, buttonH};
+      //offset by padding and continued
       yVal+=step;
       continueDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
@@ -81,7 +98,7 @@ MainMenue::MainMenue()
       aboutDim = {xVal, yVal, buttonW, buttonH};
       yVal+=step;
       exitDim = {xVal, yVal, buttonW, buttonH};
-
+      // mouse values 
       prevMousex = prevMousey = 0;
 }
 void MainMenue::updateUI()
@@ -117,29 +134,38 @@ void MainMenue::cursorJump(SDL_Rect* r)
 }
 void MainMenue::cursorUpdate(int step)
 {
+      //jumps to the bottom on negative input from the 1st element
        if (cursorDim.y + step < menumin) cursorJump(&exitDim);
+            //jumps to the top on positive input from the last element
              else if (cursorDim.y + step > menumax) cursorJump(&newGameDim);
              else cursorDim.y += step;
 }
 void MainMenue::handleEvent()
 {
       SDL_Event e;
+      //polls event
       while (SDL_PollEvent(&e) != 0) {
+            //quits on clicking the quit button
             if (e.type == SDL_QUIT)
                   quit = true;
+            //updates the ui on window envent
             if(win.handleEvent(e)) updateUI();
+            //checks keyboard event
             if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
+                        //window event
                         case SDLK_m:
                               win.toggleFullscreen();
                               updateUI();
                               break;
+                        //navigation
                         case SDLK_UP:
                               cursorUpdate(-step);
                               break;
                         case SDLK_DOWN:
                               cursorUpdate(step); 
                               break;
+                        //music
                         case SDLK_o:
                               if(Mix_PausedMusic()==1){
                                     Mix_ResumeMusic();
@@ -148,6 +174,7 @@ void MainMenue::handleEvent()
                                     Mix_PauseMusic();
                               }
                               break;
+                        //on hiting return key checks for the button currently in and executes functions accordingly
                         case SDLK_RETURN: {
                               if (cursorpoints(&newGameDim, &cursorDim)){
                                     // printf("%d\n",newGameDim.x);
@@ -156,7 +183,7 @@ void MainMenue::handleEvent()
                                     updatescreen();
                                     initGame();
                               }
-                              if(cursorpoints(&continueDim, &cursorDim)){
+                              else if(cursorpoints(&continueDim, &cursorDim)){
                                     screen = IN_GAME;
                                     isrunning = true;
                                     updatescreen();
@@ -180,7 +207,9 @@ void MainMenue::handleEvent()
  
       int mousex, mousey;
       int mbutton = SDL_GetMouseState(&mousex, &mousey);
+      //only updates on movement of mouse
       if (prevMousex != 0 && prevMousey != mousey) {
+            //checks if the y value of the mouse is inside a certain threshold and updates cursor
             if (mousey <= newGameDim.y||mousey<=newGameDim.y+newGameDim.h)
                   cursorJump(&newGameDim);
             else if (mousey <= continueDim.y||mousey<= continueDim.y+ continueDim.h)
@@ -197,6 +226,7 @@ void MainMenue::handleEvent()
                   cursorJump(&exitDim);
       }
       if (mbutton & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            //on left press checks where the mouse is and executes functions accordingly
 
             if (mouseIsInside(&newGameDim, mousex, mousey)){
                   save_game(0,3,9999,0,5,-5, 5, 9000,0);
@@ -216,15 +246,20 @@ void MainMenue::handleEvent()
             else if (mouseIsInside(&exitDim, mousex, mousey))
                   quit = true;
       }
+      //records current mouse position for next frame
       prevMousex=mousex, prevMousey=mousey;
 }
 void MainMenue::run()
 {
+      //handle event
       handleEvent();
+      //play music
       if(Mix_PlayingMusic()==0){
             Mix_PlayMusic(gBackgroundMusic,-1);
       }
+      //clear renderer
       SDL_RenderClear(ren);
+      //put elements one by one
       SDL_RenderCopy(ren, mainMenuBG, NULL, &bgdim);
       SDL_RenderCopy(ren, newGameB, NULL, &newGameDim);
       SDL_RenderCopy(ren, continueB, NULL, &continueDim);
@@ -234,6 +269,7 @@ void MainMenue::run()
       SDL_RenderCopy(ren, aboutB, NULL, &aboutDim);
       SDL_RenderCopy(ren, exitB, NULL, &exitDim);
       SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
+      //present renderer
       SDL_RenderPresent(ren);
 }
 

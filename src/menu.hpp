@@ -155,8 +155,10 @@ struct Pause
       void cursorJump(SDL_Rect* r);
 };    
 extern Pause pause;
-
-
+//checks if mouse is inside the given rect
+bool mouseIsInside(SDL_Rect* rect, int mousex, int mousey);
+//checks if the cursor points to the given rect
+bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim);
 //runs the titlescreen
 void titlescreen();
 //runs the gameover screen
