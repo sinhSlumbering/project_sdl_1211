@@ -382,7 +382,7 @@ void Options::updateUI()
       buttonH = screen_height / 20;
       buttonW = screen_width / 6;
       xVal = screen_width - 3 * buttonW / 2;
-      menumax = menumin + buttonH*2;
+      menumax = menumin + buttonH*6;
       bgdim = {0, 0, screen_width, screen_height};
       cursorDim.w = screen_width / 40;
       cursorDim.h = screen_height / 20;
@@ -394,6 +394,8 @@ void Options::updateUI()
       mouseModeDim = {xVal, yVal, buttonW, buttonH};
       yVal += step;
       clearDim = {xVal, yVal, buttonW, buttonH};
+      yVal += step;
+      musicDim = {xVal, yVal, buttonW, buttonH};
       
       backDim = {screen_width - screen_width / 10, screen_height - screen_height / 15, screen_width / 10, screen_height / 15};
 }
@@ -404,11 +406,16 @@ void Options::cursorJump(SDL_Rect* r)
 }
 void Options::cursorUpdate(int step)
 {
-      if (cursorDim.y + step < menumin) cursorJump(&backDim); 
-      else if (cursorDim.y> menumax && step<0) cursorJump(&mouseModeDim);
-      else if (cursorDim.y> menumax && step>0) cursorJump(&fullScreenDim);
-      else if (cursorDim.y + step > menumax) cursorJump(&backDim);
-      else cursorDim.y +=step;
+      // if (cursorDim.y + step < menumin) cursorJump(&backDim); 
+      // //else if (cursorDim.y> menumax && step<0) cursorJump(&mouseModeDim);
+      // else if (cursorDim.y> menumax && step>0) cursorJump(&clearDim);
+      // else if (cursorDim.y + step > menumax) cursorJump(&backDim);
+      // else cursorDim.y +=step;
+             if (cursorDim.y + step < menumin) cursorJump(&backDim);
+             else if (cursorDim.y >= backDim.y && step>0) cursorJump(&fullScreenDim);
+             else if (cursorDim.y>=backDim.y && step<0) cursorJump(&musicDim);
+             else if(cursorDim.y + step > menumax) cursorJump(&backDim);
+             else cursorDim.y += step;
 }
 
 void Options::handleEvent()
@@ -448,6 +455,15 @@ void Options::handleEvent()
                                     mouseMode=!mouseMode;
                               else if (cursorpoints(&backDim, &cursorDim))
                                     screen=MAIN_MENU, mainMenu.updateUI();
+                              else if (cursorpoints(&clearDim, &cursorDim))
+                                    highscoreclear();
+                              else if (cursorpoints(&musicDim, &cursorDim))
+                                    {
+                                          if(Mix_PausedMusic()==1)
+                                                Mix_ResumeMusic();
+                                          else
+                                          Mix_PauseMusic();
+                                    }     
                         }
                   }
             }
@@ -463,6 +479,8 @@ void Options::handleEvent()
                   cursorJump(&mouseModeDim);
             else if (mousey >= clearDim.y && mousey < clearDim.y + clearDim.h + 1)
                   cursorJump(&clearDim);
+            else if (mousey >= musicDim.y && mousey < musicDim.y + musicDim.h + 1)
+                  cursorJump(&musicDim);
             else if (mousey >= backDim.y)
                   cursorJump(&backDim);
       }
@@ -477,6 +495,13 @@ void Options::handleEvent()
                   mouseMode=!mouseMode;
             else if (mouseIsInside(&clearDim, mousex, mousey))
                   highscoreclear();
+            else if (mouseIsInside(&musicDim, mousex, mousey))
+                  {
+                        if(Mix_PausedMusic()==1)
+                              Mix_ResumeMusic();
+                        else
+                        Mix_PauseMusic();
+                  }      
             else if (mouseIsInside(&backDim, mousex, mousey))
                   screen = MAIN_MENU, mainMenu.updateUI();
       }
@@ -490,6 +515,7 @@ void Options::run()
       SDL_RenderCopy(ren, optionsToggle[win.fullScreen], NULL, &fullScreenDim);
       SDL_RenderCopy(ren, optionsToggle[mouseMode], NULL, &mouseModeDim);
       SDL_RenderCopy(ren,cleartex,NULL, &clearDim);
+      SDL_RenderCopy(ren, optionsToggle[!Mix_PausedMusic()], NULL, &musicDim);
       SDL_Rect area;
       printText(ren, screen_width/10, fullScreenDim.y,"Full Screen", &tscreentex, &area, White);
       SDL_RenderCopy(ren,tscreentex,NULL, &area);
@@ -497,8 +523,8 @@ void Options::run()
       SDL_RenderCopy(ren,tscreentex,NULL, &area);
       printText(ren, screen_width/10, clearDim.y,"Highscore Reset", &tscreentex, &area, White);
       SDL_RenderCopy(ren,tscreentex,NULL, &area);
-      // SDL_RenderCopy(ren, fullScreenText, NULL, &fullScreenTextDim);
-      // SDL_RenderCopy(ren, mouseModeText, NULL, &mouseModeTextDim);
+      printText(ren, screen_width/10, musicDim.y,"Music", &tscreentex, &area, White);
+      SDL_RenderCopy(ren,tscreentex,NULL, &area);
       SDL_RenderCopy(ren, backB, NULL, &backDim);
       SDL_RenderCopy(ren, cursor, NULL, &cursorDim);
       SDL_RenderPresent(ren);

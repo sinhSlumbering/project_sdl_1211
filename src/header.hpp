@@ -357,6 +357,7 @@ struct Options
       SDL_Rect mouseModeDim;
       SDL_Rect mouseModeTextDim;
       SDL_Rect clearDim;
+      SDL_Rect musicDim;
       SDL_Rect backDim;
       
       void run();
