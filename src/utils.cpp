@@ -31,6 +31,7 @@ extern float remaintime=0;
 
 SDL_Renderer* ren;
 SDL_Texture* titleBG;
+SDL_Texture* gameoverBG;
 SDL_Texture* mainMenuBG;
 SDL_Texture* pauseBG;
 SDL_Texture* aboutBG;
@@ -232,6 +233,11 @@ bool loadMedia() {
       titleBG = loadTex("assets/titlescreen.jpg");
       if (titleBG == NULL) {
             printf("failed to load title screen\n");
+            success = false;
+      }
+      gameoverBG = loadTex("assets/game over.jpg");
+      if (gameoverBG == NULL) {
+            printf("failed to load game over screen\n");
             success = false;
       }
  
@@ -700,6 +706,8 @@ void optimizeFPS(long *prevtime, float *remainder)
 void close() {
       SDL_DestroyTexture(titleBG);
       titleBG = NULL;
+      SDL_DestroyTexture(gameoverBG);
+      gameoverBG = NULL;
       SDL_DestroyTexture(mainMenuBG);
       mainMenuBG = NULL;
       SDL_DestroyTexture(pauseBG);

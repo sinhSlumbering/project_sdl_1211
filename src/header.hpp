@@ -77,6 +77,7 @@ void boss_change_phase(SDL_Rect r, SDL_Rect background);
 
 extern SDL_Renderer* ren;
 extern SDL_Texture* titleBG;
+extern SDL_Texture* gameoverBG;
 extern SDL_Texture* mainMenuBG;
 extern SDL_Texture* pauseBG;
 extern SDL_Texture* aboutBG;
