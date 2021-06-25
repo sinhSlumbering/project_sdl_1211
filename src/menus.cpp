@@ -141,11 +141,13 @@ void MainMenue::handleEvent()
                                     screen = IN_GAME, isrunning = true;
                                     save_game(0,3,9999,0,5,-5, 5, 9000,0);
                                     updatescreen();
+                                    initGame();
                               }
                               if(cursorpoints(&continueDim, &cursorDim)){
                                     screen = IN_GAME;
                                     isrunning = true;
                                     updatescreen();
+                                    initGame();
                               }
                               else if(cursorpoints(&highScoreDim, &cursorDim))
                                     screen=HIGH_SCORES, highScore.updateUI();
@@ -278,7 +280,7 @@ void Pause::handleEvent()
       while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT)
                   quit = true;
-            if(win.handleEvent(e)) updateUI();
+            if(win.handleEvent(e)) updateUI(), scaleGame(), walls.init();
             if (e.type == SDL_KEYDOWN) {
                   switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:

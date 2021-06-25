@@ -49,6 +49,31 @@ Player::Player()
       htbx.w = screen_width / 35;
       htbx.h = screen_height / 22;
 }
+void Player::init()
+{
+      width = screen_width / 10;
+      height = screen_height / 8;
+      xStep = screen_width / 100;
+      yStep = screen_height / 80;
+      hbspX = screen_width / 30, hbspY = screen_height / 30;
+      
+      bulletVel = 20;
+      bulletIndex = 0;
+      bulletW=player.width/3;
+      bulletH=player.height/4;
+      fire=true;
+      for(int i=0; i<PLAYERBULLET_N; i++) bulletdim[i]={-bulletW, -bulletH, bulletW, bulletH};
+
+      tex=0;
+
+      xPos = 0;
+      yPos = screen_height / 2 - ( width / 2 );
+      angle = 0.0;
+      htbx.x = xPos + hbspX;
+      htbx.y = yPos + hbspY;
+      htbx.w = screen_width / 35;
+      htbx.h = screen_height / 22;
+}
 void Player::scale()
 {
       width = screen_width / 10;
@@ -212,27 +237,35 @@ Boss::Boss()
       xPos = screen_width - width;
       yPos = screen_height / 3;
       htbx = {xPos, yPos, width, height};
-      renderQuad = {xPos, yPos, width, height};
+}
+void Boss::init()
+{
+      width = screen_width / 6;
+      height = screen_height / 3;
+      yVel = screen_height / 100;
+      scrolldir = 1;
+
+      xPos = screen_width - width;
+      yPos = screen_height / 3;
+      htbx = {xPos, yPos, width, height};
 }
 void Boss::scale()
 {
-      scaleIntX(&width);
-      scaleIntX(&xPos);
-      scaleIntX(&htbx.h);
-      scaleIntY(&height);
-      scaleIntX(&yVel);
-      yPos=screen_height/2;
+      htbx.w=screen_width/6;
+      htbx.h=screen_height/3;
+      yVel=screen_height/100;
+      htbx.x=screen_width-htbx.w;
+      htbx.y=screen_height/3;
 }
 void Boss::move()
 {
-      if ((yPos < 0) || (yPos + height > screen_height))
+      if ((htbx.y < 0) || (htbx.y + htbx.h > screen_height))
             scrolldir *= -1;
-      htbx.y = yPos += scrolldir*yVel;
+      htbx.y += scrolldir*yVel;
 }
 void Boss::render()
 {
-      renderQuad = {xPos, yPos, width, height};
-      SDL_RenderCopyEx(ren, bosstex[phase], NULL, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
+      SDL_RenderCopyEx(ren, bosstex[phase], NULL, &htbx, 0.0, NULL, SDL_FLIP_NONE);
 }
 
 
@@ -274,6 +307,7 @@ Wall::Wall()
       width=screen_width/15;
       height=screen_height;
       yPos=screen_height/2;
+      xPos=screen_width;
       htbx={xPos, yPos, width, height};
       mod=5;  
 }
@@ -300,6 +334,14 @@ Walls::Walls()
       wallz[0].htbx.x=screen_width;
       for(int i=1; i<3; i++)
             wallz[i].htbx.x=wallz[i-1].htbx.x+padding;
+}
+void Walls::init()
+{
+      padding = screen_width/3;
+      wall_number=0;
+      wallz[0].htbx={screen_width, screen_height/2, screen_width/15, screen_height};
+      for(int i=1; i<3; i++)
+            wallz[i].htbx={wallz[i-1].htbx.x+padding, screen_height/2, screen_width/15, screen_height};
 }
 void Walls::scale()
 {
@@ -332,6 +374,14 @@ void Walls::colls()
 }
 
 Powerup::Powerup()
+{
+      int width=player.width/2;
+      powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
+      vel = 5;
+      spawn = true;
+      running = false;
+}
+void Powerup::init()
 {
       int width=player.width/2;
       powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
@@ -418,6 +468,19 @@ Attack::Attack()
       hYvel=5;
       angle=0.0;
 }
+void Attack::init()
+{
+      spawn = true;
+      int side=screen_width/20, arm=side/1.42;
+      bouncedim = homedim = { screen_width, screen_height, side, side };
+      bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
+      current = 0;
+      bXvel= 5;
+      bYvel=-5;
+      hXvel=5;
+      hYvel=5;
+      angle=0.0;
+}
 void Attack::scale()
 {
       int side=screen_width/20, arm=side/1.42;
@@ -441,8 +504,8 @@ void Attack::choose()
       srand(time(0));
       current=rand()%2;
       spawn=false;
-      homedim.y=bouncedim.y=plane.yPos+plane.height/2;
-      homedim.x=bouncedim.x=plane.xPos;
+      homedim.y=bouncedim.y=plane.htbx.y+plane.height/2;
+      homedim.x=bouncedim.x=plane.htbx.x;
 }
 void Attack::bounce()
 {
@@ -493,6 +556,15 @@ void scaleGame()
       walls.scale();
       powerup.scale();
       attack.scale();
+      //ingamedim={0,0, screen_width, screen_height};
+}
+void initGame()
+{
+      plane.init();
+      player.init();
+      powerup.init();
+      walls.init();
+      attack.init();
 }
 void gamestart() 
 {
@@ -508,6 +580,7 @@ void gamestart()
       walls.wall_number = 0;
       diffTimer.start();
       Uint32 diff0 = diffTimer.getTicks();
+      //initGame();
       while (isrunning) {
             SDL_RenderClear(ren);
             SDL_Event e;
@@ -589,7 +662,7 @@ void gamestart()
             //debug hitbox
             //SDL_RenderDrawRect(ren, &player.htbx);
             if(bosshealth<= 0){
-                  boss_change_phase(plane.renderQuad,ingamedim);
+                  boss_change_phase(plane.htbx,ingamedim);
                   bosshealth = 9999;
                   diffThreshold = 9000;
             }
