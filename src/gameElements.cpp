@@ -181,10 +181,14 @@ void Player::bullet()
                   bulletdim[i].x+=bulletVel;
                   if(bulletdim[i].x>screen_width) bulletdim[i].x=-bulletW, bulletdim[i].y=0;
                   else {
-                        SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
                         if(checkCol(&bulletdim[i], &plane.htbx)) {
                               bosshealth-=5;
+                              hitdim={plane.htbx.x+plane.htbx.w/2, bulletdim[i].y, plane.htbx.w/3, plane.htbx.w/3};
+                              bulletdim[i].x=-bulletW, bulletdim[i].y=0;
+                              SDL_RenderCopy(ren, hittex, NULL, &hitdim);
                         }
+                        else
+                        SDL_RenderCopy(ren, playerbullet, NULL, &bulletdim[i]);
                   }
             }
       }
@@ -357,11 +361,16 @@ void Powerup::choose()
 
 void Powerup::run()
 {
-      Uint32 time=ptimer.getTicks();
+      Uint32 time;
       if(spawn) choose();
       else if(Pinvincible)
       {
+            time=ptimer.getTicks();
             if(time>10000) Pinvincible=false, player.tex=0, ptimer.stop(), iFrame.start(), Hinvincible=true;
+      }
+      else if(timeStopped){
+            time=tstopTimer.getTicks();
+            if(time>5000) timeStopped=false, tstopTimer.stop();
       }
       else if(running==false) spawn=true;
       else if(running)
@@ -385,6 +394,10 @@ void Powerup::run()
                                     Mix_PlayChannel(-1,gpoint,0);
                               }
                               ptimer.start();
+                        }
+                        else if(current==TIMESTOP){
+                              timeStopped=true;
+                              tstopTimer.start();
                         }
 
                   }
@@ -460,7 +473,7 @@ void Attack::bounce()
                   Mix_PlayChannel(-1,ghit,0);
             }
       }
-      bouncedim.x-=bXvel, bouncedim.y-=bYvel;
+      if(!timeStopped) bouncedim.x-=bXvel, bouncedim.y-=bYvel;
       SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
 }
 
@@ -475,7 +488,7 @@ void Attack::bomb()
                   Mix_PlayChannel(-1,ghit,0);
             }
       }
-      bombdim.x -= 3*bXvel;
+      if(!timeStopped) bombdim.x -= 3*bXvel;
       SDL_RenderCopyEx(ren, Bombtex, NULL, &bombdim, 0.0, NULL, SDL_FLIP_NONE);
       
 }
@@ -483,8 +496,10 @@ void Attack::home()
 {
       angle++;
       if(angle>360) angle=0.0;
+      if(!timeStopped){
       if (homedim.y>player.htbx.y) homedim.y-=hXvel;
       else if (homedim.y<player.htbx.y) homedim.y+=hXvel;
+      }
       else if(homedim.y==player.htbx.y);
       if (homedim.x<=0) 
             spawn=true, homedim.x=homedim.y=screen_width+homedim.w;
@@ -494,7 +509,7 @@ void Attack::home()
                         Mix_PlayChannel(-1,ghit,0);
                   }
       }
-      homedim.x-=bXvel;
+      if(!timeStopped) homedim.x-=bXvel;
       SDL_RenderCopyEx(ren, homingtex, NULL, &homedim, angle, NULL, SDL_FLIP_NONE);       
 }
 void Attack::run()

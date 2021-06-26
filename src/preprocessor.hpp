@@ -12,7 +12,7 @@
 //preprocessors
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
-#define POWERUP_N 2
+#define POWERUP_N 3
 #define POWERUP_INTERVAL 15000
 #define PLAYERBULLET_N 5
 #define PLAYERBULLET_RATE 300

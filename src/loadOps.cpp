@@ -30,6 +30,7 @@ SDL_Texture* optionsToggle[2];
 SDL_Texture* cleartex;
 SDL_Texture* towertex;
 SDL_Texture* dashtex;
+SDL_Texture* hittex;
 SDL_Texture* poweruptex[POWERUP_N];
 SDL_Texture* fireballtex;
 SDL_Texture* homingtex;
@@ -213,6 +214,11 @@ bool loadMedia() {
       {
             success = false;
       }
+      hittex = loadTex("assets/hit.png");
+      if(hittex==NULL)
+      {
+            success = false;
+      }
       poweruptex[0] = loadTex("assets/heart.png");
       if(poweruptex[0]==NULL)
       {
@@ -220,6 +226,11 @@ bool loadMedia() {
       }
       poweruptex[1] = loadTex("assets/omniman.png");
       if(poweruptex[1]==NULL)
+      {
+            success = false;
+      }
+      poweruptex[2] = loadTex("assets/clock.png");
+      if(poweruptex[2]==NULL)
       {
             success = false;
       }
@@ -355,10 +366,14 @@ void close() {
       towertex=NULL;
       SDL_DestroyTexture(dashtex);
       dashtex=NULL;
+      SDL_DestroyTexture(hittex);
+      hittex=NULL;
       SDL_DestroyTexture(poweruptex[0]);
       poweruptex[0]=NULL;
       SDL_DestroyTexture(poweruptex[1]);
       poweruptex[1]=NULL;
+      SDL_DestroyTexture(poweruptex[2]);
+      poweruptex[2]=NULL;
       SDL_DestroyTexture(fireballtex);
       fireballtex=NULL;
       SDL_DestroyTexture(homingtex);

@@ -40,6 +40,7 @@ extern SDL_Texture* cleartex;
 extern SDL_Texture* scoretex;
 extern SDL_Texture* lifetex;
 extern SDL_Texture* dashtex;
+extern SDL_Texture* hittex;
 extern SDL_Texture* towertex;
 extern SDL_Texture* poweruptex[POWERUP_N];
 extern SDL_Texture* fireballtex;

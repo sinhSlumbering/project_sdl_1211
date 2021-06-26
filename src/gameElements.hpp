@@ -141,6 +141,7 @@ struct Powerup
       enum pUP{
             LIFE,
             INVINCIBILE,
+            TIMESTOP,
             WAIT
       };
       //current powerup

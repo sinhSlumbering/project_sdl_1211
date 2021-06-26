@@ -60,13 +60,13 @@ void gamestart()
             Uint32 diff = diffTimer.getTicks();
             if (ingamedim.x >= 2124)
                   ingamedim.x = 0;
-            ingamedim.x += screen_width / 160;
+            if(!timeStopped) ingamedim.x += screen_width / 160;
             SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
             player.handleEvent();
             player.render();
-            player.bullet();
-            plane.move();
+            if(!timeStopped)plane.move();
             plane.render();
+            player.bullet();
 
             if (iFrame.running)
             {
@@ -101,7 +101,7 @@ void gamestart()
             }
             if (diff > WALL_START_TIME)
             {
-                  walls.move();
+                  if(!timeStopped) walls.move();
                   walls.render();
                   walls.colls();
             }
