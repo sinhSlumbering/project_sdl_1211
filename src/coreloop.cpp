@@ -6,7 +6,6 @@
 #include "gameElements.hpp"
 #include "gameUtills.hpp"
 
-
 void gamestart()
 {
       Hinvincible = Pinvincible = false;
@@ -18,6 +17,8 @@ void gamestart()
 
       play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed, &diffThreshold, &phase);
       printf("%d %d %d\n", score, lives, bosshealth);
+      player.xPos = xposition;
+      player.yPos = yposition;
       walls.wall_number = 0;
       diffTimer.start();
       Uint32 diff0 = diffTimer.getTicks();
@@ -148,11 +149,13 @@ void gamestart()
       {
             save_game(0, 3, 9999, 0, 5, -5, 5, 9000, 0);
             screen = GAME_OVER;
-            player.xPos = 0;
-            player.yPos = screen_height / 5;
+            xposition = 0;
+            yposition = screen_height / 2 - ( screen_width / 20 );
       }
       else
       {
             save_game(score, lives, bosshealth, walls.wall_number, attack.bXvel, attack.bYvel, wallspeed, diffThreshold, phase);
+            xposition = player.xPos;
+            yposition = player.yPos;
       }
 }
