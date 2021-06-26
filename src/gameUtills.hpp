@@ -27,6 +27,7 @@ extern bool prevtex;
 extern bool timeStopped;
 extern SDL_Rect dashdim;
 extern SDL_Rect hitdim;
+extern SDL_Rect ingamedim[2];
 //calculates highscore
 void Cal_highscore(int a);
 //prints highscore

@@ -17,6 +17,7 @@ SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
 SDL_Rect hitdim;
+SDL_Rect ingamedim[2];
 
 int score;
 int bosshealth = 9999; 
@@ -200,7 +201,8 @@ void scaleGame()
       walls.scale();
       powerup.scale();
       attack.scale();
-      //ingamedim={0,0, screen_width, screen_height};
+      ingamedim[0]={0, 0, screen_width, screen_height};
+      ingamedim[1]={-(screen_width), 0, screen_width, screen_height};
 }
 void initGame()
 {
