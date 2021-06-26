@@ -166,8 +166,10 @@ bool cursorpoints(SDL_Rect* rect, SDL_Rect* cursorDim);
 void titlescreen();
 //runs the gameover screen
 void gameoverscreen();
-
+//Pause Menu
 void Pause_the_game();
+//Changes cursor in pause menu
 void cursorjump(SDL_Rect *b);
+//updates the curson in pause menu
 void cursorupdate( int step);
 #endif

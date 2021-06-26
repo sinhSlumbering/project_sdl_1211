@@ -1,6 +1,10 @@
 #include "loadOps.hpp"
 #include "globalvars.hpp"
 
+
+//This are the textures frequently used
+//they are preprocessed and stored in global variables
+
 SDL_Texture* titleBG;
 SDL_Texture* gameoverBG;
 SDL_Texture* mainMenuBG;
