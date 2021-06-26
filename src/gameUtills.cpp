@@ -43,7 +43,7 @@ void upTimer::stop()
       startTicks=0;
 }
 
-
+//collisiong checker
 bool checkCol(SDL_Rect *a, SDL_Rect *b)
 {
       int leftA, leftB;

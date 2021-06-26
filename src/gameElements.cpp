@@ -12,6 +12,7 @@ Player player;
 Powerup powerup;
 Attack attack;
 
+//Struct of player
 Player::Player()
 {
       width = screen_width / 10;
@@ -37,6 +38,7 @@ Player::Player()
       htbx.w = screen_width / 35;
       htbx.h = screen_height / 22;
 }
+//initializes played
 void Player::init()
 {
       width = screen_width / 10;
@@ -62,6 +64,7 @@ void Player::init()
       htbx.w = screen_width / 35;
       htbx.h = screen_height / 22;
 }
+//scale player to and from full-screen
 void Player::scale()
 {
       width = screen_width / 10;
@@ -83,14 +86,14 @@ void Player::scale()
       htbx.w = screen_width / 35;
       htbx.h = screen_height / 22;
 }
-
+//renders player
 void Player::render()
 {
       playerdim = { xPos, yPos, width, height };
       if(Pinvincible) tex=1;
       SDL_RenderCopyEx(ren, playertex[tex], NULL, &playerdim, angle, NULL, SDL_FLIP_NONE);
 }
-
+//handles movement
 void Player::handleEvent()
 {
       if ( !mouseMode )
@@ -162,6 +165,8 @@ void Player::handleEvent()
       }
        
 }
+
+//Player weapon
 void Player::bullet()
 {
       if(btimer.running&&btimer.getTicks()>PLAYERBULLET_RATE) fire=true, btimer.stop();
@@ -193,6 +198,8 @@ void Player::bullet()
             }
       }
 }
+
+//player collision detector
 bool Player::col(SDL_Rect* projectile)
 {
       bool ret=false;
@@ -203,6 +210,7 @@ bool Player::col(SDL_Rect* projectile)
       return ret;
 }
 
+//Struct of boss
 Boss::Boss()
 {
       width = screen_width / 6;
@@ -214,6 +222,7 @@ Boss::Boss()
       yPos = screen_height / 3;
       htbx = {xPos, yPos, width, height};
 }
+//initilization function of boss
 void Boss::init()
 {
       width = screen_width / 6;
@@ -225,6 +234,7 @@ void Boss::init()
       yPos = screen_height / 3;
       htbx = {xPos, yPos, width, height};
 }
+//scales to and from full-screen
 void Boss::scale()
 {
       htbx.w=screen_width/6;
@@ -233,16 +243,21 @@ void Boss::scale()
       htbx.x=screen_width-htbx.w;
       htbx.y=screen_height/3;
 }
+
+//Boss movement
 void Boss::move()
 {
       if ((htbx.y < 0) || (htbx.y + htbx.h > screen_height))
             scrolldir *= -1;
       htbx.y += scrolldir*yVel;
 }
+//Boss rendering function
 void Boss::render()
 {
       SDL_RenderCopyEx(ren, bosstex[phase], NULL, &htbx, 0.0, NULL, SDL_FLIP_NONE);
 }
+
+//Obstacle struct
 Wall::Wall()
 {
       width=screen_width/15;
@@ -252,6 +267,8 @@ Wall::Wall()
       htbx={xPos, yPos, width, height};
       mod=10;  
 }
+
+//movement dunction
 void Wall::move()
 {
       htbx.x-=wallspeed;
@@ -265,10 +282,13 @@ void Wall::move()
       }
       htbx.h=screen_height-htbx.y;
 }
+//renders obstacle
 void Wall::render()
 {     
       SDL_RenderCopyEx(ren, towertex, NULL, &htbx, 0.0, NULL, SDL_FLIP_NONE);
 }
+
+//Struct for multiple walls
 Walls::Walls()
 {
       padding = screen_width/3;
@@ -277,6 +297,8 @@ Walls::Walls()
       for(int i=1; i<3; i++)
             wallz[i].htbx.x=wallz[i-1].htbx.x+wallz[i-1].htbx.w+padding;
 }
+
+//initialization part
 void Walls::init()
 {
       padding = screen_width/3;
@@ -285,6 +307,8 @@ void Walls::init()
       for(int i=1; i<3; i++)
             wallz[i].htbx={wallz[i-1].htbx.x+wallz[i-1].htbx.w+padding, screen_height/2, screen_width/15, screen_height};
 }
+
+//scales to and from full-screen
 void Walls::scale()
 {
       scaleIntX(&padding);
@@ -293,17 +317,21 @@ void Walls::scale()
       }
 }
 
+//movement function
 void Walls::move()
 {
       for(int i=0; i<3; i++)
             wallz[i].move();
 }
+//renders all the walls
 void Walls::render()
 {
       for(int i=0; i<wall_number; i++)
             wallz[i].render();
       
 }
+
+//collision with player checker
 void Walls::colls()
 {
       for(int i=0; i<wall_number; i++)
@@ -315,6 +343,7 @@ void Walls::colls()
             }
 }
 
+//struct for power ups
 Powerup::Powerup()
 {
       int width=player.width/2;
@@ -323,6 +352,8 @@ Powerup::Powerup()
       spawn = true;
       running = false;
 }
+
+//initialization
 void Powerup::init()
 {
       int width=player.width/2;
@@ -331,6 +362,8 @@ void Powerup::init()
       spawn = true;
       running = false;
 }
+
+//for scaling to and from full-screen
 void Powerup::scale()
 {
       int wid=player.width/2;
@@ -341,6 +374,8 @@ void Powerup::scale()
       powerupdim.h=powerupdim.w=initdim.h=initdim.w=wid;
       scaleIntX(&vel);
 }
+
+//movement controller
 void Powerup::move()
 {
       powerupdim.x-=vel;
@@ -348,6 +383,7 @@ void Powerup::move()
       SDL_RenderCopy(ren, poweruptex[current], NULL, &powerupdim);
 }
 
+//for randomly choosing a power up
 void Powerup::choose()
 {
       srand(time(0));
@@ -359,6 +395,7 @@ void Powerup::choose()
       running = true;
 }
 
+//For running the power up with just a function
 void Powerup::run()
 {
       Uint32 time;
@@ -403,8 +440,10 @@ void Powerup::run()
                   }
             else move();
       }
-      
+
 }
+
+//enemy attack struct
 Attack::Attack()
 {
       spawn = true;
@@ -418,6 +457,8 @@ Attack::Attack()
       hYvel=5;
       angle=0.0;
 }
+
+//initialization
 void Attack::init()
 {
       spawn = true;
@@ -431,6 +472,8 @@ void Attack::init()
       hYvel=5;
       angle=0.0;
 }
+
+//for scaling to and from full-screen
 void Attack::scale()
 {
       int side=screen_width/20, arm=side/1.42;
@@ -449,6 +492,8 @@ void Attack::scale()
       scaleIntX(&bYvel);
       scaleIntX(&hYvel);
 }
+
+//Randomly choosing a attack type
 void Attack::choose()
 {
       srand(time(0));
@@ -460,6 +505,8 @@ void Attack::choose()
       homedim.y = bouncedim.y = bombdim.y = plane.htbx.y+plane.height/2;
       homedim.x = bouncedim.x = bombdim.x = plane.htbx.x;
 }
+
+//this attack bounces
 void Attack::bounce()
 {
       angle++;
@@ -477,6 +524,7 @@ void Attack::bounce()
       SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
 }
 
+//This is a fast bomb
 void Attack::bomb()
 {
       if(bombdim.x <= 0){
@@ -492,6 +540,8 @@ void Attack::bomb()
       SDL_RenderCopyEx(ren, Bombtex, NULL, &bombdim, 0.0, NULL, SDL_FLIP_NONE);
       
 }
+
+//this projectile has homing
 void Attack::home()
 {
       angle++;
