@@ -39,7 +39,8 @@ void gamestart()
                         switch (e.key.keysym.sym)
                         {
                         case SDLK_ESCAPE:
-                              screen = PAUSE, isrunning = false, pause.updateUI();
+                              // screen = PAUSE, isrunning = false, pause.updateUI();
+                              Pause_the_game();
                               break;
                         case SDLK_o:
                               if (Mix_PausedMusic() == 1)
@@ -54,6 +55,7 @@ void gamestart()
                         }
                   }
             }
+            if(!isrunning)break;
             score++;
             Uint32 diff = diffTimer.getTicks();
             if (ingamedim.x >= 2124)

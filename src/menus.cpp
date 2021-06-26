@@ -43,14 +43,6 @@ void titlescreen() {
 
 void gameoverscreen()
 {
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, gameoverBG, NULL, NULL);
-      std::string yourscore = "Your Score: "+ std::to_string(score);
-      printText(ren,screen_width/2 - screen_width/10, screen_height/2 - screen_height/20, yourscore, &tscreentex, &tscreentextdim,White);
-      SDL_RenderCopy(ren,tscreentex, NULL, &tscreentextdim);
-      printText(ren, screen_width/3, screen_height-screen_height/4, "Press any key to continue", &tscreentex, &tscreentextdim, Megenta); 
-      SDL_RenderCopy(ren, tscreentex, NULL, &tscreentextdim);
-      SDL_RenderPresent(ren);
       SDL_Event e;
       while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT)
@@ -60,7 +52,17 @@ void gameoverscreen()
             else if (e.type == SDL_MOUSEBUTTONDOWN)
                   screen = MAIN_MENU, mainMenu.updateUI();
       }
+      SDL_RenderClear(ren);
+      SDL_RenderCopy(ren, gameoverBG, NULL, NULL);
+      std::string yourscore = "Your Score: "+ std::to_string(score);
+      printText(ren,screen_width/2 - screen_width/10, screen_height/2 - screen_height/20, yourscore, &tscreentex, &tscreentextdim,White);
+      SDL_RenderCopy(ren,tscreentex, NULL, &tscreentextdim);
+      printText(ren, screen_width/3, screen_height-screen_height/4, "Press any key to continue", &tscreentex, &tscreentextdim, Megenta); 
+      SDL_RenderCopy(ren, tscreentex, NULL, &tscreentextdim);
+      SDL_RenderPresent(ren);
+      SDL_Delay(1000/60);
 }
+
 
 MainMenue::MainMenue()
 {

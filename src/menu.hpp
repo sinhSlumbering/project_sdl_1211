@@ -164,4 +164,7 @@ void titlescreen();
 //runs the gameover screen
 void gameoverscreen();
 
+void Pause_the_game();
+void cursorjump(SDL_Rect *b);
+void cursorupdate( int step);
 #endif
