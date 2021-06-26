@@ -8,11 +8,11 @@
 
 upTimer iFrame, cFrame, ptimer, btimer, diffTimer, tstopTimer;
 
-int lives = 3;
+int lives = LIVES_ON_START;
 bool Hinvincible = false, Pinvincible=false, timeStopped=false;
 bool prevtex = 0;
-int wallspeed = 5;
-int diffThreshold = 9000, diffStep = 1000;
+int wallspeed = WALL_SCROLL_SPEED;
+int diffThreshold = STARTING_DIFFICULTY_THRESHOLD, diffStep = DIFFICULTY_STEP_HP;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
@@ -20,7 +20,7 @@ SDL_Rect hitdim;
 SDL_Rect ingamedim[2];
 
 int score;
-int bosshealth = 9999; 
+int bosshealth = BOSSHEALTH_MAX; 
 SDL_Color white = {255, 255, 255, 0};
 SDL_Rect area;
 

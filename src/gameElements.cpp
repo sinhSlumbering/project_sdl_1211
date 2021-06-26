@@ -21,7 +21,7 @@ Player::Player()
       yStep = screen_height / 80;
       hbspX = screen_width / 30, hbspY = screen_height / 30;
       
-      bulletVel = 20;
+      bulletVel = screen_width/40;
       bulletIndex = 0;
       bulletW=player.width/3;
       bulletH=player.height/4;
@@ -47,7 +47,7 @@ void Player::init()
       yStep = screen_height / 80;
       hbspX = screen_width / 30, hbspY = screen_height / 30;
       
-      bulletVel = 20;
+      bulletVel = screen_width/40;
       bulletIndex = 0;
       bulletW=player.width/3;
       bulletH=player.height/4;
@@ -73,7 +73,7 @@ void Player::scale()
       yStep = screen_height / 80;
       hbspX = screen_width / 30, hbspY = screen_height / 30;
       
-      bulletVel = 20;
+      bulletVel = screen_width/40;
       bulletIndex = 0;
       bulletW=player.width/3;
       bulletH=player.height/4;
@@ -348,7 +348,7 @@ Powerup::Powerup()
 {
       int width=player.width/2;
       powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
-      vel = 5;
+      vel = POWERUP_VELOCITY;
       spawn = true;
       running = false;
 }
@@ -358,7 +358,7 @@ void Powerup::init()
 {
       int width=player.width/2;
       powerupdim = initdim = {screen_width+width*2, screen_height, width, width};
-      vel = 5;
+      vel = POWERUP_VELOCITY;
       spawn = true;
       running = false;
 }
