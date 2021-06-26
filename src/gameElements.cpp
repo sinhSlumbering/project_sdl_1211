@@ -213,6 +213,7 @@ void Player::bullet()
                               bosshealth -= PLAYERBULLET_DAMMAGE;
                               hitdim = {plane.htbx.x + plane.htbx.w / 2, bulletdim[i].y, plane.htbx.w / 3, plane.htbx.w / 3};
                               bulletdim[i].x = -bulletW, bulletdim[i].y = 0;
+
                               SDL_RenderCopy(ren, hittex, NULL, &hitdim);
                         }
                         else
