@@ -187,7 +187,7 @@ void Player::bullet()
                   if(bulletdim[i].x>screen_width) bulletdim[i].x=-bulletW, bulletdim[i].y=0;
                   else {
                         if(checkCol(&bulletdim[i], &plane.htbx)) {
-                              bosshealth-=5;
+                              bosshealth-=PLAYERBULLET_DAMMAGE;
                               hitdim={plane.htbx.x+plane.htbx.w/2, bulletdim[i].y, plane.htbx.w/3, plane.htbx.w/3};
                               bulletdim[i].x=-bulletW, bulletdim[i].y=0;
                               SDL_RenderCopy(ren, hittex, NULL, &hitdim);

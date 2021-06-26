@@ -132,6 +132,7 @@ void difficulty(){
       if(walls.wall_number >= 3)
       {
             wallspeed += 1;
+            if(wallspeed>30) wallspeed=30;
       }
       else walls.wall_number++, walls.wallz[walls.wall_number-1].xPos=walls.wallz[walls.wall_number-2].xPos+walls.padding;
       if(attack.bXvel < 0){
