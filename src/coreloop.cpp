@@ -9,12 +9,8 @@
 void gamestart()
 {
       Hinvincible = Pinvincible = false;
-      SDL_Rect ingamedim;
-      ingamedim.h = screen_height;
-      ingamedim.w = screen_width;
-      ingamedim.x = 0;
-      ingamedim.y = 0;
-
+      ingamedim[0]={0, 0, screen_width, screen_height};
+      ingamedim[1]={-(screen_width), 0, screen_width, screen_height};
       play(&score, &lives, &bosshealth, &walls.wall_number, &attack.bXvel, &attack.bYvel, &wallspeed, &diffThreshold, &phase);
       printf("%d %d %d\n", score, lives, bosshealth);
       player.xPos = xposition;
@@ -59,10 +55,14 @@ void gamestart()
             if(!isrunning)break;
             score++;
             Uint32 diff = diffTimer.getTicks();
-            if (ingamedim.x >= 2124)
-                  ingamedim.x = 0;
-            if(!timeStopped) ingamedim.x += screen_width / 160;
-            SDL_RenderCopy(ren, inGameBG, &ingamedim, NULL);
+            SDL_RenderCopy(ren, inGameBG, NULL, &ingamedim[0]);
+            SDL_RenderCopy(ren, inGameBG, NULL, &ingamedim[1]);
+            if (ingamedim[0].x >= screen_width)
+                  ingamedim[0]={-screen_width, 0, screen_width, screen_height};
+            if (ingamedim[1].x >= screen_width)
+                  ingamedim[1]={-screen_width, 0, screen_width, screen_height};
+            if(!timeStopped) ingamedim[0].x += screen_width/80, ingamedim[1].x += screen_width/80;
+
             player.handleEvent();
             player.render();
             if(!timeStopped)plane.move();
@@ -131,7 +131,9 @@ void gamestart()
             //SDL_RenderDrawRect(ren, &player.htbx);
             if (bosshealth <= 0)
             {
-                  boss_change_phase(plane.htbx, ingamedim);
+                  // ingamedim[0]={0, 0, screen_width, screen_height};
+                  // ingamedim[1]={-(screen_width), 0, screen_width, screen_height};
+                  boss_change_phase(plane.htbx, ingamedim[0]);
                   bosshealth = 9999;
                   diffThreshold = 9000;
             }
