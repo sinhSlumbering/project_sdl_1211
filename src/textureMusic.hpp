@@ -44,6 +44,7 @@ extern SDL_Texture* towertex;
 extern SDL_Texture* poweruptex[POWERUP_N];
 extern SDL_Texture* fireballtex;
 extern SDL_Texture* homingtex;
+extern SDL_Texture* Bombtex;
 extern SDL_Texture* tscreentex;
 extern SDL_Texture* fullScreenText;
 extern SDL_Texture* mouseModeText;

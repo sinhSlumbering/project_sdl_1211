@@ -33,6 +33,7 @@ SDL_Texture* dashtex;
 SDL_Texture* poweruptex[POWERUP_N];
 SDL_Texture* fireballtex;
 SDL_Texture* homingtex;
+SDL_Texture* Bombtex;
 SDL_Texture* tscreentex;
 SDL_Texture* fullScreenText;
 SDL_Texture* mouseModeText;
@@ -232,6 +233,11 @@ bool loadMedia() {
       {
             success = false;
       }
+      Bombtex = loadTex("assets/Bomb.png");
+      if(Bombtex==NULL)
+      {
+            success = false;
+      }
       gBackgroundMusic = Mix_LoadMUS("assets/Fluffing-a-Duck.mp3");
       if (gBackgroundMusic == NULL)
       {
@@ -357,6 +363,8 @@ void close() {
       fireballtex=NULL;
       SDL_DestroyTexture(homingtex);
       homingtex=NULL;
+      SDL_DestroyTexture(Bombtex);
+      Bombtex=NULL;
       
       SDL_DestroyRenderer(ren);
       ren = NULL;

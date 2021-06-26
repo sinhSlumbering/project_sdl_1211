@@ -165,8 +165,8 @@ struct Attack
       //controls the spawing of a new attack
       bool spawn;
       //dimension and position of attacks and their hitboxes
-      SDL_Rect bouncedim, homedim;
-      SDL_Rect bhtbx, hhtbx;
+      SDL_Rect bouncedim, homedim, bombdim;
+      SDL_Rect bhtbx, hhtbx, bombhtbx;
       //velocites in both axes of attacks
       int bXvel, bYvel, hXvel, hYvel;
       //angle of the attack texture
@@ -175,7 +175,8 @@ struct Attack
       enum att
       {
             BOUNCING,
-            HOMING
+            HOMING,
+            BOMB
       };
       //current attack
       int current;
@@ -189,6 +190,7 @@ struct Attack
       void bounce();
       //homing attack subroutine
       void home();
+      void bomb();
       //runs the attack subroutine
       void run();
 };

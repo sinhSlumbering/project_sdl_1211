@@ -10,9 +10,9 @@ upTimer iFrame, cFrame, ptimer, btimer, diffTimer;
 
 int lives = 3;
 bool Hinvincible = false, Pinvincible=false;
-bool prevtex=0;
-int wallspeed=5;
-int diffThreshold=9000, diffStep=1000;
+bool prevtex = 0;
+int wallspeed = 5;
+int diffThreshold = 9000, diffStep = 1000;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
@@ -129,7 +129,7 @@ void highscore_printing(int a, int x, int y)
 void difficulty(){
       if(walls.wall_number >= 3)
       {
-            wallspeed += 5;
+            wallspeed += 1;
       }
       else walls.wall_number++, walls.wallz[walls.wall_number-1].xPos=walls.wallz[walls.wall_number-2].xPos+walls.padding;
       if(attack.bXvel < 0){
@@ -191,6 +191,7 @@ void boss_change_phase(SDL_Rect r, SDL_Rect background){
             SDL_Delay(60);
       }
 }
+//scales the game.
 void scaleGame()
 {
       player.scale();
