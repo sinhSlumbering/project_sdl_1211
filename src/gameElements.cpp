@@ -246,7 +246,7 @@ Wall::Wall()
       yPos=screen_height/2;
       xPos=screen_width;
       htbx={xPos, yPos, width, height};
-      mod=5;  
+      mod=10;  
 }
 void Wall::move()
 {
@@ -254,9 +254,10 @@ void Wall::move()
       if(htbx.x+htbx.w<=0)
       {
             htbx.x=screen_width+htbx.w;
-            double val[10]={1.3, 1.5, 2, 1.6, 1.2, 0.9, 0.75, 0.6, 0.85,0.8};
+            double val[10]={1, 1.5, 0.9, 1.6, 1.2, 2, 1.8, 0.3 , 1.3,0.8};
             srand(time(0)+yPos);
-            htbx.y=(screen_height/2)*val[rand()%mod];
+            double value=(double)(screen_height/2)*val[rand()%mod];
+            htbx.y = (int)value;
       }
       htbx.h=screen_height-htbx.y;
 }
