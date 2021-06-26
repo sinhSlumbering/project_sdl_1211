@@ -142,12 +142,12 @@ void gamestart()
             optimizeFPS(&prevtime, &remaintime);
       }
       Cal_highscore(score);
-      player.xPos = 0;
-      player.yPos = screen_height / 5;
       if (lives == 0)
       {
             save_game(0, 3, 9999, 0, 5, -5, 5, 9000, 0);
             screen = GAME_OVER;
+            player.xPos = 0;
+            player.yPos = screen_height / 5;
       }
       else
       {
