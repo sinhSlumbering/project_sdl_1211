@@ -397,7 +397,7 @@ Attack::Attack()
       spawn = true;
       int side=screen_width/20, arm=side/1.42;
       bouncedim = homedim = { screen_width, screen_height, side, side };
-      bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
+      bhtbx = hhtbx = bombhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
       current = 0;
       bXvel= 5;
       bYvel=-5;
@@ -409,7 +409,7 @@ void Attack::init()
 {
       spawn = true;
       int side=screen_width/20, arm=side/1.42;
-      bouncedim = homedim = { screen_width, screen_height, side, side };
+      bouncedim = homedim = bombdim = { screen_width, screen_height, side, side };
       bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
       current = 0;
       bXvel= 5;
@@ -439,10 +439,13 @@ void Attack::scale()
 void Attack::choose()
 {
       srand(time(0));
-      current=rand()%2;
+      if(phase==1){
+            current = rand()%3;
+      }
+      else current=rand()%2;
       spawn=false;
-      homedim.y=bouncedim.y=plane.htbx.y+plane.height/2;
-      homedim.x=bouncedim.x=plane.htbx.x;
+      homedim.y = bouncedim.y = bombdim.y = plane.htbx.y+plane.height/2;
+      homedim.x = bouncedim.x = bombdim.x = plane.htbx.x;
 }
 void Attack::bounce()
 {
@@ -459,6 +462,22 @@ void Attack::bounce()
       }
       bouncedim.x-=bXvel, bouncedim.y-=bYvel;
       SDL_RenderCopyEx(ren, fireballtex, NULL, &bouncedim, angle, NULL, SDL_FLIP_NONE);       
+}
+
+void Attack::bomb()
+{
+      if(bombdim.x <= 0){
+            spawn = true, bombdim =  {0,0,screen_width/15,screen_width/15};
+      }
+      if(player.col(&bombdim)){
+            spawn=true, bombdim =  {0,0,screen_width/15,screen_width/15}, lives--;
+            if(Mix_PausedMusic()==0){
+                  Mix_PlayChannel(-1,ghit,0);
+            }
+      }
+      bombdim.x -= 3*bXvel;
+      SDL_RenderCopyEx(ren, Bombtex, NULL, &bombdim, 0.0, NULL, SDL_FLIP_NONE);
+      
 }
 void Attack::home()
 {
@@ -482,7 +501,9 @@ void Attack::run()
 {
       if(spawn) choose();
       else{
-      if(current==BOUNCING) bounce();
-      else if(current==HOMING) home();
+            if(current==BOUNCING) bounce();
+            else if(current==HOMING) home();
+            else bomb();
       }
+
 }
