@@ -6,6 +6,9 @@
 #include "gameElements.hpp"
 #include "gameUtills.hpp"
 
+int xposition = 0;
+int yposition = screen_height / 2 - ( screen_width / 20 );
+
 About about;
 Help help;
 HighScore highScore;
@@ -182,6 +185,8 @@ void MainMenue::handleEvent()
                                     // printf("%d\n",newGameDim.x);
                                     screen = IN_GAME, isrunning = true;
                                     save_game(0,3,9999,0,5,-5, 5, 9000,0);
+                                    xposition = 0;
+                                    yposition = screen_height / 2 - ( screen_width / 20 );
                                     updatescreen();
                                     initGame();
                               }
@@ -234,9 +239,12 @@ void MainMenue::handleEvent()
                   save_game(0,3,9999,0,5,-5, 5, 9000,0);
                   isrunning = true, screen = IN_GAME;
                   updatescreen();
+                  initGame();
+                  xposition = 0;
+                  yposition = screen_height / 2 - ( screen_width / 20 );
             }
             if (mouseIsInside(&continueDim, mousex, mousey))
-                  isrunning = true, screen = IN_GAME, updatescreen();
+                  isrunning = true, screen = IN_GAME, updatescreen(),initGame();
             else if (mouseIsInside(&highScoreDim, mousex, mousey))
                   screen = HIGH_SCORES, highScore.updateUI();
             else if (mouseIsInside(&optionsDim, mousex, mousey))

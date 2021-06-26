@@ -25,6 +25,9 @@
 
 */
 //The main menu
+
+extern int xposition;
+extern int yposition;
 struct MainMenue
 {
       //constructor
