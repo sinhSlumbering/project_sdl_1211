@@ -397,11 +397,14 @@ Attack::Attack()
       int side=screen_width/20, arm=side/1.42;
       bouncedim = homedim = { screen_width, screen_height, side, side };
       bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
+      tPadding=screen_width/2;
+      for (int i=0; i<3; i++) tornadoDim[i]={screen_width+tPadding, 0, screen_width/20, screen_height}, tPadding+=screen_width/2;
       current = 0;
       bXvel= 5;
       bYvel=-5;
       hXvel=5;
       hYvel=5;
+      tXvel=5;
       angle=0.0;
 }
 void Attack::init()
@@ -410,11 +413,14 @@ void Attack::init()
       int side=screen_width/20, arm=side/1.42;
       bouncedim = homedim = { screen_width, screen_height, side, side };
       bhtbx = hhtbx = {screen_width+arm/2, screen_height+arm/2, arm, arm};
+      tPadding=screen_width/2;
+      for (int i=0; i<3; i++) tornadoDim[i]={screen_width+tPadding, 0, screen_width/20, screen_height}, tPadding+=screen_width/2;
       current = 0;
       bXvel= 5;
       bYvel=-5;
       hXvel=5;
       hYvel=5;
+      tXvel=5;
       angle=0.0;
 }
 void Attack::scale()
@@ -432,16 +438,22 @@ void Attack::scale()
       scaleIntY(&hhtbx.y);
       scaleIntX(&bXvel);
       scaleIntX(&hXvel);
-      scaleIntX(&bYvel);
-      scaleIntX(&hYvel);
+      scaleIntY(&bYvel);
+      scaleIntY(&hYvel);
+      scaleIntX(&tXvel);
+      for(int i=0; i<3; i++) scaleRect(&tornadoDim[i]);
 }
 void Attack::choose()
 {
       srand(time(0));
-      current=rand()%2;
+      current=rand()%3;
       spawn=false;
       homedim.y=bouncedim.y=plane.htbx.y+plane.height/2;
       homedim.x=bouncedim.x=plane.htbx.x;
+      if(current==TORNADO){
+            tPadding=screen_width/2;
+      for (int i=0; i<3; i++) tornadoDim[i]={screen_width+tPadding, 0, screen_width/20, screen_height}, tPadding+=screen_width/2;
+      } 
 }
 void Attack::bounce()
 {
@@ -477,11 +489,23 @@ void Attack::home()
       homedim.x-=bXvel;
       SDL_RenderCopyEx(ren, homingtex, NULL, &homedim, angle, NULL, SDL_FLIP_NONE);       
 }
+void Attack::tornado()
+{
+      for(int i=0; i<3; i++)
+      {
+            tornadoDim[i].x-=tXvel;
+            if(player.col(&tornadoDim[i])) lives--;
+            ///CHANGE TEXTURE HERE
+            SDL_RenderCopy(ren, tornadotex, NULL, &tornadoDim[i]);
+      }
+      if(tornadoDim[3].x+tornadoDim[3].w<0) spawn = true; 
+}
 void Attack::run()
 {
       if(spawn) choose();
       else{
       if(current==BOUNCING) bounce();
       else if(current==HOMING) home();
+      else if(current==TORNADO) tornado();
       }
 }

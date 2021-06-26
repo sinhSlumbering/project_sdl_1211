@@ -166,16 +166,18 @@ struct Attack
       bool spawn;
       //dimension and position of attacks and their hitboxes
       SDL_Rect bouncedim, homedim;
-      SDL_Rect bhtbx, hhtbx;
+      SDL_Rect bhtbx, hhtbx, tornadoDim[3];
       //velocites in both axes of attacks
-      int bXvel, bYvel, hXvel, hYvel;
+      int bXvel, bYvel, hXvel, hYvel, tXvel;
       //angle of the attack texture
       double angle;
+      int tPadding;
       //enumerated to help randomiztion
       enum att
       {
             BOUNCING,
-            HOMING
+            HOMING,
+            TORNADO
       };
       //current attack
       int current;
@@ -189,6 +191,8 @@ struct Attack
       void bounce();
       //homing attack subroutine
       void home();
+      //runs the wall attack subroutine
+      void tornado();
       //runs the attack subroutine
       void run();
 };
