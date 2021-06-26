@@ -498,7 +498,11 @@ void Attack::tornado()
             ///CHANGE TEXTURE HERE
             SDL_RenderCopy(ren, tornadotex, NULL, &tornadoDim[i]);
       }
-      if(tornadoDim[3].x+tornadoDim[3].w<0) spawn = true; 
+      if(tornadoDim[2].x<0){ 
+            spawn = true;
+            tPadding=screen_width/2;
+      for (int i=0; i<3; i++) tornadoDim[i]={screen_width+tPadding, 0, screen_width/20, screen_height}, tPadding+=screen_width/2;
+      } 
 }
 void Attack::run()
 {
