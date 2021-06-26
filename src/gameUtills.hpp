@@ -19,12 +19,14 @@ struct upTimer
       void stop();
 };
 //timers for Invinsibility frames on hit, on dash, on powerup respcetively, followed by timers for player bullets and difficulty
-extern upTimer iFrame, cFrame, ptimer, btimer, diffTimer;
+extern upTimer iFrame, cFrame, ptimer, btimer, diffTimer, tstopTimer;
 
 
 extern int diffThreshold, diffStep;
 extern bool prevtex;
+extern bool timeStopped;
 extern SDL_Rect dashdim;
+extern SDL_Rect hitdim;
 //calculates highscore
 void Cal_highscore(int a);
 //prints highscore

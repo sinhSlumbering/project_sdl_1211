@@ -6,16 +6,17 @@
 #include "textureMusic.hpp"
 
 
-upTimer iFrame, cFrame, ptimer, btimer, diffTimer;
+upTimer iFrame, cFrame, ptimer, btimer, diffTimer, tstopTimer;
 
 int lives = 3;
-bool Hinvincible = false, Pinvincible=false;
+bool Hinvincible = false, Pinvincible=false, timeStopped=false;
 bool prevtex = 0;
 int wallspeed = 5;
 int diffThreshold = 9000, diffStep = 1000;
 SDL_Texture* scoretex;
 SDL_Texture* lifetex;
 SDL_Rect dashdim;
+SDL_Rect hitdim;
 
 int score;
 int bosshealth = 9999; 
